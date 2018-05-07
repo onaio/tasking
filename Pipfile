@@ -10,6 +10,7 @@ pyflakes = "*"
 pylint = "*"
 pycodestyle = "*"
 coverage = "*"
+tox = "*"
 
 [packages]
 django = "==1.11"
