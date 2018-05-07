@@ -11,9 +11,6 @@ setup(
     author='Ona Kenya',
     author_email='tech@ona.io',
     url='https://github.com/onaio/tasking',
-    install_requires=[
-        'django',
-    ],
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
