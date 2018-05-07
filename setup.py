@@ -7,7 +7,7 @@ setup(
     name='ona-tasking',
     version='0.1',
     description='A tasking library.',
-    license='MIT',
+    license='GPL 3',
     author='Ona Kenya',
     author_email='tech@ona.io',
     url='https://github.com/onaio/tasking',
@@ -23,4 +23,3 @@ setup(
         'Framework :: Django :: 1.11',
     ],
 )
-
