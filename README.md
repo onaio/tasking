@@ -1,5 +1,7 @@
 # ona-tasking
 
+[![Build Status](https://travis-ci.org/onaio/tasking.svg?branch=master)](https://travis-ci.org/onaio/tasking)
+
 A Django app that provides adds tasking to your Django project.
 
 ## What is tasking?
