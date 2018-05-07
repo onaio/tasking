@@ -1,19 +1,17 @@
 [[source]]
-url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
-
-[dev-packages]
-python-language-server = {extras = ["all"]}
-"flake8" = "*"
-pyflakes = "*"
-pylint = "*"
-pycodestyle = "*"
-coverage = "*"
-tox = "*"
+url = "https://pypi.org/simple"
 
 [packages]
 django = "==1.11"
 
-[requires]
-python_version = "2.7"
+[dev-packages]
+"flake8" = "*"
+pylint = "*"
+pycodestyle = "*"
+coverage = "*"
+tox = "*"
+yapf = "*"
+isort = "*"
+ipdb = "*"
