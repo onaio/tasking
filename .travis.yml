@@ -17,3 +17,8 @@ matrix:
 install:
     - pip install tox
 script: tox
+notifications:
+    email:
+        - tech+travis@ona.io
+    slack:
+        - onaio:snkNXgprD498qQv4DgRREKJF
