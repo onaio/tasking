@@ -1,10 +1,7 @@
 [[source]]
 verify_ssl = true
-name = "pypi"
 url = "https://pypi.org/simple"
-
-[packages]
-django = "==1.11"
+name = "pypi"
 
 [dev-packages]
 "flake8" = "*"
@@ -15,3 +12,6 @@ tox = "*"
 yapf = "*"
 isort = "*"
 ipdb = "*"
+
+[packages]
+"e1839a8" = {editable = true, path = "."}
