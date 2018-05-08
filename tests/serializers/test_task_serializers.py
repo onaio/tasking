@@ -15,7 +15,7 @@ class TestTaskSerializer(TestCase):
     Test the taskSerializer
     """
 
-    def test_create(self):
+    def test_create_task(self):
         """
         Test that the serializer can create Task objects
         """
