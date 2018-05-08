@@ -14,6 +14,7 @@ setup(
     url='https://github.com/onaio/tasking',
     install_requires=[
         'Django >= 1.11',
+        'python-dateutil',
     ],
     classifiers=[
         'Programming Language :: Python',
