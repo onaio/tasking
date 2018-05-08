@@ -10,6 +10,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import python_2_unicode_compatible
 
+from tasking.utils import validate_rrule
+
 
 class BaseTask(models.Model):
     """
@@ -29,7 +31,7 @@ class BaseTask(models.Model):
     )
 
     created = models.DateTimeField(
-        varbose_name=_('Created'),
+        verbose_name=_('Created'),
         auto_now_add=True)
     modified = models.DateTimeField(
         verbose_name=_('Modified'),
@@ -99,6 +101,7 @@ class BaseTask(models.Model):
         )
     timing_rule = models.TextField(
         verbose_name=_('Timing Rule'),
+        validators=[validate_rrule],
         help_text=_('This stores the rrule for recurrence.'))
     total_submission_target = models.IntegerField(
         verbose_name=_('Total Submissions Target'),
