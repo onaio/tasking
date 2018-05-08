@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tasking Serializers
+Common strings used in the tasking app
 """
 from __future__ import unicode_literals
 

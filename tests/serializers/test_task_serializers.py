@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Module for the Task model(s)
+Test for TaskSerializer
 """
 from __future__ import unicode_literals
 
@@ -19,7 +19,7 @@ from tasking.utils import get_target
 
 class TestTaskSerializer(TestCase):
     """
-    Test the taskSerializer
+    Test the TaskSerializer
     """
 
     def test_task_serializer_validate_bad_data(self):

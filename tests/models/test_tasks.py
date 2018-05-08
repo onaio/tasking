@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Module for the Task model(s)
+Test for Task model
 """
 from __future__ import unicode_literals
 
@@ -9,9 +9,9 @@ from django.test import TestCase
 from model_mommy import mommy
 
 
-class TestUtils(TestCase):
+class TestTasks(TestCase):
     """
-    Test class for tasking utils
+    Test class for task models
     """
 
     def test_task_model_str(self):
