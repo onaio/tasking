@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 from rest_framework import serializers
 from tasking.models import Task
 from tasking.utils import get_target
-from tasking.utils import TargetDoesNotExist
+from tasking.exceptions import TargetDoesNotExist
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
 
 
