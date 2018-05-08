@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import six, timezone
 
 from model_mommy import mommy
 from rest_framework.exceptions import ValidationError
@@ -43,9 +43,9 @@ class TestTaskSerializer(TestCase):
         with self.assertRaises(ValidationError) as bad_target_id_cm:
             TaskSerializer().validate(bad_target_id)
 
-        self.assertEqual(
-            {'target_id': TARGET_DOES_NOT_EXIST},
-            bad_target_id_cm.exception.args[0])
+        error_detail = bad_target_id_cm.exception.detail['target_id']
+        self.assertEqual(TARGET_DOES_NOT_EXIST, six.text_type(error_detail))
+        self.assertEqual('invalid', error_detail.code)
         self.assertEqual(400, bad_target_id_cm.exception.status_code)
 
         bad_target_app_label = OrderedDict(
@@ -62,9 +62,9 @@ class TestTaskSerializer(TestCase):
         with self.assertRaises(ValidationError) as bad_target_app_label_cm:
             TaskSerializer().validate(bad_target_app_label)
 
-        self.assertEqual(
-            {'target_type': TARGET_DOES_NOT_EXIST},
-            bad_target_app_label_cm.exception.args[0])
+        error_detail = bad_target_app_label_cm.exception.detail['target_type']
+        self.assertEqual(TARGET_DOES_NOT_EXIST, six.text_type(error_detail))
+        self.assertEqual('invalid', error_detail.code)
         self.assertEqual(400, bad_target_app_label_cm.exception.status_code)
 
         bad_content_type = OrderedDict(
@@ -81,9 +81,9 @@ class TestTaskSerializer(TestCase):
         with self.assertRaises(ValidationError) as bad_content_type_cm:
             TaskSerializer().validate(bad_content_type)
 
-        self.assertEqual(
-            {'target_type': TARGET_DOES_NOT_EXIST},
-            bad_content_type_cm.exception.args[0])
+        error_detail = bad_content_type_cm.exception.detail['target_type']
+        self.assertEqual(TARGET_DOES_NOT_EXIST, six.text_type(error_detail))
+        self.assertEqual('invalid', error_detail.code)
         self.assertEqual(400, bad_content_type_cm.exception.status_code)
 
     def test_task_serializer_validate(self):
