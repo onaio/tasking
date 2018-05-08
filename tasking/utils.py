@@ -13,10 +13,10 @@ def validate_rrule(rule_string):
     """
     try:
         rrulestr(rule_string)
-    except ValueError as exc:
+    except ValueError:
         # this string is not a valid rrule
         return False
-    except TypeError as exc:
+    except TypeError:
         # this is not even a string
         return False
     else:

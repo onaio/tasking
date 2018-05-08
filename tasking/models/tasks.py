@@ -53,22 +53,22 @@ class BaseTask(models.Model):
         blank=True,
         default='',
         help_text=_('This represents the description.'))
-    tasklist = models.ForeignKey(
-        'tasking.BaseTaskList',
-        verbose_name=_('Task List'),
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=models.SET_NULL,
-        help_text=_('This represents the tasklist.'))
-    location = models.ForeignKey(
-        'tasking.BaseLocation',
-        verbose_name=_('Location'),
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=models.SET_NULL,
-        help_text=_('This represents the location.'))
+    # tasklist = models.ForeignKey(
+    #     'tasking.BaseTaskList',
+    #     verbose_name=_('Task List'),
+    #     null=True,
+    #     blank=True,
+    #     default=None,
+    #     on_delete=models.SET_NULL,
+    #     help_text=_('This represents the tasklist.'))
+    # location = models.ForeignKey(
+    #     'tasking.BaseLocation',
+    #     verbose_name=_('Location'),
+    #     null=True,
+    #     blank=True,
+    #     default=None,
+    #     on_delete=models.SET_NULL,
+    #     help_text=_('This represents the location.'))
     # we use Django's ContentType app to add a Generic Foreign Key
     # this makes it possible to tie a Task to any other model
     # which is the `target`
@@ -127,6 +127,7 @@ class BaseTask(models.Model):
         help_text=_('The status of the Task'))
 
     # pylint: disable=no-self-use
+    # pylint: disable=too-few-public-methods
     class Meta(object):
         """
         This is the meta options class for BaseTask
@@ -139,30 +140,31 @@ class Task(BaseTask):
     """
     Task model class
     """
-    tasklist = models.ForeignKey(
-        'tasking.TaskList',
-        verbose_name=_('Task List'),
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=models.SET_NULL,
-        help_text=_('This represents the tasklist.'))
-    location = models.ForeignKey(
-        'tasking.Location',
-        verbose_name=_('Location'),
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=models.SET_NULL,
-        help_text=_('This represents the location.'))
+    # tasklist = models.ForeignKey(
+    #     'tasking.TaskList',
+    #     verbose_name=_('Task List'),
+    #     null=True,
+    #     blank=True,
+    #     default=None,
+    #     on_delete=models.SET_NULL,
+    #     help_text=_('This represents the tasklist.'))
+    # location = models.ForeignKey(
+    #     'tasking.Location',
+    #     verbose_name=_('Location'),
+    #     null=True,
+    #     blank=True,
+    #     default=None,
+    #     on_delete=models.SET_NULL,
+    #     help_text=_('This represents the location.'))
 
     # pylint: disable=no-self-use
+    # pylint: disable=too-few-public-methods
     class Meta(object):
         """
         This is the meta options class for the Task model
         """
         abstract = False
-        ordering = ['start', 'tasklist_id', 'name', 'id']
+        ordering = ['start', 'name', 'id']
 
     def __str__(self):
         """
