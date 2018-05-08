@@ -3,15 +3,18 @@
 Module for the Task model(s)
 """
 from __future__ import unicode_literals
+
 from collections import OrderedDict
 
 from django.test import TestCase
 from django.utils import timezone
-from tasking.serializers import TaskSerializer
-from tasking.common_tags import TARGET_DOES_NOT_EXIST
-from rest_framework.exceptions import ValidationError
-from tasking.utils import get_target
+
 from model_mommy import mommy
+from rest_framework.exceptions import ValidationError
+
+from tasking.common_tags import TARGET_DOES_NOT_EXIST
+from tasking.serializers import TaskSerializer
+from tasking.utils import get_target
 
 
 class TestTaskSerializer(TestCase):

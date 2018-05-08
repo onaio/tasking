@@ -25,6 +25,7 @@ class TaskSerializer(serializers.ModelSerializer):
         write_only=True,
         allow_blank=False)
 
+    # pylint: disable=no-self-use
     def validate_timing_rule(self, value):
         """
         Validate timing rule

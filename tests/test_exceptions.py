@@ -5,9 +5,10 @@ Tests for tasking exceptions
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from tasking.utils import get_target
+
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
 from tasking.exceptions import TargetDoesNotExist
+from tasking.utils import get_target
 
 
 class TestExceptions(TestCase):

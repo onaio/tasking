@@ -4,8 +4,9 @@ Module for the Task model(s)
 """
 from __future__ import unicode_literals
 
-from model_mommy import mommy
 from django.test import TestCase
+
+from model_mommy import mommy
 
 
 class TestUtils(TestCase):

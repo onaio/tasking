@@ -4,10 +4,11 @@ Tests for tasking utils
 """
 from __future__ import unicode_literals
 
-from tasking.utils import validate_rrule, get_target
+from django.test import TestCase
+
 from tasking.exceptions import TargetDoesNotExist
 from tasking.models import Task
-from django.test import TestCase
+from tasking.utils import get_target, validate_rrule
 
 
 class TestUtils(TestCase):
