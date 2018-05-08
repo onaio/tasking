@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils.translation import ugettext as _
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class BaseTask(models.Model):
@@ -98,3 +99,27 @@ class BaseTask(models.Model):
         This is the meta options class for BaseTask
         """
         abstract = True
+
+
+@python_2_unicode_compatible
+class Task(BaseTask):
+    """
+    Task model class
+    """
+    pass
+
+    # pylint: disbale=no-self-use
+    class Meta(object):
+        """
+        This is the meta options class for BaseTask
+        """
+        abstract = False
+        ordering = ['start', 'tasklist_id', 'name', 'id']
+
+    def __str__(self):
+        """
+        String representation of a Task object
+
+        e.g. Cow prices - 1
+        """
+        return "{name} - {id}".format(id=self.id, name=self.name)
