@@ -4,11 +4,11 @@ Module for the Task model(s)
 """
 from __future__ import unicode_literals
 
-from django.db import models
-from django.utils.translation import ugettext as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext as _
 
 from tasking.utils import validate_rrule
 

@@ -5,6 +5,7 @@ Utility functions for tasking
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
+
 from dateutil.rrule import rrulestr
 
 from tasking.exceptions import TargetDoesNotExist
