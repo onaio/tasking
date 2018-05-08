@@ -12,6 +12,9 @@ from django.utils.encoding import python_2_unicode_compatible
 class BaseTask(models.Model):
     """
     Base abstract model class for a Task
+
+    This class is meant to be extended to add Tasks to your own project.
+    It only implements the bare minimum of what a Task could be.
     """
     ACTIVE = 'a'
     DRAFT = 'b'
@@ -93,7 +96,7 @@ class BaseTask(models.Model):
         max_length=1,
         help_text=_('The status of the Task'))
 
-    # pylint: disbale=no-self-use
+    # pylint: disable=no-self-use
     class Meta(object):
         """
         This is the meta options class for BaseTask
@@ -108,10 +111,10 @@ class Task(BaseTask):
     """
     pass
 
-    # pylint: disbale=no-self-use
+    # pylint: disable=no-self-use
     class Meta(object):
         """
-        This is the meta options class for BaseTask
+        This is the meta options class for the Task model
         """
         abstract = False
         ordering = ['start', 'tasklist_id', 'name', 'id']
@@ -122,4 +125,4 @@ class Task(BaseTask):
 
         e.g. Cow prices - 1
         """
-        return "{name} - {id}".format(id=self.id, name=self.name)
+        return "{name} - {pk}".format(pk=self.pk, name=self.name)
