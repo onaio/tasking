@@ -15,6 +15,9 @@ setup(
     install_requires=[
         'Django >= 1.11',
         'python-dateutil',
+        'djangorestframework',  # Adds Serializers and API support
+        'markdown',  # adds markdown support for browsable REST API
+        'django-filter'  # for filtering in the API
     ],
     classifiers=[
         'Programming Language :: Python',

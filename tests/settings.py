@@ -1,5 +1,9 @@
 INSTALLED_APPS = (
+    # core django apps
     'django.contrib.contenttypes',
+    # third party
+    'rest_framework',
+    # custom
     'tasking',
 )
 DATABASES = {
