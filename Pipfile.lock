@@ -21,9 +21,30 @@
             ],
             "version": "==2.0.5"
         },
+        "django-filter": {
+            "hashes": [
+                "sha256:ea204242ea83790e1512c9d0d8255002a652a6f4986e93cee664f28955ba0c22",
+                "sha256:ec0ef1ba23ef95b1620f5d481334413700fb33f45cd76d56a63f4b0b1d76976a"
+            ],
+            "version": "==1.1.0"
+        },
+        "djangorestframework": {
+            "hashes": [
+                "sha256:b6714c3e4b0f8d524f193c91ecf5f5450092c2145439ac2769711f7eba89a9d9",
+                "sha256:c375e4f95a3a64fccac412e36fb42ba36881e52313ec021ef410b40f67cddca4"
+            ],
+            "version": "==3.8.2"
+        },
         "e1839a8": {
             "editable": true,
             "path": "."
+        },
+        "markdown": {
+            "hashes": [
+                "sha256:9ba587db9daee7ec761cfc656272be6aabe2ed300fece21208e4aab2e457bc8f",
+                "sha256:a856869c7ff079ad84a3e19cd87a64998350c2b94e9e08e44270faef33400f81"
+            ],
+            "version": "==2.6.11"
         },
         "python-dateutil": {
             "hashes": [
