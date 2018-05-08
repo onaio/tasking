@@ -40,5 +40,5 @@ def get_target(app_label, target_type):
     """
     try:
         return ContentType.objects.get(app_label=app_label, model=target_type)
-    except ContentType.DoesNotExist:
+    except ContentType.DoesNotExist:  # pylint: disable=no-member
         raise TargetDoesNotExist(TARGET_DOES_NOT_EXIST)
