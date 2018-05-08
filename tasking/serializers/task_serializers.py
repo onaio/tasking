@@ -6,10 +6,10 @@ from __future__ import unicode_literals
 
 from rest_framework import serializers
 
-from tasking.common_tags import TARGET_DOES_NOT_EXIST
+from tasking.common_tags import INVALID_TIMING_RULE, TARGET_DOES_NOT_EXIST
 from tasking.exceptions import TargetDoesNotExist
 from tasking.models import Task
-from tasking.utils import get_target
+from tasking.utils import get_target, validate_rrule
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -25,10 +25,21 @@ class TaskSerializer(serializers.ModelSerializer):
         write_only=True,
         allow_blank=False)
 
+    def validate_timing_rule(self, value):
+        """
+        Validate timing rule
+        """
+        if validate_rrule(value) is True:
+            return value
+        raise serializers.ValidationError(
+            {'timing_rule': INVALID_TIMING_RULE}
+        )
+
     def validate(self, attrs):
         """
         Custom validation for TaskSerializer
         """
+
         target_id = attrs.get('target_object_id')
         target_type = attrs.get('target_content_type')
         app_label = attrs.get('target_app_label')
@@ -39,7 +50,7 @@ class TaskSerializer(serializers.ModelSerializer):
                 app_label=app_label, target_type=target_type)
         except TargetDoesNotExist:
             raise serializers.ValidationError(
-                {'target_content_type': TARGET_DOES_NOT_EXIST}
+                {'target_type': TARGET_DOES_NOT_EXIST}
             )
         else:
             target_model_class = target_model_contentype.model_class()
@@ -50,7 +61,7 @@ class TaskSerializer(serializers.ModelSerializer):
             target_model_class.objects.get(pk=target_id)
         except target_model_class.DoesNotExist:
             raise serializers.ValidationError(
-                {'target_content_type': TARGET_DOES_NOT_EXIST}
+                {'target_id': TARGET_DOES_NOT_EXIST}
             )
 
         # this field needs to refer to the content type object so we add
@@ -61,7 +72,7 @@ class TaskSerializer(serializers.ModelSerializer):
         del attrs['target_app_label']
         # these attrs are then passed on to the create method of the
         # ModelSerializer
-        return attrs
+        return super(TaskSerializer, self).validate(attrs)
 
     # pylint: disable=too-few-public-methods
     class Meta(object):
