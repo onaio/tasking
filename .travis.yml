@@ -3,7 +3,7 @@ dist: trusty
 language: python
 env:
     global:
-        - DJANGO_SETTINGS_MODULE=test_app.settings
+        - DJANGO_SETTINGS_MODULE=tests.travis.settings
 matrix:
     include:
         - python: 2.7
