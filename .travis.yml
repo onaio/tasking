@@ -1,7 +1,9 @@
 sudo: required
 dist: trusty
 language: python
-env: DJANGO_SETTINGS_MODULE=test_app.settings
+env:
+    global:
+        - DJANGO_SETTINGS_MODULE=test_app.settings
 matrix:
     include:
         - python: 2.7
