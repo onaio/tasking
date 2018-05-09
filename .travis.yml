@@ -1,4 +1,5 @@
 sudo: false
+dist: trusty
 language: python
 matrix:
     include:
@@ -14,10 +15,13 @@ matrix:
           env: TOXENV=pylint
         - python: 3.6
           env: TOXENV=coverage
-before_install:
-    - sudo apt-get -qq update
-    - sudo apt-get install -y binutils libproj-dev gdal-bin
-    - sudo apt-get install -y libsqlite3-0 libspatialite5
+services:
+    - postgresql
+addons:
+    postgresql: 9.6
+before_script:
+    - psql -c 'create extension postgis;' -U postgres
+    - psql -c 'create database ona_tasking;' -U postgres
 install:
     - pip install tox
 script: tox

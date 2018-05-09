@@ -14,11 +14,14 @@ INSTALLED_APPS = (
     # custom
     'tasking',
 )
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': ':memory:',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'ona_tasking',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1'
     }
 }
 SECRET_KEY = "secret_key_for_testing"
-SPATIALITE_LIBRARY_PATH = 'mod_spatialite'

@@ -13,6 +13,7 @@ yapf = "*"
 isort = "*"
 ipdb = "*"
 model-mommy = "*"
+"psycopg2-binary" = "*"
 
 [packages]
 "e1839a8" = {editable = true, path = "."}
