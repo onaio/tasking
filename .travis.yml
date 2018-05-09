@@ -17,7 +17,7 @@ matrix:
 before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y binutils libproj-dev gdal-bin
-    - sudo apt-get install -y libsqlite3-mod-spatialite spatialite-bin
+    - sudo apt-get install -y spatialite-bin
 install:
     - pip install tox
 script: tox
