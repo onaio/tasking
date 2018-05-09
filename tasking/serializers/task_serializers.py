@@ -32,9 +32,7 @@ class TaskSerializer(serializers.ModelSerializer):
         """
         if validate_rrule(value) is True:
             return value
-        raise serializers.ValidationError(
-            {'timing_rule': INVALID_TIMING_RULE}
-        )
+        raise serializers.ValidationError({'timing_rule': INVALID_TIMING_RULE})
 
     def validate(self, attrs):
         """
@@ -48,7 +46,8 @@ class TaskSerializer(serializers.ModelSerializer):
         # we are checking if we have a model of this type
         try:
             target_model_contentype = get_target(
-                app_label=app_label, target_type=target_type)
+                app_label=app_label,
+                target_type=target_type)
         except TargetDoesNotExist:
             raise serializers.ValidationError(
                 {'target_type': TARGET_DOES_NOT_EXIST}

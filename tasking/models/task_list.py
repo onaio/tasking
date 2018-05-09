@@ -8,6 +8,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
+
 class BaseTaskList(models.Model):
     """
     Base abstract model class for a Task List
@@ -16,19 +17,24 @@ class BaseTaskList(models.Model):
     It only implements the bare minimum of what a Task List could be.
     """
     name = models.CharField(
-      _('Name'),
-      max_length=255,
-      help_text=_('This is the name of the task list')
-    )
+        _('Name'),
+        max_length=255,
+        help_text=_('This is the name of the task list'))
 
+    # pylint: disable=too-few-public-methods
     class Meta(object):
         """
         The meta option class for BaseTaskList
         """
         abstract = True
+
+
 @python_2_unicode_compatible
 class TaskList(BaseTaskList):
-
+    """
+    Task list model class
+    """
+    # pylint: disable=too-few-public-methods
     class Meta(object):
         """
         This is the meta options class for the Task List model

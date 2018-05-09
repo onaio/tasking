@@ -76,21 +76,19 @@ class BaseTask(models.Model):
         db_index=True,
         blank=True,
         null=True,
-        default=None
-    )
+        default=None)
     target_content_object = GenericForeignKey(
-        'target_content_type', 'target_object_id')
+        'target_content_type',
+        'target_object_id')
     start = models.DateTimeField(
         verbose_name=_('Start'),
-        help_text=_('This is the date and time the task starts.')
-        )
+        help_text=_('This is the date and time the task starts.'))
     end = models.DateTimeField(
         verbose_name=_('Start'),
         null=True,
         blank=True,
         default=None,
-        help_text=_('This is the date and time the task starts.')
-        )
+        help_text=_('This is the date and time the task starts.'))
     timing_rule = models.TextField(
         verbose_name=_('Timing Rule'),
         validators=[validate_rrule],
@@ -140,6 +138,7 @@ class Task(BaseTask):
         default=None,
         on_delete=models.SET_NULL,
         help_text=_('This represents the tasklist.'))
+
     # location = models.ForeignKey(
     #     'tasking.Location',
     #     verbose_name=_('Location'),

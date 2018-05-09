@@ -7,7 +7,7 @@ setup(
     name='ona-tasking',
     version='0.1',
     description='A Django app that provides adds tasking to your Django '
-                'project.',
+    'project.',
     license='GPL 3',
     author='Ona Kenya',
     author_email='tech@ona.io',

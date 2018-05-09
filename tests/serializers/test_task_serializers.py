@@ -37,8 +37,7 @@ class TestTaskSerializer(TestCase):
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             target_content_type='task',
             target_object_id=1337,
-            target_app_label='tasking'
-        )
+            target_app_label='tasking')
 
         with self.assertRaises(ValidationError) as bad_target_id_cm:
             TaskSerializer().validate(bad_target_id)
@@ -56,8 +55,7 @@ class TestTaskSerializer(TestCase):
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             target_content_type='task',
             target_object_id=mocked_target_object.id,
-            target_app_label='superduperapp'
-        )
+            target_app_label='superduperapp')
 
         with self.assertRaises(ValidationError) as bad_target_app_label_cm:
             TaskSerializer().validate(bad_target_app_label)
@@ -75,8 +73,7 @@ class TestTaskSerializer(TestCase):
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             target_content_type='foobar',
             target_object_id=mocked_target_object.id,
-            target_app_label='tasking'
-        )
+            target_app_label='tasking')
 
         with self.assertRaises(ValidationError) as bad_content_type_cm:
             TaskSerializer().validate(bad_content_type)
@@ -101,8 +98,7 @@ class TestTaskSerializer(TestCase):
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             target_content_type='task',
             target_object_id=mocked_target_object.id,
-            target_app_label='tasking'
-        )
+            target_app_label='tasking')
         validated_data = TaskSerializer().validate(attrs)
 
         expected_contenttype = get_target(
@@ -114,8 +110,7 @@ class TestTaskSerializer(TestCase):
             total_submission_target=10,
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             target_content_type=expected_contenttype,
-            target_object_id=mocked_target_object.id
-        )
+            target_object_id=mocked_target_object.id)
 
         self.assertDictEqual(dict(expected), dict(validated_data))
 
