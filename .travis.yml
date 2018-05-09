@@ -1,6 +1,7 @@
 sudo: required
 dist: trusty
 language: python
+env: DJANGO_SETTINGS_MODULE=test_app.settings
 matrix:
     include:
         - python: 2.7
@@ -23,7 +24,6 @@ addons:
         packages:
             - postgresql-9.6-postgis-2.3
 before_script:
-    env: DJANGO_SETTINGS_MODULE=tests.travis.settings
     - psql -c 'CREATE DATABASE ona_tasking;' -U postgres
     - psql -c 'CREATE EXTENSION postgis;' -U postgres -d ona_tasking
     - psql -c 'CREATE EXTENSION postgis_topology;' -U postgres -d ona_tasking
