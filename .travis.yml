@@ -20,8 +20,9 @@ services:
 addons:
     postgresql: 9.6
 before_script:
-    - psql -c 'create extension postgis;' -U postgres
-    - psql -c 'create database ona_tasking;' -U postgres
+    - psql -c 'CREATE DATABASE ona_tasking;' -U postgres
+    - psql -c 'CREATE EXTENSION postgis;' -U postgres -d ona_tasking
+    - psql -c 'CREATE EXTENSION postgis_topology;' -U postgres -d ona_tasking
 install:
     - pip install tox
 script: tox
