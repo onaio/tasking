@@ -53,14 +53,6 @@ class BaseTask(models.Model):
         blank=True,
         default='',
         help_text=_('This represents the description.'))
-    # tasklist = models.ForeignKey(
-    #     'tasking.BaseTaskList',
-    #     verbose_name=_('Task List'),
-    #     null=True,
-    #     blank=True,
-    #     default=None,
-    #     on_delete=models.SET_NULL,
-    #     help_text=_('This represents the tasklist.'))
     # location = models.ForeignKey(
     #     'tasking.BaseLocation',
     #     verbose_name=_('Location'),
@@ -140,14 +132,14 @@ class Task(BaseTask):
     """
     Task model class
     """
-    # tasklist = models.ForeignKey(
-    #     'tasking.TaskList',
-    #     verbose_name=_('Task List'),
-    #     null=True,
-    #     blank=True,
-    #     default=None,
-    #     on_delete=models.SET_NULL,
-    #     help_text=_('This represents the tasklist.'))
+    tasklist = models.ForeignKey(
+        'tasking.TaskList',
+        verbose_name=_('Task List'),
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        help_text=_('This represents the tasklist.'))
     # location = models.ForeignKey(
     #     'tasking.Location',
     #     verbose_name=_('Location'),
