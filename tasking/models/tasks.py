@@ -74,7 +74,7 @@ class BaseTask(models.Model):
     # which is the `target`
     target_content_type = models.ForeignKey(
         ContentType,
-        related_name='target',
+        related_name='task_target',
         blank=True,
         null=True,
         default=None,
