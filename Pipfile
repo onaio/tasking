@@ -16,4 +16,4 @@ model-mommy = "*"
 "psycopg2-binary" = "*"
 
 [packages]
-"e1839a8" = {editable = true, path = "."}
+"e1839a8" = {path = ".", editable = true}
