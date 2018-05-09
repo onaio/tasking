@@ -4,14 +4,13 @@ Module for SegmentRule model(s)
 """
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
+from tasking.models.base import TimeStampedModel, GenericFKModel
 
 
-class BaseSegmentRule(models.Model):
+class BaseSegmentRule(GenericFKModel, TimeStampedModel, models.Model):
     """
     BaseSegmentRule abstract model class
 
@@ -35,22 +34,6 @@ class BaseSegmentRule(models.Model):
         default='',
         help_text=_('The description of this rule.')
     )
-    target_content_type = models.ForeignKey(
-        ContentType,
-        related_name='segment_target',
-        blank=True,
-        null=True,
-        default=None,
-        db_index=True,
-        on_delete=models.SET_NULL)
-    target_object_id = models.PositiveIntegerField(
-        db_index=True,
-        blank=True,
-        null=True,
-        default=None
-    )
-    target_content_object = GenericForeignKey(
-        'target_content_type', 'target_object_id')
     active = models.BooleanField()
 
     # pylint: disable=too-few-public-methods

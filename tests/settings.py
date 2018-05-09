@@ -19,8 +19,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'ona_tasking',
-        'USER': 'postgres',
-        'PASSWORD': '',
+        'USER': 'ona_tasking',
+        'PASSWORD': 'ona_tasking',
         'HOST': '127.0.0.1'
     }
 }
