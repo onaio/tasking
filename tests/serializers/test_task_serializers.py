@@ -124,7 +124,7 @@ class TestTaskSerializer(TestCase):
         Test that the serializer can create Task objects
         """
         now = timezone.now()
-        mocked_target_object = mommy.make('tasking.Task')
+        mocked_target_object = mommy.make('tasking.Task', make_m2m=True)
 
         data = {
             'name': 'Cow price',
