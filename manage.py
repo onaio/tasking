@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+This module is used to run tests
+"""
 import os
 
 from django.core import management

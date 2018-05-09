@@ -22,7 +22,7 @@ class TestTaskSerializer(TestCase):
     Test the TaskSerializer
     """
 
-    def test_task_serializer_validate_bad_data(self):
+    def test_validate_bad_data(self):
         """
         Test validate method of TaskSerializer works as expected
         for bad data

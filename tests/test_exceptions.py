@@ -16,11 +16,11 @@ class TestExceptions(TestCase):
     Test class for tasking exceptions
     """
 
-    def test_targetdoesnotexist_error_message(self):
+    def test_target_does_not_exist(self):
         """
         Test TargetDoesNotExist error message is what we expect
         """
-        with self.assertRaises(TargetDoesNotExist) as cm:
+        with self.assertRaises(TargetDoesNotExist) as context:
             get_target(app_label='foo', target_type='bar')
-        the_exception = cm.exception
+        the_exception = context.exception
         self.assertEqual(TARGET_DOES_NOT_EXIST, the_exception.message)

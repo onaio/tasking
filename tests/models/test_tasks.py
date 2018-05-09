@@ -15,6 +15,9 @@ class TestTasks(TestCase):
     """
 
     def test_task_model_str(self):
+        """
+        Test the str method on Task model
+        """
         cow_price = mommy.make('tasking.Task', name="Cow prices")
         expected = 'Cow prices - {}'.format(cow_price.pk)
         self.assertEqual(expected, cow_price.__str__())
