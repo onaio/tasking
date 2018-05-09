@@ -19,9 +19,17 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'ona_tasking',
-        'USER': 'ona_tasking',
-        'PASSWORD': 'ona_tasking',
+        'USER': 'postgres',
+        'PASSWORD': '',
         'HOST': '127.0.0.1'
     }
 }
 SECRET_KEY = "secret_key_for_testing"
+
+# try and load local_settings if present
+try:
+    # pylint: disable=wildcard-import
+    # pylint: disable=unused-wildcard-import
+    from .local_settings import *  # noqa
+except ImportError:
+    pass
