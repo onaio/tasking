@@ -35,6 +35,13 @@
             ],
             "version": "==3.8.2"
         },
+        "djangorestframework-gis": {
+            "hashes": [
+                "sha256:018200f8ac8e4babd04001e86ce8df5ad86057d1e7438558b7c9ce24b532ea20",
+                "sha256:94901389f32f0b8cdd1133e581f81c745c903449a08c2ddff0fcb2645cca846c"
+            ],
+            "version": "==0.13"
+        },
         "e1839a8": {
             "editable": true,
             "path": "."

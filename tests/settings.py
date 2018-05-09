@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 INSTALLED_APPS = (
     # core django apps
     'django.contrib.contenttypes',
+    'django.contrib.gis',  # Need for the Location model.
     # third party
     'rest_framework',
     # custom
@@ -15,8 +16,10 @@ INSTALLED_APPS = (
 )
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
         'NAME': ':memory:',
     }
 }
 SECRET_KEY = "secret_key_for_testing"
+SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
+# GDAL_LIBRARY_PATH = '/usr/lib/ogdi/libgdal.so'
