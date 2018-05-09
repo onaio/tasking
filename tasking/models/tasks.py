@@ -132,7 +132,7 @@ class Task(BaseTask):
     """
     Task model class
     """
-    tasklist = models.ForeignKey(
+    task_list = models.ForeignKey(
         'tasking.TaskList',
         verbose_name=_('Task List'),
         null=True,

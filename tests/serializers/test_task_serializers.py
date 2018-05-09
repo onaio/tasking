@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Test for TaskSerializer
+Tests for TaskSerializers
 """
 from __future__ import unicode_literals
 
