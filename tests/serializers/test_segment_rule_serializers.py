@@ -54,6 +54,21 @@ class TestSegmentRuleSerializer(TestCase):
         self.assertEqual('6', segment_rule.target_field_value)
         self.assertEqual(task_contenttype, segment_rule.target_content_type)
 
+        expected_fields = [
+            'id',
+            'created',
+            'modified',
+            'name',
+            'description',
+            'active',
+            'target_type',
+            'target_field',
+            'target_field_value'
+        ]
+
+        self.assertEqual(set(expected_fields),
+                         set(list(serializer_instance.data)))
+
     def test_segment_rule_validate(self):
         """
         Test validate method of SegmentRuleSerializer works as expected
