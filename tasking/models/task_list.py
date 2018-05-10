@@ -46,6 +46,6 @@ class TaskList(BaseTaskList):
         """
         String representation of a Task List object
 
-        e.g. Cow prices - 1
+        e.g. Livestock prices
         """
         return self.name
