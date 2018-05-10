@@ -133,7 +133,6 @@ class Task(BaseTask):
     task_list = models.ManyToManyField(
         'tasking.TaskList',
         verbose_name=_('Task List'),
-        null=True,
         blank=True,
         default=None,
         help_text=_('This represents the tasklist.'))
