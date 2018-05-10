@@ -4,11 +4,11 @@ SegmentRule Serializers
 """
 from __future__ import unicode_literals
 
-from tasking.serializers.base import GenericForeignKeySerializer
+from tasking.serializers.base import ContentTypeFieldSerializer
 from tasking.models import SegmentRule
 
 
-class SegmentRuleSerializer(GenericForeignKeySerializer):
+class SegmentRuleSerializer(ContentTypeFieldSerializer):
     """
     SegmentRule serializer class
     """
