@@ -35,6 +35,8 @@ class TaskSerializer(GenericForeignKeySerializer):
         """
         fields = [
             'id',
+            'created',
+            'modified',
             'name',
             'parent',
             'description',

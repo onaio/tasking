@@ -172,6 +172,26 @@ class TestTaskSerializer(TestCase):
         self.assertEqual(rule1, task.segment_rules.get(id=rule1.id))
         self.assertEqual(rule2, task.segment_rules.get(id=rule2.id))
 
+        expected_fields = [
+            'id',
+            'created',
+            'modified',
+            'name',
+            'parent',
+            'description',
+            'start',
+            'end',
+            'timing_rule',
+            'total_submission_target',
+            'user_submission_target',
+            'status',
+            'target_type',
+            'target_id',
+            'segment_rules',
+        ]
+        self.assertEqual(set(expected_fields),
+                         set(list(serializer_instance.data.keys())))
+
     def test_validate_timing_rule(self):
         """
         Test that the serializer timing_rule validation works
