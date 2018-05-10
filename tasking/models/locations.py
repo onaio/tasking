@@ -29,13 +29,15 @@ class BaseLocation(GeoTimeStampedModel, models.Model):
         verbose_name=_('GeoPoint'),
         null=True,
         blank=True,
-        default=True,
+        default=None,
         help_text=_('This represents the Geographical Point of the Location.'))
     radius = models.DecimalField(
         verbose_name=_('Radius'),
         null=True,
         blank=True,
         default=None,
+        decimal_places=4,
+        max_digits=64,
         help_text=_('This represents the radius of the Location.'))
     shapefile = models.MultiPolygonField(
         srid=4326,
