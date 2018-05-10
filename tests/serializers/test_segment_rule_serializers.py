@@ -21,6 +21,39 @@ class TestSegmentRuleSerializer(TestCase):
     Test the SegmentRuleSerializer
     """
 
+    def test_create_segment_rule(self):
+        """
+        Test that the serializer can create SegmentRule objects
+        """
+
+        data = {
+            'name': 'Rule Zero',
+            'description': 'Some description',
+            'target_type': 'task',
+            'target_app_label': 'tasking',
+            'target_field': 'id',
+            'target_field_value': '6',
+            'active': True
+        }
+
+        task_contenttype = get_target(
+            app_label='tasking', target_type='task')
+
+        serializer_instance = SegmentRuleSerializer(data=data)
+        self.assertTrue(serializer_instance.is_valid())
+        segment_rule = serializer_instance.save()
+
+        # we remove this field because it is not part fo the model's
+        # serialized data.  It is only used to get the content_type
+        del data['target_app_label']
+        # the start field is going to be converted to isformat
+        self.assertDictContainsSubset(data, serializer_instance.data)
+        self.assertEqual('Rule Zero', segment_rule.name)
+        self.assertEqual('Some description', segment_rule.description)
+        self.assertEqual('id', segment_rule.target_field)
+        self.assertEqual('6', segment_rule.target_field_value)
+        self.assertEqual(task_contenttype, segment_rule.target_content_type)
+
     def test_segment_rule_validate(self):
         """
         Test validate method of SegmentRuleSerializer works as expected

@@ -147,7 +147,6 @@ class TestTaskSerializer(TestCase):
         del data['target_app_label']
         # the start field is going to be converted to isformat
         data['start'] = now.isoformat()
-        # import ipdb; ipdb.set_trace()
         self.assertDictContainsSubset(data, serializer_instance.data)
         self.assertEqual('Cow price', task.name)
         self.assertEqual('Some description', task.description)

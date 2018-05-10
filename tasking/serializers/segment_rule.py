@@ -26,6 +26,7 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
             'description',
             'active',
             'target_app_label',
+            'target_type',
             'target_field',
             'target_field_value'
         ]
