@@ -11,6 +11,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     # third party
     'rest_framework',
+    'rest_framework_gis',  # Required for CountryField in Location Model
     # custom
     'tasking',
 )
