@@ -25,7 +25,7 @@ class GeoTimeStampedModel(geomodels.Model):
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
-        Meta options for TimeStampedModel
+        Meta options for GeoTimeStampedModel
         """
         abstract = True
 
