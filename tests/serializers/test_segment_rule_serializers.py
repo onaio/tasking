@@ -55,15 +55,15 @@ class TestSegmentRuleSerializer(TestCase):
         self.assertEqual(task_contenttype, segment_rule.target_content_type)
 
         expected_fields = [
-            'id',
             'created',
-            'modified',
             'name',
+            'target_field',
             'description',
+            'modified',
             'active',
             'target_type',
-            'target_field',
             'target_field_value'
+            'id',
         ]
 
         self.assertEqual(set(expected_fields),

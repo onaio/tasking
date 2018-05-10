@@ -19,15 +19,15 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
         Meta options for SegmentRuleSerializer
         """
         fields = [
-            'id',
-            'created',
-            'modified',
-            'name',
             'description',
             'active',
             'target_app_label',
             'target_type',
             'target_field',
-            'target_field_value'
+            'target_field_value',
+            'id',
+            'created',
+            'modified',
+            'name',
         ]
         model = SegmentRule
