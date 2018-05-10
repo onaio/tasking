@@ -4,13 +4,15 @@ Module for SegmentRule model(s)
 """
 from __future__ import unicode_literals
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
-from tasking.models.base import TimeStampedModel, GenericFKModel
+
+from tasking.models.base import TimeStampedModel
 
 
-class BaseSegmentRule(GenericFKModel, TimeStampedModel, models.Model):
+class BaseSegmentRule(TimeStampedModel, models.Model):
     """
     BaseSegmentRule abstract model class
 
@@ -33,6 +35,24 @@ class BaseSegmentRule(GenericFKModel, TimeStampedModel, models.Model):
         blank=True,
         default='',
         help_text=_('The description of this rule.')
+    )
+    target_content_type = models.ForeignKey(
+        ContentType,
+        blank=True,
+        null=True,
+        default=None,
+        db_index=True,
+        on_delete=models.SET_NULL)
+    target_field = models.CharField(
+        _('Target Field'),
+        max_length=255,
+        help_text=_('The field on the target model.'),
+        db_index=True
+    )
+    target_field_value = models.CharField(
+        _('Target Field Value'),
+        max_length=255,
+        help_text=_('The value of the target field')
     )
     active = models.BooleanField()
 
