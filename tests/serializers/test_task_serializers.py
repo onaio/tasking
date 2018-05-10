@@ -188,7 +188,7 @@ class TestTaskSerializer(TestCase):
             'description': 'Some description',
             'start': now,
             'total_submission_target': 10,
-            'location': location,
+            'location': location.id,
             'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             'target_type': 'task',
             'target_id': mocked_target_object.id,
