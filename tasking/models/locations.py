@@ -41,7 +41,7 @@ class BaseLocation(GeoTimeStampedModel, models.Model):
         default=None,
         decimal_places=4,
         max_digits=64,
-        help_text=_('This represents the radius of the Location.'))
+        help_text=_('This represents the radius from the geopoint.'))
     shapefile = models.MultiPolygonField(
         srid=4326,
         verbose_name=_('Shapefile'),
@@ -63,14 +63,19 @@ class Location(BaseLocation):
         This is the meta options class for the Location model
         """
         abstract = False
-        ordering = ['country', 'name']
+        ordering = ['country', 'name', 'id']
 
+    # pylint: disable=no-else-return
     def __str__(self):
         """
         String representation of a Location object
 
         e.g. Kenya - Nairobi
         """
-        return "{country} - {name}".format(
-            country=self.country.name,
-            name=self.name)
+        if self.country.name != '':
+            return "{country} - {name}".format(
+                country=self.country.name,
+                name=self.name)
+        else:
+            return "{name}".format(
+                name=self.name)
