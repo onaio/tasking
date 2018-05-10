@@ -16,8 +16,19 @@ class TestLocations(TestCase):
 
     def test_task_model_str(self):
         """
-        Test the str method on Location model
+        Test the str method on Location model with Country Defined
+        """
+        nairobi = mommy.make(
+            'tasking.Location',
+            name="Nairobi",
+            country="KE")
+        expected = 'Kenya - Nairobi'
+        self.assertEqual(expected, nairobi.__str__())
+
+    def test_task_model_str_no_country(self):
+        """
+        Test the str method on Location model without Country Defined
         """
         nairobi = mommy.make('tasking.Location', name="Nairobi")
-        expected = '{} - Nairobi'.format(nairobi.country.name)
+        expected = 'Nairobi'
         self.assertEqual(expected, nairobi.__str__())
