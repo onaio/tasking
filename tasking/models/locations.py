@@ -4,6 +4,8 @@ Module for the Location model(s)
 """
 from __future__ import unicode_literals
 
+from django_countries.fields import CountryField
+
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext as _
 from django.utils.encoding import python_2_unicode_compatible
@@ -21,10 +23,11 @@ class BaseLocation(GeoTimeStampedModel, models.Model):
         _('Name'),
         max_length=255,
         help_text=_('This represents the name of Location.'))
-    country = models.CharField(
+    country = CountryField(
         _('Country'),
-        max_length=255,
-        help_text=_('This represents the name of the Country.'))
+        blank=True,
+        default='',
+        help_text=_('This represents the Country.'))
     geopoint = models.PointField(
         verbose_name=_('GeoPoint'),
         null=True,
@@ -69,5 +72,5 @@ class Location(BaseLocation):
         e.g. Kenya - Nairobi
         """
         return "{country} - {name}".format(
-            country=self.country,
+            country=self.country.name,
             name=self.name)
