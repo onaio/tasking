@@ -7,9 +7,10 @@ from __future__ import unicode_literals
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext as _
 from django.utils.encoding import python_2_unicode_compatible
+from tasking.models.base import GeoTimeStampedModel
 
 
-class BaseLocation(models.Model):
+class BaseLocation(GeoTimeStampedModel, models.Model):
     """
     Base abstract model class for a Location
 
@@ -36,12 +37,13 @@ class BaseLocation(models.Model):
         blank=True,
         default=None,
         help_text=_('This represents the radius of the Location.'))
-    geom = models.GeometryField(
-        verbose_name=_('Geometry'),
+    shapefile = models.MultiPolygonField(
+        srid=4326,
+        verbose_name=_('Shapefile'),
         null=True,
         blank=True,
         default=None,
-        help_text=_('This represents the Geometry Shapefile of the Location'))
+        help_text=_('This represents the Shapefile of the Location'))
 
 
 @python_2_unicode_compatible
