@@ -84,7 +84,6 @@ class TaskSerializer(serializers.ModelSerializer):
             'name',
             'parent',
             'description',
-            'task_list_id',
             'start',
             'end',
             'timing_rule',

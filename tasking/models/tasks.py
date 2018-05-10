@@ -130,13 +130,12 @@ class Task(BaseTask):
     """
     Task model class
     """
-    task_list = models.ForeignKey(
+    task_list = models.ManyToManyField(
         'tasking.TaskList',
         verbose_name=_('Task List'),
         null=True,
         blank=True,
         default=None,
-        on_delete=models.SET_NULL,
         help_text=_('This represents the tasklist.'))
 
     # location = models.ForeignKey(
