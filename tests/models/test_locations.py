@@ -19,5 +19,5 @@ class TestLocations(TestCase):
         Test the str method on Location model
         """
         nairobi = mommy.make('tasking.Location', name="Nairobi")
-        expected = '{} - Nairobi'.format(nairobi.country)
+        expected = '{} - Nairobi'.format(nairobi.country.name)
         self.assertEqual(expected, nairobi.__str__())
