@@ -93,6 +93,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'status',
             'target_app_label',
             'target_type',
-            'target_id'
+            'target_id',
+            'location'
         ]
         model = Task
