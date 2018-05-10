@@ -133,6 +133,12 @@ class Task(BaseTask):
     #     default=None,
     #     on_delete=models.SET_NULL,
     #     help_text=_('This represents the location.'))
+    segment_rules = models.ManyToManyField(
+        'tasking.SegmentRule',
+        verbose_name=_('Segment Rules'),
+        blank=True,
+        default=None
+    )
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods

@@ -40,6 +40,7 @@ class BaseSegmentRule(TimeStampedModel, models.Model):
         ContentType,
         blank=True,
         null=True,
+        related_name='segment_rule',
         default=None,
         db_index=True,
         on_delete=models.SET_NULL)

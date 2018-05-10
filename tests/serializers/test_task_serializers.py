@@ -126,6 +126,9 @@ class TestTaskSerializer(TestCase):
         now = timezone.now()
         mocked_target_object = mommy.make('tasking.Task')
 
+        rule1 = mommy.make('tasking.SegmentRule')
+        rule2 = mommy.make('tasking.SegmentRule')
+
         data = {
             'name': 'Cow price',
             'description': 'Some description',
@@ -134,10 +137,13 @@ class TestTaskSerializer(TestCase):
             'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             'target_type': 'task',
             'target_id': mocked_target_object.id,
-            'target_app_label': 'tasking'
+            'target_app_label': 'tasking',
         }
 
-        serializer_instance = TaskSerializer(data=data)
+        data_with_segment_rules = data.copy()
+        data_with_segment_rules['segment_rules'] = [rule1.id, rule2.id]
+
+        serializer_instance = TaskSerializer(data=data_with_segment_rules)
         self.assertTrue(serializer_instance.is_valid())
 
         task = serializer_instance.save()
@@ -145,13 +151,26 @@ class TestTaskSerializer(TestCase):
         # we remove this field because it is not part fo the model's
         # serialized data.  It is only used to get the content_type
         del data['target_app_label']
+
         # the start field is going to be converted to isformat
         data['start'] = now.isoformat()
+
+        # the order of segment_rules may have changed so a dict comparison
+        # may faile, we use `data` that does not include segment rules
         self.assertDictContainsSubset(data, serializer_instance.data)
+
+        # we test that we do have our segment rules
+        self.assertEqual(set([rule1.id, rule2.id]),
+                         set(serializer_instance.data['segment_rules']))
+
         self.assertEqual('Cow price', task.name)
         self.assertEqual('Some description', task.description)
         self.assertEqual(now, task.start)
         self.assertEqual(10, task.total_submission_target)
+
+        # test that the segment rules for the task are as we expect
+        self.assertEqual(rule1, task.segment_rules.get(id=rule1.id))
+        self.assertEqual(rule2, task.segment_rules.get(id=rule2.id))
 
     def test_validate_timing_rule(self):
         """
