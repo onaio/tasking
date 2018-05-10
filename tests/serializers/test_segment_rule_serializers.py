@@ -62,7 +62,7 @@ class TestSegmentRuleSerializer(TestCase):
             'modified',
             'active',
             'target_type',
-            'target_field_value'
+            'target_field_value',
             'id',
         ]
 
