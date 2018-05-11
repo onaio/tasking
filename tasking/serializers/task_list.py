@@ -22,5 +22,6 @@ class TaskListSerializer(serializers.ModelSerializer):
         model = TaskList
         fields = [
             'id',
-            'name'
+            'name',
+            'tasks'
         ]

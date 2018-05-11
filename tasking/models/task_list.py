@@ -34,6 +34,13 @@ class TaskList(BaseTaskList):
     """
     Task list model class
     """
+    tasks = models.ManyToManyField(
+        'tasking.Task',
+        verbose_name=_('Tasks'),
+        blank=True,
+        default=None,
+        help_text=_('This represents the Task.'))
+
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
