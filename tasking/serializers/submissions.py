@@ -20,8 +20,8 @@ class SubmissionSerializer(GenericForeignKeySerializer):
         """
         fields = [
             'id',
-            'created',
             'modified',
+            'created',
             'task',
             'location',
             'user',
