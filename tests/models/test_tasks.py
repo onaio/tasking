@@ -33,5 +33,5 @@ class TestTasks(TestCase):
             name="Rice harvest",
             location=nairobi)
         self.assertEqual(
-            six.text_type(nairobi),
-            six.text_type(rice_harvest.location))
+            nairobi,
+            rice_harvest.location)
