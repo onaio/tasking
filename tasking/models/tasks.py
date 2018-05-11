@@ -4,16 +4,15 @@ Module for the Task model(s)
 """
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
+from tasking.models.base import GenericFKModel, TimeStampedModel
 from tasking.utils import validate_rrule
 
 
-class BaseTask(models.Model):
+class BaseTask(GenericFKModel, TimeStampedModel, models.Model):
     """
     Base abstract model class for a Task
 
@@ -30,12 +29,6 @@ class BaseTask(models.Model):
         (CLOSED, _('Closed')),
     )
 
-    created = models.DateTimeField(
-        verbose_name=_('Created'),
-        auto_now_add=True)
-    modified = models.DateTimeField(
-        verbose_name=_('Modified'),
-        auto_now=True)
     parent = models.ForeignKey(
         'self',
         verbose_name=_('Parent task'),
@@ -72,22 +65,6 @@ class BaseTask(models.Model):
     # we use Django's ContentType app to add a Generic Foreign Key
     # this makes it possible to tie a Task to any other model
     # which is the `target`
-    target_content_type = models.ForeignKey(
-        ContentType,
-        related_name='target',
-        blank=True,
-        null=True,
-        default=None,
-        db_index=True,
-        on_delete=models.SET_NULL)
-    target_object_id = models.PositiveIntegerField(
-        db_index=True,
-        blank=True,
-        null=True,
-        default=None
-    )
-    target_content_object = GenericForeignKey(
-        'target_content_type', 'target_object_id')
     start = models.DateTimeField(
         verbose_name=_('Start'),
         help_text=_('This is the date and time the task starts.')
@@ -156,6 +133,12 @@ class Task(BaseTask):
     #     default=None,
     #     on_delete=models.SET_NULL,
     #     help_text=_('This represents the location.'))
+    segment_rules = models.ManyToManyField(
+        'tasking.SegmentRule',
+        verbose_name=_('Segment Rules'),
+        blank=True,
+        default=None
+    )
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
