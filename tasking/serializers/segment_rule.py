@@ -4,8 +4,8 @@ SegmentRule Serializers
 """
 from __future__ import unicode_literals
 
-from tasking.serializers.base import ContentTypeFieldSerializer
 from tasking.models import SegmentRule
+from tasking.serializers.base import ContentTypeFieldSerializer
 
 
 class SegmentRuleSerializer(ContentTypeFieldSerializer):
@@ -21,8 +21,7 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
         fields = [
             'description',
             'active',
-            'target_app_label',
-            'target_type',
+            'target_content_type',
             'target_field',
             'target_field_value',
             'id',

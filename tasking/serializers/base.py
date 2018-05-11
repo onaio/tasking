@@ -9,6 +9,7 @@ from rest_framework import serializers
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
 from tasking.exceptions import TargetDoesNotExist
 from tasking.utils import get_target
+from tasking.tools import get_allowed_contenttypes
 
 
 def validate_content_type(attrs):
@@ -43,23 +44,25 @@ class ContentTypeFieldSerializer(serializers.ModelSerializer):
     Serializer class that provides a contenty_type field and a method
     to validate it
     """
+    target_content_type = serializers.PrimaryKeyRelatedField(
+        many=False, queryset=get_allowed_contenttypes())
 
-    target_type = serializers.CharField(
-        source='target_content_type',
-        allow_blank=False)
-    target_app_label = serializers.CharField(
-        write_only=True,
-        allow_blank=False)
+    # target_type = serializers.CharField(
+    #     source='target_content_type',
+    #     allow_blank=False)
+    # target_app_label = serializers.CharField(
+    #     write_only=True,
+    #     allow_blank=False)
 
-    def validate(self, attrs):
-        """
-        Custom validation for content_type field
-        """
+    # def validate(self, attrs):
+    #     """
+    #     Custom validation for content_type field
+    #     """
 
-        attrs = super(ContentTypeFieldSerializer, self).validate(attrs)
-        attrs = validate_content_type(attrs)
+    #     attrs = super(ContentTypeFieldSerializer, self).validate(attrs)
+    #     attrs = validate_content_type(attrs)
 
-        return super(ContentTypeFieldSerializer, self).validate(attrs)
+    #     return super(ContentTypeFieldSerializer, self).validate(attrs)
 
 
 class GenericForeignKeySerializer(ContentTypeFieldSerializer):
