@@ -40,6 +40,19 @@ class TestLocationSerializer(TestCase):
         self.assertEqual('KE', location.country)
         self.assertEqual('Kenya - Nairobi', six.text_type(location))
 
+        expected_fields = [
+            'created',
+            'name',
+            'modified',
+            'country',
+            'shapefile',
+            'geopoint',
+            'id',
+            'radius'
+        ]
+        self.assertEqual(set(expected_fields),
+                         set(list(serializer_instance.data)))
+
     def test_validate_bad_data(self):
         """
         Test validate method of LocationSerializer works as expected
