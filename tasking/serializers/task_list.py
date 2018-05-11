@@ -23,5 +23,7 @@ class TaskListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
-            'tasks'
+            'tasks',
+            'created',
+            'modified'
         ]

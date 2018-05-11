@@ -41,7 +41,9 @@ class TestTaskListSerializer(TestCase):
         expected_fields = [
             'id',
             'name',
-            'tasks'
+            'tasks',
+            'created',
+            'modified'
         ]
 
         self.assertEqual(set(expected_fields),
