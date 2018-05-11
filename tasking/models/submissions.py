@@ -90,4 +90,4 @@ class Submission(BaseSubmission):
         e.g. Cattle Price - 1 submission 1
         """
         return "{task} submission {submission_id}".format(
-            submission_id=self.id, task=self.task)
+            submission_id=self.pk, task=self.task)
