@@ -6,26 +6,16 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
-from django.test import TestCase
+from tests.serializers.test_base import TestSerializerBase
 
 from tasking.serializers import SegmentRuleSerializer
 from tasking.utils import get_target
 
-from tasking.tools import get_allowed_contenttypes
 
-
-class TestSegmentRuleSerializer(TestCase):
+class TestSegmentRuleSerializer(TestSerializerBase):
     """
     Test the SegmentRuleSerializer
     """
-
-    def setUp(self):
-        """
-        Setup tests
-        """
-
-        self.task_type = get_allowed_contenttypes().filter(
-            model='task').first()
 
     def test_create_segment_rule(self):
         """

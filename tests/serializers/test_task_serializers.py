@@ -6,18 +6,15 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
-from django.test import TestCase
-from django.utils import six, timezone
+from django.utils import timezone
 
 from model_mommy import mommy
-from rest_framework.exceptions import ValidationError
+from tests.serializers.test_base import TestSerializerBase
 
-from tasking.common_tags import TARGET_DOES_NOT_EXIST
 from tasking.serializers import TaskSerializer
-from tasking.utils import get_target
 
 
-class TestTaskSerializer(TestCase):
+class TestTaskSerializer(TestSerializerBase):
     """
     Test the TaskSerializer
     """
@@ -40,32 +37,7 @@ class TestTaskSerializer(TestCase):
             target_app_label='tasking'
         )
 
-        with self.assertRaises(ValidationError) as bad_target_id_cm:
-            TaskSerializer().validate(bad_target_id)
-
-        error_detail = bad_target_id_cm.exception.detail['target_id']
-        self.assertEqual(TARGET_DOES_NOT_EXIST, six.text_type(error_detail))
-        self.assertEqual('invalid', error_detail.code)
-        self.assertEqual(400, bad_target_id_cm.exception.status_code)
-
-        bad_target_app_label = OrderedDict(
-            name='Cow price',
-            description='Some description',
-            start=timezone.now(),
-            total_submission_target=10,
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
-            target_content_type='task',
-            target_object_id=mocked_target_object.id,
-            target_app_label='superduperapp'
-        )
-
-        with self.assertRaises(ValidationError) as bad_target_app_label_cm:
-            TaskSerializer().validate(bad_target_app_label)
-
-        error_detail = bad_target_app_label_cm.exception.detail['target_type']
-        self.assertEqual(TARGET_DOES_NOT_EXIST, six.text_type(error_detail))
-        self.assertEqual('invalid', error_detail.code)
-        self.assertEqual(400, bad_target_app_label_cm.exception.status_code)
+        self.assertFalse(TaskSerializer(data=bad_target_id).is_valid())
 
         bad_content_type = OrderedDict(
             name='Cow price',
@@ -78,46 +50,7 @@ class TestTaskSerializer(TestCase):
             target_app_label='tasking'
         )
 
-        with self.assertRaises(ValidationError) as bad_content_type_cm:
-            TaskSerializer().validate(bad_content_type)
-
-        error_detail = bad_content_type_cm.exception.detail['target_type']
-        self.assertEqual(TARGET_DOES_NOT_EXIST, six.text_type(error_detail))
-        self.assertEqual('invalid', error_detail.code)
-        self.assertEqual(400, bad_content_type_cm.exception.status_code)
-
-    def test_task_serializer_validate(self):
-        """
-        Test validate method of TaskSerializer works as expected
-        """
-        now = timezone.now()
-        mocked_target_object = mommy.make('tasking.Task')
-
-        attrs = OrderedDict(
-            name='Cow price',
-            description='Some description',
-            start=now,
-            total_submission_target=10,
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
-            target_content_type='task',
-            target_object_id=mocked_target_object.id,
-            target_app_label='tasking'
-        )
-        validated_data = TaskSerializer().validate(attrs)
-
-        expected_contenttype = get_target(
-            app_label='tasking', target_type='task')
-        expected = OrderedDict(
-            name='Cow price',
-            description='Some description',
-            start=now,
-            total_submission_target=10,
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
-            target_content_type=expected_contenttype,
-            target_object_id=mocked_target_object.id
-        )
-
-        self.assertDictEqual(dict(expected), dict(validated_data))
+        self.assertFalse(TaskSerializer(data=bad_content_type).is_valid())
 
     def test_create_task(self):
         """
@@ -135,9 +68,8 @@ class TestTaskSerializer(TestCase):
             'start': now,
             'total_submission_target': 10,
             'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
-            'target_type': 'task',
+            'target_content_type': self.task_type.id,
             'target_id': mocked_target_object.id,
-            'target_app_label': 'tasking',
         }
 
         data_with_segment_rules = data.copy()
@@ -147,10 +79,6 @@ class TestTaskSerializer(TestCase):
         self.assertTrue(serializer_instance.is_valid())
 
         task = serializer_instance.save()
-
-        # we remove this field because it is not part fo the model's
-        # serialized data.  It is only used to get the content_type
-        del data['target_app_label']
 
         # the start field is going to be converted to isformat
         data['start'] = now.isoformat()
@@ -185,7 +113,7 @@ class TestTaskSerializer(TestCase):
             'total_submission_target',
             'user_submission_target',
             'status',
-            'target_type',
+            'target_content_type',
             'target_id',
             'segment_rules',
         ]
