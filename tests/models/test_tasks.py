@@ -5,6 +5,7 @@ Test for Task model
 from __future__ import unicode_literals
 
 from django.test import TestCase
+from django.utils import six
 
 from model_mommy import mommy
 
@@ -31,4 +32,6 @@ class TestTasks(TestCase):
             'tasking.Task',
             name="Rice harvest",
             location=nairobi)
-        self.assertEqual(str(nairobi), str(rice_harvest.location))
+        self.assertEqual(
+            nairobi.__str__(),
+            rice_harvest.location.__str__())
