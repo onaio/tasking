@@ -49,5 +49,6 @@ class TaskSerializer(GenericForeignKeySerializer):
             'target_content_type',
             'target_id',
             'segment_rules',
+            'location',
         ]
         model = Task

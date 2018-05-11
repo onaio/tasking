@@ -116,6 +116,7 @@ class TestTaskSerializer(TestSerializerBase):
             'target_content_type',
             'target_id',
             'segment_rules',
+            'location',
         ]
         self.assertEqual(set(expected_fields),
                          set(list(serializer_instance.data.keys())))
@@ -139,3 +140,30 @@ class TestTaskSerializer(TestSerializerBase):
 
         serializer_instance = TaskSerializer(data=data)
         self.assertFalse(serializer_instance.is_valid())
+
+    def test_location_link(self):
+        """
+        Test the connection of Task and Location
+        """
+        location = mommy.make('tasking.location', name='Nairobi', country='KE')
+        mocked_target_object = mommy.make('tasking.Task')
+
+        now = timezone.now()
+
+        data = {
+            'name': 'Cow price',
+            'description': 'Some description',
+            'start': now,
+            'total_submission_target': 10,
+            'location': location.id,
+            'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+            'target_content_type': self.task_type.id,
+            'target_id': mocked_target_object.id,
+        }
+        serializer_instance = TaskSerializer(data=data)
+
+        self.assertTrue(serializer_instance.is_valid())
+
+        task = serializer_instance.save()
+
+        self.assertEqual(location, task.location)
