@@ -22,29 +22,40 @@ class BaseSubmission(GenericFKModel, TimeStampedModel, models.Model):
     to your own project. It only implements the bare minimum of
     what a Submission could be.
     """
+    user = models.ForeignKey(
+        USER,
+        verbose_name=_('User'),
+        on_delete=models.PROTECT,
+        help_text=_('This represents the User.')
+    )
     submission_time = models.DateTimeField(
         verbose_name=_('Submission Time'),
         help_text=_('This is the date and time the task was submitted.')
-        )
-
+    )
     valid = models.BooleanField(
         verbose_name=_('Valid'),
         default=False,
         help_text=_('This represents whether submission is valid or not.')
-        )
-
+    )
     approved = models.BooleanField(
         verbose_name=_('Approved'),
         default=False,
         help_text=_('This represents whether submission is approved or not.')
-        )
-
+    )
     comments = models.TextField(
         _('Comments'),
         blank=True,
         default='',
         help_text=_('This represents the comments.')
-        )
+    )
+
+    # pylint: disable=no-self-use
+    # pylint: disable=too-few-public-methods
+    class Meta(object):
+        """
+        This is the meta options class for the abstract Submission model
+        """
+        abstract = True
 
 
 @python_2_unicode_compatible
@@ -52,12 +63,6 @@ class Submission(BaseSubmission):
     """
     Submission model class
     """
-    user = models.ForeignKey(
-        USER,
-        verbose_name=_('User'),
-        on_delete=models.PROTECT,
-        help_text=_('This represents the User.')
-    )
     task = models.ForeignKey(
         'tasking.Task',
         verbose_name=_('Task'),
