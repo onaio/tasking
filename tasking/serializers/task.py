@@ -46,8 +46,7 @@ class TaskSerializer(GenericForeignKeySerializer):
             'total_submission_target',
             'user_submission_target',
             'status',
-            'target_app_label',
-            'target_type',
+            'target_content_type',
             'target_id',
             'segment_rules',
         ]

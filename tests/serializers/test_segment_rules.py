@@ -6,17 +6,13 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
-from django.test import TestCase
-from django.utils import six
+from tests.serializers.test_base import TestSerializerBase
 
-from rest_framework.exceptions import ValidationError
-
-from tasking.common_tags import TARGET_DOES_NOT_EXIST
 from tasking.serializers import SegmentRuleSerializer
 from tasking.utils import get_target
 
 
-class TestSegmentRuleSerializer(TestCase):
+class TestSegmentRuleSerializer(TestSerializerBase):
     """
     Test the SegmentRuleSerializer
     """
@@ -29,8 +25,7 @@ class TestSegmentRuleSerializer(TestCase):
         data = {
             'name': 'Rule Zero',
             'description': 'Some description',
-            'target_type': 'task',
-            'target_app_label': 'tasking',
+            'target_content_type': self.task_type.id,
             'target_field': 'id',
             'target_field_value': '6',
             'active': True
@@ -43,10 +38,6 @@ class TestSegmentRuleSerializer(TestCase):
         self.assertTrue(serializer_instance.is_valid())
         segment_rule = serializer_instance.save()
 
-        # we remove this field because it is not part fo the model's
-        # serialized data.  It is only used to get the content_type
-        del data['target_app_label']
-        # the start field is going to be converted to isformat
         self.assertDictContainsSubset(data, serializer_instance.data)
         self.assertEqual('Rule Zero', segment_rule.name)
         self.assertEqual('Some description', segment_rule.description)
@@ -61,11 +52,10 @@ class TestSegmentRuleSerializer(TestCase):
             'description',
             'modified',
             'active',
-            'target_type',
+            'target_content_type',
             'target_field_value',
             'id',
         ]
-
         self.assertEqual(set(expected_fields),
                          set(list(serializer_instance.data)))
 
@@ -77,10 +67,9 @@ class TestSegmentRuleSerializer(TestCase):
         attrs = OrderedDict(
             name='Rule Zero',
             description='Some description',
-            target_content_type='task',
+            target_content_type=self.task_type.id,
             target_field='id',
             target_field_value=6,
-            target_app_label='tasking'
         )
         validated_data = SegmentRuleSerializer().validate(attrs)
 
@@ -89,7 +78,7 @@ class TestSegmentRuleSerializer(TestCase):
         expected = OrderedDict(
             name='Rule Zero',
             description='Some description',
-            target_content_type=expected_contenttype,
+            target_content_type=expected_contenttype.id,
             target_field='id',
             target_field_value=6
         )
@@ -101,23 +90,6 @@ class TestSegmentRuleSerializer(TestCase):
         for bad data
         """
 
-        bad_target_app_label = OrderedDict(
-            name='Rule Zero',
-            description='Some description',
-            target_content_type='task',
-            target_field='id',
-            target_field_value=6,
-            target_app_label='BAD'
-        )
-
-        with self.assertRaises(ValidationError) as bad_target_app_label_cm:
-            SegmentRuleSerializer().validate(bad_target_app_label)
-
-        error_detail = bad_target_app_label_cm.exception.detail['target_type']
-        self.assertEqual(TARGET_DOES_NOT_EXIST, six.text_type(error_detail))
-        self.assertEqual('invalid', error_detail.code)
-        self.assertEqual(400, bad_target_app_label_cm.exception.status_code)
-
         bad_content_type = OrderedDict(
             name='Rule Zero',
             description='Some description',
@@ -127,10 +99,5 @@ class TestSegmentRuleSerializer(TestCase):
             target_app_label='tasking'
         )
 
-        with self.assertRaises(ValidationError) as bad_content_type_cm:
-            SegmentRuleSerializer().validate(bad_content_type)
-
-        error_detail = bad_content_type_cm.exception.detail['target_type']
-        self.assertEqual(TARGET_DOES_NOT_EXIST, six.text_type(error_detail))
-        self.assertEqual('invalid', error_detail.code)
-        self.assertEqual(400, bad_content_type_cm.exception.status_code)
+        instance = SegmentRuleSerializer(data=bad_content_type)
+        self.assertFalse(instance.is_valid())
