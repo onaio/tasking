@@ -38,7 +38,7 @@ class TestLocationSerializer(TestCase):
 
         self.assertEqual('Nairobi', location.name)
         self.assertEqual('KE', location.country)
-        self.assertEqual('Kenya - Nairobi', location.__str__())
+        self.assertEqual('Kenya - Nairobi', six.text_type(location))
 
     def test_validate_bad_data(self):
         """

@@ -21,7 +21,7 @@ class TestTasks(TestCase):
         """
         cow_price = mommy.make('tasking.Task', name="Cow prices")
         expected = 'Cow prices - {}'.format(cow_price.pk)
-        self.assertEqual(expected, cow_price.__str__())
+        self.assertEqual(expected, six.text_type(cow_price))
 
     def test_location_link(self):
         """
@@ -33,5 +33,5 @@ class TestTasks(TestCase):
             name="Rice harvest",
             location=nairobi)
         self.assertEqual(
-            nairobi.__str__(),
-            rice_harvest.location.__str__())
+            six.text_type(nairobi),
+            six.text_type(rice_harvest.location))
