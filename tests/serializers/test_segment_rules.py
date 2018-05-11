@@ -38,10 +38,6 @@ class TestSegmentRuleSerializer(TestSerializerBase):
         self.assertTrue(serializer_instance.is_valid())
         segment_rule = serializer_instance.save()
 
-        # we remove this field because it is not part fo the model's
-        # serialized data.  It is only used to get the content_type
-        # del data['target_app_label']
-        # the start field is going to be converted to isformat
         self.assertDictContainsSubset(data, serializer_instance.data)
         self.assertEqual('Rule Zero', segment_rule.name)
         self.assertEqual('Some description', segment_rule.description)

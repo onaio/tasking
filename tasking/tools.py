@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Utility functions for tasking
+Tools for tasking
 """
 from __future__ import unicode_literals
 import operator
