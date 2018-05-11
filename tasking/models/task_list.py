@@ -8,8 +8,10 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
+from tasking.models.base import GenericFKModel, TimeStampedModel
 
-class BaseTaskList(models.Model):
+
+class BaseTaskList(GenericFKModel, TimeStampedModel, models.Model):
     """
     Base abstract model class for a Task List
 
