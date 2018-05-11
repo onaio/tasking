@@ -32,27 +32,3 @@ class TestLocations(TestCase):
         nairobi = mommy.make('tasking.Location', name="Nairobi")
         expected = 'Nairobi'
         self.assertEqual(expected, nairobi.__str__())
-
-    def test_entry_geodetails(self):
-        """
-        Test when geopoint or a radius is entered the other is present and
-        Only Geopoint and Radius Or Shapefile are entered not both
-        """
-        mocked_geodetails = mommy.make(
-            'tasking.Location',
-            geopoint='POINT(0.0 0.0)',
-            radius=45.678)
-
-        if mocked_geodetails.shapefile is not None:
-            self.assertEqual(None, mocked_geodetails.geopoint)
-            self.assertEqual(None, mocked_geodetails.radius)
-        elif mocked_geodetails.geopoint is not None:
-            self.assertTrue(mocked_geodetails.radius is not None)
-            self.assertEqual(None, mocked_geodetails.shapefile)
-        elif mocked_geodetails.radius is not None:
-            self.assertTrue(mocked_geodetails.radius is not None)
-            self.assertEqual(None, mocked_geodetails.shapefile)
-        else:
-            self.assertEqual(None, mocked_geodetails.geopoint)
-            self.assertEqual(None, mocked_geodetails.radius)
-            self.assertEqual(None, mocked_geodetails.shapefile)
