@@ -53,17 +53,6 @@ class BaseTask(models.Model):
         blank=True,
         default='',
         help_text=_('This represents the description.'))
-    # location = models.ForeignKey(
-    #     'tasking.BaseLocation',
-    #     verbose_name=_('Location'),
-    #     null=True,
-    #     blank=True,
-    #     default=None,
-    #     on_delete=models.SET_NULL,
-    #     help_text=_('This represents the location.'))
-    # we use Django's ContentType app to add a Generic Foreign Key
-    # this makes it possible to tie a Task to any other model
-    # which is the `target`
     target_content_type = models.ForeignKey(
         ContentType,
         related_name='target',
@@ -130,16 +119,6 @@ class Task(BaseTask):
     """
     Task model class
     """
-
-    # location = models.ForeignKey(
-    #     'tasking.Location',
-    #     verbose_name=_('Location'),
-    #     null=True,
-    #     blank=True,
-    #     default=None,
-    #     on_delete=models.SET_NULL,
-    #     help_text=_('This represents the location.'))
-
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
     class Meta(object):
