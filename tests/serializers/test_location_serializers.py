@@ -38,14 +38,14 @@ class TestLocationSerializer(TestCase):
 
         self.assertEqual('Nairobi', location.name)
         self.assertEqual('KE', location.country)
-        self.assertEqual('Kenya - Nairobi', str(location))
+        self.assertEqual('Kenya - Nairobi', location.__str__())
 
     def test_validate_bad_data(self):
         """
         Test validate method of LocationSerializer works as expected
         for bad data
         """
-        mocked_shapefile = mommy.make(
+        mocked_location_with_shapefile = mommy.make(
             'tasking.Location',
             name='Nairobi',
             _fill_optional=['shapefile'])
@@ -59,7 +59,7 @@ class TestLocationSerializer(TestCase):
             name='Arusha',
             radius=56.6789,
             geopoint='Point(0.0, 0.0)',
-            shapefile=mocked_shapefile.shapefile)
+            shapefile=mocked_location_with_shapefile.shapefile)
 
         with self.assertRaises(ValidationError) as missing_radius_cm:
             LocationSerializer().validate(missing_radius)
@@ -83,13 +83,13 @@ class TestLocationSerializer(TestCase):
         """
         Test validate method of TaskSerializer works as expected for shapefile
         """
-        mocked_shapefile = mommy.make(
+        mocked_location_with_shapefile = mommy.make(
             'tasking.Location',
             name='Nairobi',
             _fill_optional=['shapefile'])
         data = OrderedDict(
             name='Montreal',
-            shapefile=mocked_shapefile.shapefile)
+            shapefile=mocked_location_with_shapefile.shapefile)
 
         validated_data = LocationSerializer().validate(data)
         self.assertDictEqual(dict(data), dict(validated_data))
