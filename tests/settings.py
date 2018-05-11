@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 
 INSTALLED_APPS = (
     # core django apps
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.gis',
     # third party
