@@ -24,7 +24,7 @@ class BaseSegmentRule(TimeStampedModel, models.Model):
         target_field: id
         target_field_value: 6
     Then you would be able to use this SegmentRule to filter:
-        where task_id is 6
+        SELECT * FROM task WHERE task_id=6;
     """
     name = models.CharField(
         _('Name'),
