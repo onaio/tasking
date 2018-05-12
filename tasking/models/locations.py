@@ -50,6 +50,14 @@ class BaseLocation(GeoTimeStampedModel, models.Model):
         default=None,
         help_text=_('This represents the Shapefile of the Location'))
 
+    # pylint: disable=no-self-use
+    # pylint: disable=too-few-public-methods
+    class Meta(object):
+        """
+        This is the meta options class for the abstract Location model
+        """
+        abstract = True
+
 
 @python_2_unicode_compatible
 class Location(BaseLocation):

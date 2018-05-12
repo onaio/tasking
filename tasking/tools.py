@@ -16,7 +16,7 @@ DEFAULT_ALLOWED_CONTENTTYPES = [
     {'app_label': 'tasking', 'model': 'tasklist'},
     {'app_label': 'tasking', 'model': 'segmentrule'},
     {'app_label': 'tasking', 'model': 'tasksubmission'},
-    {'app_label': 'auth', 'model': ' user'},
+    {'app_label': 'auth', 'model': 'user'},
     {'app_label': 'auth', 'model': 'group'},
     {'app_label': 'logger', 'model': 'xform'},
     {'app_label': 'logger', 'model': 'instance'},
@@ -33,7 +33,6 @@ def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
     """
     filters = [Q(app_label=item['app_label'], model=item['model']) for item in
                allowed_content_types]
-
     if filters:
         return ContentType.objects.filter(reduce(operator.or_, filters))
     return ContentType.objects.none()
