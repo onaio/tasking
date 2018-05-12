@@ -1,0 +1,33 @@
+# -*- coding: utf-8 -*-
+"""
+Test for Submission model
+"""
+from __future__ import unicode_literals
+
+from django.test import TestCase
+from django.utils import six
+
+from model_mommy import mommy
+
+
+class TestSubmission(TestCase):
+    """
+    Test for Submission Model
+    """
+
+    def test_submission_model_str(self):
+        """
+        Test the string representation of Submission Model
+        """
+        nairobi = mommy.make('tasking.Location', name='Nairobi')
+        cattle = mommy.make(
+            'tasking.Task',
+            name='Cattle Price',
+            location=nairobi)
+        submission = mommy.make(
+            'tasking.Submission',
+            task=cattle,
+            location=nairobi,
+            _fill_optional=['user', 'comment', 'submission_time'])
+        expected = "Cattle Price - 1 submission 1"
+        self.assertEqual(expected, six.text_type(submission))
