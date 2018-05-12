@@ -46,20 +46,15 @@ class BaseTask(GenericFKModel, TimeStampedModel, models.Model):
         blank=True,
         default='',
         help_text=_('This represents the description.'))
-    # we use Django's ContentType app to add a Generic Foreign Key
-    # this makes it possible to tie a Task to any other model
-    # which is the `target`
     start = models.DateTimeField(
         verbose_name=_('Start'),
-        help_text=_('This is the date and time the task starts.')
-        )
+        help_text=_('This is the date and time the task starts.'))
     end = models.DateTimeField(
         verbose_name=_('Start'),
         null=True,
         blank=True,
         default=None,
-        help_text=_('This is the date and time the task starts.')
-        )
+        help_text=_('This is the date and time the task starts.'))
     timing_rule = models.TextField(
         verbose_name=_('Timing Rule'),
         validators=[validate_rrule],
@@ -101,14 +96,6 @@ class Task(BaseTask):
     """
     Task model class
     """
-    # tasklist = models.ForeignKey(
-    #     'tasking.TaskList',
-    #     verbose_name=_('Task List'),
-    #     null=True,
-    #     blank=True,
-    #     default=None,
-    #     on_delete=models.SET_NULL,
-    #     help_text=_('This represents the tasklist.'))
     segment_rules = models.ManyToManyField(
         'tasking.SegmentRule',
         verbose_name=_('Segment Rules'),
