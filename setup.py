@@ -1,17 +1,18 @@
 """
 Setup.py for ona tasking
 """
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='ona-tasking',
-    version='0.1',
+    version=__import__('tasking').__version__,
     description='A Django app that provides adds tasking to your Django '
     'project.',
     license='GPL 3',
     author='Ona Kenya',
     author_email='tech@ona.io',
     url='https://github.com/onaio/tasking',
+    packages=find_packages(exclude=['docs', 'tests']),
     install_requires=[
         'Django >= 1.11',
         'python-dateutil',
