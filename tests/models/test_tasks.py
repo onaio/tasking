@@ -22,16 +22,3 @@ class TestTasks(TestCase):
         cow_price = mommy.make('tasking.Task', name="Cow prices")
         expected = 'Cow prices - {}'.format(cow_price.pk)
         self.assertEqual(expected, six.text_type(cow_price))
-
-    def test_location_link(self):
-        """
-        Test the connection of Task and Location
-        """
-        nairobi = mommy.make('tasking.Location', name="Nairobi", country="KE")
-        rice_harvest = mommy.make(
-            'tasking.Task',
-            name="Rice harvest",
-            location=nairobi)
-        self.assertEqual(
-            nairobi,
-            rice_harvest.location)
