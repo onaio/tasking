@@ -1,7 +1,7 @@
 """
 Setup.py for ona tasking
 """
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='ona-tasking',
@@ -12,6 +12,7 @@ setup(
     author='Ona Kenya',
     author_email='tech@ona.io',
     url='https://github.com/onaio/tasking',
+    packages=find_packages(exclude=['docs', 'tests']),
     install_requires=[
         'Django >= 1.11',
         'python-dateutil',
