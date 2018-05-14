@@ -160,10 +160,40 @@ class TestTaskSerializer(TestSerializerBase):
             'target_content_type': self.task_type.id,
             'target_id': mocked_target_object.id,
         }
+        data_with_location = data.copy()
+        data_with_location['location'] = [location.id]
+
+        serializer_instance = TaskSerializer(data=data_with_location)
+
+        self.assertTrue(serializer_instance.is_valid())
+
+        task = serializer_instance.save()
+
+        self.assertEqual(location, task.location.get(id=location.id))
+
+    def test_task_parent_link(self):
+        """
+        Test the connection between a parent and child task
+        """
+        mocked_parent_task = mommy.make('tasking.Task', name='Cow Price')
+        mocked_target_object = mommy.make('tasking.Task')
+        now = timezone.now()
+
+        data = {
+            'name': 'Milk Production',
+            'description': 'Some description',
+            'start': now,
+            'total_submission_target': 10,
+            'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+            'target_content_type': self.task_type.id,
+            'target_id': mocked_target_object.id,
+            'parent': mocked_parent_task.id
+        }
+
         serializer_instance = TaskSerializer(data=data)
 
         self.assertTrue(serializer_instance.is_valid())
 
         task = serializer_instance.save()
 
-        self.assertEqual(location, task.location)
+        self.assertEqual(mocked_parent_task, task.parent)

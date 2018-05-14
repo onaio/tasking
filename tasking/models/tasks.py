@@ -4,6 +4,8 @@ Module for the Task model(s)
 """
 from __future__ import unicode_literals
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
@@ -12,7 +14,7 @@ from tasking.models.base import GenericFKModel, TimeStampedModel
 from tasking.utils import validate_rrule
 
 
-class BaseTask(GenericFKModel, TimeStampedModel, models.Model):
+class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
     """
     Base abstract model class for a Task
 
@@ -29,7 +31,7 @@ class BaseTask(GenericFKModel, TimeStampedModel, models.Model):
         (CLOSED, _('Closed')),
     )
 
-    parent = models.ForeignKey(
+    parent = TreeForeignKey(
         'self',
         verbose_name=_('Parent task'),
         null=True,
@@ -102,13 +104,11 @@ class Task(BaseTask):
         blank=True,
         default=None
     )
-    location = models.ForeignKey(
+    location = models.ManyToManyField(
         'tasking.Location',
         verbose_name=_('Location'),
-        null=True,
         blank=True,
         default=None,
-        on_delete=models.SET_NULL,
         help_text=_('This represents the location.'))
 
     # pylint: disable=no-self-use
