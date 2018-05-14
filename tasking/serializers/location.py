@@ -59,6 +59,7 @@ class LocationSerializer(serializers.ModelSerializer):
             'geopoint',
             'radius',
             'shapefile',
+            'parent',
             'created',
             'modified'
         ]
