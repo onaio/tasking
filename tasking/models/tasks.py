@@ -102,13 +102,11 @@ class Task(BaseTask):
         blank=True,
         default=None
     )
-    location = models.ForeignKey(
+    location = models.ManyToManyField(
         'tasking.Location',
         verbose_name=_('Location'),
-        null=True,
         blank=True,
         default=None,
-        on_delete=models.SET_NULL,
         help_text=_('This represents the location.'))
 
     # pylint: disable=no-self-use

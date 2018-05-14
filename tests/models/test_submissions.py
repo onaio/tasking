@@ -19,15 +19,12 @@ class TestSubmission(TestCase):
         """
         Test the string representation of Submission Model
         """
-        nairobi = mommy.make('tasking.Location', name='Nairobi')
         cattle = mommy.make(
             'tasking.Task',
-            name='Cattle Price',
-            location=nairobi)
+            name='Cattle Price')
         submission = mommy.make(
             'tasking.Submission',
             task=cattle,
-            location=nairobi,
             _fill_optional=['user', 'comment', 'submission_time'])
         expected = "Cattle Price - 1 submission 1"
         self.assertEqual(expected, six.text_type(submission))

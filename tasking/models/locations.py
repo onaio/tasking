@@ -5,6 +5,7 @@ Module for the Location model(s)
 from __future__ import unicode_literals
 
 from django_countries.fields import CountryField
+from mptt.models import MPTTModel, TreeForeignKey
 
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext as _
@@ -12,13 +13,20 @@ from django.utils.encoding import python_2_unicode_compatible
 from tasking.models.base import GeoTimeStampedModel
 
 
-class BaseLocation(GeoTimeStampedModel, models.Model):
+class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
     """
     Base abstract model class for a Location
 
     This class is meant to be extended to add Location to your own project.
     It only implements the bare minimum of what a Location could be.
     """
+    parent = TreeForeignKey(
+        'self',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        default=None,
+        related_name=_('children'))
     name = models.CharField(
         _('Name'),
         max_length=255,
@@ -57,6 +65,12 @@ class BaseLocation(GeoTimeStampedModel, models.Model):
         This is the meta options class for the abstract Location model
         """
         abstract = True
+
+    class MPTTMeta:
+        """
+        This is the MPTTMeta options class for the abstract Location model
+        """
+        order_insertion_by = ['id']
 
 
 @python_2_unicode_compatible

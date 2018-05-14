@@ -160,10 +160,13 @@ class TestTaskSerializer(TestSerializerBase):
             'target_content_type': self.task_type.id,
             'target_id': mocked_target_object.id,
         }
-        serializer_instance = TaskSerializer(data=data)
+        data_with_location = data.copy()
+        data_with_location['location'] = [location.id]
+
+        serializer_instance = TaskSerializer(data=data_with_location)
 
         self.assertTrue(serializer_instance.is_valid())
 
         task = serializer_instance.save()
 
-        self.assertEqual(location, task.location)
+        self.assertEqual(location, task.location.get(id=location.id))
