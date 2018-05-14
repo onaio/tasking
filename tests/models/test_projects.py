@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Test for Task List model
+Test for Project model
 """
 from __future__ import unicode_literals
 
@@ -14,9 +14,9 @@ class TestTaskList(TestCase):
     Test class for TaskList models
     """
 
-    def test_task_list_model_str(self):
+    def test_project_model_str(self):
         livestock_task_list = mommy.make(
-            'tasking.TaskList',
+            'tasking.Project',
             name="Livestock tasks")
         expected = "Livestock tasks"
         self.assertEqual(expected, livestock_task_list.__str__())

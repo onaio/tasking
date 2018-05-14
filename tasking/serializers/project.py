@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-Task List Serializers
+Project Serializers
 """
 
 from __future__ import unicode_literals
 
 from rest_framework import serializers
 
-from tasking.models import TaskList
+from tasking.models import Project
 
 
-class TaskListSerializer(serializers.ModelSerializer):
+class ProjectSerializer(serializers.ModelSerializer):
     """
-    Task List serializer class
+    Project serializer class
     """
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
-        Meta options for TaskListSerializer
+        Meta options for ProjectSerializer
         """
-        model = TaskList
+        model = Project
         fields = [
             'id',
             'name',

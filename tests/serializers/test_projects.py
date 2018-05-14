@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Test for Task List Serializers
+Test for Project Serializers
 """
 from __future__ import unicode_literals
 
@@ -8,16 +8,16 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from tasking.serializers import TaskListSerializer
+from tasking.serializers import ProjectSerializer
 
 
-class TestTaskListSerializer(TestCase):
+class TestProjectSerializer(TestCase):
     """
-    Test the Task List Serializer
+    Test the Project Serializer
     """
-    def test_create_task_list(self):
+    def test_create_Project(self):
         """
-        Test that the serializer can create Task List objects
+        Test that the serializer can create Project objects
         """
 
         task_1 = mommy.make('tasking.Task')
@@ -27,13 +27,13 @@ class TestTaskListSerializer(TestCase):
         data_with_tasks = data.copy()
         data_with_tasks['tasks'] = [task_1.id, task_2.id]
 
-        serializer_instance = TaskListSerializer(data=data_with_tasks)
+        serializer_instance = ProjectSerializer(data=data_with_tasks)
 
         self.assertTrue(serializer_instance.is_valid())
-        task_list = serializer_instance.save()
+        Project = serializer_instance.save()
 
         self.assertDictContainsSubset(data, serializer_instance.data)
-        self.assertEqual('Livestock prices', task_list.name)
+        self.assertEqual('Livestock prices', Project.name)
 
         self.assertEqual(set([task_1.id, task_2.id]),
                          set(serializer_instance.data['tasks']))
