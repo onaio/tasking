@@ -11,14 +11,22 @@ from django.utils.translation import ugettext as _
 from django.utils.encoding import python_2_unicode_compatible
 from tasking.models.base import GeoTimeStampedModel
 
+from mptt.models import MPTTModel, TreeForeignKey
 
-class BaseLocation(GeoTimeStampedModel, models.Model):
+
+class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
     """
     Base abstract model class for a Location
 
     This class is meant to be extended to add Location to your own project.
     It only implements the bare minimum of what a Location could be.
     """
+    parent = TreeForeignKey(
+        'self',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name=_('children'))
     name = models.CharField(
         _('Name'),
         max_length=255,
