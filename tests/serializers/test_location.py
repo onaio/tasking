@@ -48,10 +48,28 @@ class TestLocationSerializer(TestCase):
             'shapefile',
             'geopoint',
             'id',
-            'radius'
+            'radius',
+            'parent'
         ]
         self.assertEqual(set(expected_fields),
                          set(list(serializer_instance.data)))
+
+    def test_location_parent_link(self):
+        """
+        Test the parent link between locations
+        """
+        mocked_location_parent = mommy.make('tasking.Location', name='Nairobi')
+        data = {
+            'name': 'Nairobi',
+            'parent': mocked_location_parent.id
+        }
+
+        serializer_instance = LocationSerializer(data=data)
+        self.assertTrue(serializer_instance.is_valid())
+
+        location = serializer_instance.save()
+
+        self.assertEqual(mocked_location_parent, location.parent)
 
     def test_validate_bad_data(self):
         """
