@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='ona-tasking',
-    version='0.1',
+    version=__import__('tasking').__version__,
     description='A Django app that provides adds tasking to your Django '
     'project.',
     license='GPL 3',

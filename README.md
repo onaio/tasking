@@ -8,6 +8,7 @@ A Django app that provides adds tasking to your Django project.
 
 * [Design guidelines](https://github.com/onaio/tasking/blob/master/docs/design.md)
 * [Installation](https://github.com/onaio/tasking/blob/master/docs/installation.md)
+* [Usage](https://github.com/onaio/tasking/blob/master/docs/usage.md)
 * [What is tasking?](https://github.com/onaio/tasking#what-is-tasking)
 * [Testing](https://github.com/onaio/tasking#testing)
 
