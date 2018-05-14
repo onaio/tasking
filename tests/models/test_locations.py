@@ -14,7 +14,7 @@ class TestLocations(TestCase):
     Test class for Location models
     """
 
-    def test_task_model_str(self):
+    def test_location_model_str(self):
         """
         Test the str method on Location model with Country Defined
         """
@@ -25,7 +25,7 @@ class TestLocations(TestCase):
         expected = 'Kenya - Nairobi'
         self.assertEqual(expected, nairobi.__str__())
 
-    def test_task_model_str_no_country(self):
+    def test_location_model_str_no_country(self):
         """
         Test the str method on Location model without Country Defined
         """
