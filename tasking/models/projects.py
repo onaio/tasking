@@ -1,5 +1,5 @@
 """
-Module for the Task List model
+Module for the Project model
 """
 
 from __future__ import unicode_literals
@@ -11,30 +11,30 @@ from django.utils.translation import ugettext as _
 from tasking.models.base import GenericFKModel, TimeStampedModel
 
 
-class BaseTaskList(GenericFKModel, TimeStampedModel, models.Model):
+class BaseProject(GenericFKModel, TimeStampedModel, models.Model):
     """
-    Base abstract model class for a Task List
+    Base abstract model class for a Project
 
-    This class is meant to be extended to add Task Lists to your own project.
-    It only implements the bare minimum of what a Task List could be.
+    This class is meant to be extended to add Projects to your own project.
+    It only implements the bare minimum of what a Project could be.
     """
     name = models.CharField(
         _('Name'),
         max_length=255,
-        help_text=_('This is the name of the task list'))
+        help_text=_('This is the name of the Project'))
 
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
-        The meta option class for BaseTaskList
+        The meta option class for BaseProject
         """
         abstract = True
 
 
 @python_2_unicode_compatible
-class TaskList(BaseTaskList):
+class Project(BaseProject):
     """
-    Task list model class
+    Project model class
     """
     tasks = models.ManyToManyField(
         'tasking.Task',
@@ -46,14 +46,14 @@ class TaskList(BaseTaskList):
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
-        This is the meta options class for the Task List model
+        This is the meta options class for the Project model
         """
         abstract = False
         ordering = ['name']
 
     def __str__(self):
         """
-        String representation of a Task List object
+        String representation of a Project object
 
         e.g. Livestock prices
         """
