@@ -5,13 +5,12 @@ Module for the Location model(s)
 from __future__ import unicode_literals
 
 from django_countries.fields import CountryField
+from mptt.models import MPTTModel, TreeForeignKey
 
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext as _
 from django.utils.encoding import python_2_unicode_compatible
 from tasking.models.base import GeoTimeStampedModel
-
-from mptt.models import MPTTModel, TreeForeignKey
 
 
 class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
@@ -67,7 +66,10 @@ class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
         abstract = True
 
     class MPTTMeta:
-        order_insertion_by = ['name']
+        """
+        This is the MPTTMeta options class for the abstract Location model
+        """
+        order_insertion_by = ['id']
 
 
 @python_2_unicode_compatible
