@@ -66,6 +66,9 @@ class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
         """
         abstract = True
 
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
 
 @python_2_unicode_compatible
 class Location(BaseLocation):
