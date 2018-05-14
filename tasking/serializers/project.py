@@ -5,12 +5,12 @@ Project Serializers
 
 from __future__ import unicode_literals
 
-from rest_framework import serializers
-
 from tasking.models import Project
 
+from tasking.serializers.base import GenericForeignKeySerializer
 
-class ProjectSerializer(serializers.ModelSerializer):
+
+class ProjectSerializer(GenericForeignKeySerializer):
     """
     Project serializer class
     """
@@ -25,5 +25,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'name',
             'tasks',
             'created',
-            'modified'
+            'modified',
+            'target_content_type',
+            'target_id',
         ]
