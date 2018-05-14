@@ -22,13 +22,15 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
     It only implements the bare minimum of what a Task could be.
     """
     ACTIVE = 'a'
-    DRAFT = 'b'
-    CLOSED = 'c'
+    DEACTIVATED = 'b'
+    EXPIRED = 'c'
+    DRAFT = 'd'
 
     STATUS_CHOICES = (
         (ACTIVE, _('Active')),
-        (DRAFT, _('Draft')),
-        (CLOSED, _('Closed')),
+        (DEACTIVATED, _('Deactivated')),
+        (EXPIRED, _('Expired')),
+        (DRAFT, _('Draft'))
     )
 
     parent = TreeForeignKey(
