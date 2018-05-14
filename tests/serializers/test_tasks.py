@@ -9,12 +9,12 @@ from collections import OrderedDict
 from django.utils import timezone
 
 from model_mommy import mommy
-from tests.serializers.test_base import TestSerializerBase
 
+from tests.base import TestBase
 from tasking.serializers import TaskSerializer
 
 
-class TestTaskSerializer(TestSerializerBase):
+class TestTaskSerializer(TestBase):
     """
     Test the TaskSerializer
     """
@@ -82,7 +82,7 @@ class TestTaskSerializer(TestSerializerBase):
         data['start'] = now.isoformat()
 
         # the order of segment_rules may have changed so a dict comparison
-        # may faile, we use `data` that does not include segment rules
+        # may fail, we use `data` that does not include segment rules
         self.assertDictContainsSubset(data, serializer_instance.data)
 
         # we test that we do have our segment rules
