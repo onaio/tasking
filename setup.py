@@ -20,6 +20,7 @@ setup(
         'django-filter',  # for filtering in the API
         'djangorestframework-gis',  # for location model
         'django_countries',  # for location model
+        'django-mptt',  # For MPTT
     ],
     classifiers=[
         'Programming Language :: Python',
