@@ -8,7 +8,7 @@ setup(
     version=__import__('tasking').__version__,
     description='A Django app that provides adds tasking to your Django '
     'project.',
-    license='GPL 3',
+    license='Apache 2.0',
     author='Ona Kenya',
     author_email='tech@ona.io',
     url='https://github.com/onaio/tasking',
