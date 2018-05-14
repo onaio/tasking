@@ -107,7 +107,6 @@ class Task(BaseTask):
         verbose_name=_('Location'),
         blank=True,
         default=None,
-        on_delete=models.SET_NULL,
         help_text=_('This represents the location.'))
 
     # pylint: disable=no-self-use
