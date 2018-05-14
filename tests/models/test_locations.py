@@ -32,3 +32,14 @@ class TestLocations(TestCase):
         nairobi = mommy.make('tasking.Location', name="Nairobi")
         expected = 'Nairobi'
         self.assertEqual(expected, nairobi.__str__())
+
+    def test_location_parent_link(self):
+        """
+        Test the parent link between Locations
+        """
+        nairobi = mommy.make('tasking.Location', name="Nairobi")
+        hurlingham = mommy.make(
+            'tasking.Location',
+            name="Hurlingham",
+            parent=nairobi)
+        self.assertEqual(nairobi, hurlingham.parent)
