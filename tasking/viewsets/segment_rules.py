@@ -16,7 +16,7 @@ class SegmentRuleViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                          mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
                          mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """
-    Viewset for tasks
+    Viewset for segment rules
     """
     serializer_class = SegmentRuleSerializer
     permission_classes = [IsAuthenticated]
