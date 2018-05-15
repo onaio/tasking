@@ -179,7 +179,9 @@ class TestTaskViewSet(TestBase):
         Test UPDATE task
         """
         user = mommy.make('auth.User')
+        user2 = mommy.make('auth.User')
         task_data = self._create_task()
+        task_data2 = self._create_task()
 
         data = {
             'name': "Milk Price",
@@ -200,7 +202,23 @@ class TestTaskViewSet(TestBase):
             response.data['target_content_type'])
         self.assertEqual(user.id, response.data['target_id'])
 
-    #
+        data2 = {
+            'name': "Cattle Price",
+            'description': 'Hello there!',
+            }
+
+        view2 = TaskViewSet.as_view({'patch': 'partial_update'})
+        request2 = self.factory.patch(
+            '/task/{id}'.format(id=task_data2['id']), data=data2)
+        force_authenticate(request2, user=user2)
+        response2 = view2(request=request2, pk=task_data2['id'])
+
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual('Cattle Price', response2.data['name'])
+        self.assertEqual(
+            'Hello there!',
+            response2.data['description'])
+
     def test_authentication_required(self):
         """
         Test that authentication is required for all viewset actions
