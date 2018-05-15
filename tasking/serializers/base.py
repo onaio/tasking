@@ -30,8 +30,17 @@ class GenericForeignKeySerializer(ContentTypeFieldSerializer):
         """
         Validate target id
         """
-        target_id = attrs.get('target_object_id')
-        target_model_contenttype = attrs.get('target_content_type')
+        if self.instance is not None:
+            # we are doing an update
+            target_id = attrs.get(
+                'target_object_id', self.instance.target_object_id)
+            target_model_contenttype = attrs.get(
+                'target_content_type', self.instance.target_content_type)
+        else:
+            # we are creating a new object
+            target_id = attrs.get('target_object_id')
+            target_model_contenttype = attrs.get('target_content_type')
+
         target_model_class = target_model_contenttype.model_class()
 
         try:
