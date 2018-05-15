@@ -195,7 +195,9 @@ class TestTaskViewSet(TestBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual('Milk Price', response.data['name'])
-        self.assertEqual(self.user_type.id, response.data['target_content_type'])
+        self.assertEqual(
+            self.user_type.id,
+            response.data['target_content_type'])
         self.assertEqual(user.id, response.data['target_id'])
 
     #
