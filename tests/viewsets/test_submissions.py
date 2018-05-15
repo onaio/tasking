@@ -10,7 +10,7 @@ from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
 
-from tasking.common_tags import TARGET_DOES_NOT_EXIST
+from tasking.common_tags import TARGET_DOES_NOT_EXIST, CANT_EDIT_TASK
 from tasking.models import Submission
 from tasking.viewsets import SubmissionViewSet
 
@@ -185,14 +185,17 @@ class TestSubmissionViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         user2 = mommy.make('auth.User')
+        user3 = mommy.make('auth.User')
+        task = mommy.make('tasking.Task')
         submission_data = self._create_submission()
         submission_data2 = self._create_submission()
+        submission_data3 = self._create_submission()
 
         data = {
             'target_content_type': self.user_type.id,
             'target_id': user.id,
             }
-
+        # test that target_content_type and target_id can be changed
         view = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
             '/submission/{id}'.format(id=submission_data['id']), data=data)
@@ -221,6 +224,21 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(
             'Hello there!',
             response2.data['comments'])
+
+        data3 = {
+            'task': task.id
+        }
+        # test an error is raised when trying to change task
+        view3 = SubmissionViewSet.as_view({'patch': 'partial_update'})
+        request3 = self.factory.patch(
+            '/submission/{id}'.format(id=submission_data3['id']), data=data3)
+        force_authenticate(request3, user=user3)
+        response3 = view3(request=request3, pk=submission_data3['id'])
+
+        self.assertEqual(response3.status_code, 400)
+        self.assertIn('task', response3.data.keys())
+        self.assertEqual(CANT_EDIT_TASK,
+                         six.text_type(response3.data['task'][0]))
 
         def test_authentication_required(self):
             """
