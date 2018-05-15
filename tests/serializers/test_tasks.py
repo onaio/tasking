@@ -32,9 +32,8 @@ class TestTaskSerializer(TestSerializerBase):
             start=timezone.now(),
             total_submission_target=10,
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
-            target_content_type='task',
-            target_object_id=1337,
-            target_app_label='tasking'
+            target_content_type=self.task_type.id,
+            target_id=1337
         )
 
         self.assertFalse(TaskSerializer(data=bad_target_id).is_valid())
@@ -46,8 +45,7 @@ class TestTaskSerializer(TestSerializerBase):
             total_submission_target=10,
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             target_content_type='foobar',
-            target_object_id=mocked_target_object.id,
-            target_app_label='tasking'
+            target_id=mocked_target_object.id,
         )
 
         self.assertFalse(TaskSerializer(data=bad_content_type).is_valid())
@@ -133,9 +131,8 @@ class TestTaskSerializer(TestSerializerBase):
             'start': timezone.now(),
             'total_submission_target': 10,
             'timing_rule': 'inva;lid',
-            'target_type': 'task',
+            'target_content_type': self.task_type.id,
             'target_id': mocked_target_object.id,
-            'target_app_label': 'tasking'
         }
 
         serializer_instance = TaskSerializer(data=data)
