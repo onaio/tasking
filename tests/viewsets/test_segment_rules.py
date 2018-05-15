@@ -171,7 +171,7 @@ class TestSegmentRuleViewSet(TestBase):
         Test that authentication is required for all viewset actions
         """
         segment_rule_data = self._create_segment_rule()
-        task = mommy.make('tasking.Task')
+        segment_rule = mommy.make('tasking.SegmentRule')
 
         # test that you need authentication for creating a segment rule
         good_data = {
@@ -211,11 +211,13 @@ class TestSegmentRuleViewSet(TestBase):
 
         # test that you need authentication for deleting a segment rule
         # pylint: disable=no-member
-        self.assertTrue(SegmentRule.objects.filter(pk=task.id).exists())
+        self.assertTrue(
+            SegmentRule.objects.filter(pk=segment_rule.id).exists())
 
         view4 = SegmentRuleViewSet.as_view({'delete': 'destroy'})
-        request4 = self.factory.delete('/segment-rule/{id}'.format(id=task.id))
-        response4 = view4(request=request4, pk=task.id)
+        request4 = self.factory.delete(
+            '/segment-rule/{id}'.format(id=segment_rule.id))
+        response4 = view4(request=request4, pk=segment_rule.id)
 
         self.assertEqual(response4.status_code, 403)
         self.assertEqual(
