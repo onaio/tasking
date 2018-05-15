@@ -217,6 +217,7 @@ class TestTaskViewSet(TestBase):
             'Hello there!',
             response2.data['description'])
 
+    # pylint: disable=too-many-locals
     def test_authentication_required(self):
         """
         Test that authentication is required for all viewset actions
