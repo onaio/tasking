@@ -7,12 +7,12 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 
 from model_mommy import mommy
-from tests.serializers.test_base import TestSerializerBase
+from tests.base import TestBase
 
 from tasking.serializers import ProjectSerializer
 
 
-class TestProjectSerializer(TestSerializerBase):
+class TestProjectSerializer(TestBase):
     """
     Test the Project Serializer
     """

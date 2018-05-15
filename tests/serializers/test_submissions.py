@@ -10,14 +10,14 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 from model_mommy import mommy
-from tests.serializers.test_base import TestSerializerBase
+from tests.base import TestBase
 
 from tasking.serializers import SubmissionSerializer
 
 USER = get_user_model()
 
 
-class TestSubmissionSerializer(TestSerializerBase):
+class TestSubmissionSerializer(TestBase):
     """
     Tests for SubmissionSerializer
     """

@@ -6,13 +6,13 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
-from tests.serializers.test_base import TestSerializerBase
+from tests.base import TestBase
 
 from tasking.serializers import SegmentRuleSerializer
 from tasking.utils import get_target
 
 
-class TestSegmentRuleSerializer(TestSerializerBase):
+class TestSegmentRuleSerializer(TestBase):
     """
     Test the SegmentRuleSerializer
     """

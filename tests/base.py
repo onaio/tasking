@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-base Serializer tes classes
+Base Tasking test classes
 """
 from __future__ import unicode_literals
 
@@ -9,9 +9,9 @@ from django.test import TestCase
 from tasking.tools import get_allowed_contenttypes
 
 
-class TestSerializerBase(TestCase):
+class TestBase(TestCase):
     """
-    Serializer base test class
+    Base test class
     """
 
     def setUp(self):
