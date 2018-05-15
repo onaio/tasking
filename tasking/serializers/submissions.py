@@ -21,7 +21,7 @@ class SubmissionSerializer(GenericForeignKeySerializer):
         Validate Task
         """
         if self.instance is not None:
-            if self.instance.task is value:
+            if self.instance.task == value:
                 return value
             else:
                 raise serializers.ValidationError(
