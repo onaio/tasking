@@ -68,7 +68,7 @@ class TestTaskViewSet(TestBase):
 
     def test_create_task(self):
         """
-        Test POST /messaging adding a new task.
+        Test POST /task adding a new task.
         """
         self._create_task()
 
@@ -99,8 +99,6 @@ class TestTaskViewSet(TestBase):
         response1 = view1(request=request1)
 
         self.assertEqual(response1.status_code, 400)
-        response1.render()
-
         self.assertIn('target_id', response1.data.keys())
         self.assertEqual(TARGET_DOES_NOT_EXIST,
                          six.text_type(response1.data['target_id'][0]))
@@ -279,7 +277,7 @@ class TestTaskViewSet(TestBase):
         # test that you need authentication for updating a task
         data = {
             'name': "Milk Price",
-            'target_content_type': self.task_type.id,
+            'target_content_type': self.user_type.id,
             'target_id': user.id,
             }
 
