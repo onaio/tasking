@@ -291,7 +291,7 @@ class TestSubmissionViewSet(TestBase):
             # test that you need authentication for updating a task
             data = {
                 'name': "Milk Price",
-                'target_content_type': self.task_type.id,
+                'target_content_type': self.user_type.id,
                 'target_id': user.id,
                 }
 
