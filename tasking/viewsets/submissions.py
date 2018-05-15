@@ -20,4 +20,4 @@ class SubmissionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     """
     serializer_class = SubmissionSerializer
     permission_classes = [IsAuthenticated]
-    queryset = Submission.objects.all()
+    queryset = Submission.objects.all()  # pylint: disable=no-member
