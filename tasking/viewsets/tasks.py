@@ -11,9 +11,10 @@ from tasking.models import Task
 from tasking.serializers import TaskSerializer
 
 
+# pylint: disable=too-many-ancestors
 class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                   mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
-                  viewsets.GenericViewSet):
+                  mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """
     Viewset for tasks
     """
