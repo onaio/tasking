@@ -174,11 +174,39 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.data.pop(), task_data)
 
+    def test_update_task(self):
+        """
+        Test UPDATE task
+        """
+        user = mommy.make('auth.User')
+        task_data = self._create_task()
+
+        data = {
+            'name': "Milk Price",
+            'target_content_type': self.user_type.id,
+            'target_id': user.id,
+            }
+
+        view = TaskViewSet.as_view({'patch': 'partial_update'})
+        request = self.factory.patch(
+            '/task/{id}'.format(id=task_data['id']), data=data)
+        force_authenticate(request, user=user)
+        response = view(request=request, pk=task_data['id'])
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual('Milk Price', response.data['name'])
+        self.assertEqual(self.user_type.id, response.data['target_content_type'])
+        self.assertEqual(user.id, response.data['target_id'])
+
+    #
     def test_authentication_required(self):
         """
         Test that authentication is required for all viewset actions
         """
         mocked_target_object = mommy.make('tasking.Task')
+        task_data = self._create_task()
+        task = mommy.make('tasking.Task')
+        user = mommy.make('auth.User')
 
         # test that you need authentication for creating a task
         good_data = {
@@ -190,15 +218,57 @@ class TestTaskViewSet(TestBase):
             'target_content_type': self.task_type.id,
             'target_id': mocked_target_object.id,
         }
-        view3 = TaskViewSet.as_view({'post': 'create'})
-        request3 = self.factory.post('/tasks', good_data)
+        view = TaskViewSet.as_view({'post': 'create'})
+        request = self.factory.post('/tasks', good_data)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response.data['detail']))
+
+        # test that you need authentication for retrieving a task
+        view2 = TaskViewSet.as_view({'get': 'retrieve'})
+        request2 = self.factory.get('/task/{id}'.format(id=task_data['id']))
+        response2 = view2(request=request2, pk=task_data['id'])
+        self.assertEqual(response2.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response2.data['detail']))
+
+        # test that you need authentication for listing a task
+        view3 = TaskViewSet.as_view({'get': 'list'})
+        request3 = self.factory.get('/tasks')
         response3 = view3(request=request3)
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
             six.text_type(response3.data['detail']))
 
-        # retrieve
-        # list
-        # destroy
-        # update
+        # test that you need authentication for deleting a task
+        self.assertTrue(Task.objects.filter(pk=task.id).exists())
+
+        view4 = TaskViewSet.as_view({'delete': 'destroy'})
+        request4 = self.factory.delete('/tasks/{id}'.format(id=task.id))
+        response4 = view4(request=request4, pk=task.id)
+
+        self.assertEqual(response4.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response4.data['detail']))
+
+        # test that you need authentication for updating a task
+        data = {
+            'name': "Milk Price",
+            'target_content_type': self.task_type.id,
+            'target_id': user.id,
+            }
+
+        view5 = TaskViewSet.as_view({'patch': 'partial_update'})
+        request5 = self.factory.patch(
+            '/task/{id}'.format(id=task_data['id']), data=data)
+        response5 = view5(request=request5, pk=task_data['id'])
+
+        self.assertEqual(response5.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response5.data['detail']))
