@@ -3,14 +3,21 @@
 Tasking urls module.
 """
 from django.conf.urls import include, url
+
 from rest_framework import routers
 
-from tasking.viewsets import TaskViewSet, ProjectViewSet
+from tasking.viewsets import (LocationViewSet, ProjectViewSet,
+                              SegmentRuleViewSet, SubmissionViewSet,
+                              TaskViewSet)
 
-router = routers.DefaultRouter(trailing_slash=False)  # pylint: disable=C0103
+# pylint: disable=invalid-name
+router = routers.DefaultRouter(trailing_slash=False)
+router.register(r'segment-rules', SegmentRuleViewSet)
 router.register(r'tasks', TaskViewSet)
-router.register(r'tasks', ProjectViewSet)
+router.register(r'submissions', SubmissionViewSet)
+router.register(r'locations', LocationViewSet)
+router.register(r'projects', ProjectViewSet)
 
-urlpatterns = [  # pylint: disable=C0103
+urlpatterns = [
     url(r'^api/v1/', include(router.urls)),
 ]

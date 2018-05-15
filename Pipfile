@@ -16,6 +16,7 @@ model-mommy = "*"
 "psycopg2-binary" = "*"
 "pep8" = "*"
 "autopep8" = "*"
+tblib = "*"
 
 [packages]
 "e1839a8" = {path = ".", editable = true}
