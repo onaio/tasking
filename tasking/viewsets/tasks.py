@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
+from tasking.models import Task
 from tasking.serializers import TaskSerializer
 
 
@@ -18,3 +19,4 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     """
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+    queryset = Task.objects.all()

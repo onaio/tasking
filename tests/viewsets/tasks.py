@@ -11,6 +11,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
 
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
+from tasking.models import Task
 from tasking.viewsets import TaskViewSet
 
 
@@ -23,7 +24,7 @@ class TestTaskViewSet(TestBase):
         super(TestTaskViewSet, self).setUp()
         self.factory = APIRequestFactory()
 
-    def _create_message(self):
+    def _create_task(self):
         """
         Helper to create a single task
         """
@@ -65,11 +66,11 @@ class TestTaskViewSet(TestBase):
         self.assertDictContainsSubset(data, response.data)
         return response.data
 
-    def test_create_message(self):
+    def test_create_task(self):
         """
         Test POST /messaging adding a new task.
         """
-        self._create_message()
+        self._create_task()
 
     def test_create_with_bad_data(self):
         """
@@ -80,6 +81,7 @@ class TestTaskViewSet(TestBase):
         alice_user = mommy.make('auth.User')
         mocked_target_object = mommy.make('tasking.Task')
 
+        # test bad target_id validation
         bad_target_id = dict(
             name='Cow price',
             description='Some description',
@@ -103,6 +105,7 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(TARGET_DOES_NOT_EXIST,
                          six.text_type(response1.data['target_id'][0]))
 
+        # test bad content type validation
         bad_content_type = dict(
             name='Cow price',
             description='Some description',
@@ -126,6 +129,58 @@ class TestTaskViewSet(TestBase):
             'Invalid pk "999" - object does not exist.',
             six.text_type(response2.data['target_content_type'][0]))
 
+    def test_delete_task(self):
+        """
+        Test DELETE tasks.
+        """
+        user = mommy.make('auth.User')
+        task = mommy.make('tasking.Task')
+
+        # assert that task exists
+        self.assertTrue(Task.objects.filter(pk=task.id).exists())
+        # delete task
+        view = TaskViewSet.as_view({'delete': 'destroy'})
+        request = self.factory.delete('/tasks/{id}'.format(id=task.id))
+        force_authenticate(request, user=user)
+        response = view(request=request, pk=task.id)
+        # assert that task was deleted
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Task.objects.filter(pk=task.id).exists())
+
+    def test_retrieve_task(self):
+        """
+        Test GET /tasks/[pk] return a task matching pk.
+        """
+        user = mommy.make('auth.User')
+        task_data = self._create_task()
+        view = TaskViewSet.as_view({'get': 'retrieve'})
+        request = self.factory.get('/task/{id}'.format(id=task_data['id']))
+        force_authenticate(request, user=user)
+        response = view(request=request, pk=task_data['id'])
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(response.data, task_data)
+
+    def test_list_tasks(self):
+        """
+        Test GET /tasks listing of tasks for specific forms.
+        """
+        user = mommy.make('auth.User')
+        task_data = self._create_task()
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        request = self.factory.get('/tasks')
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(response.data.pop(), task_data)
+
+    def test_authentication_required(self):
+        """
+        Test that authentication is required for all viewset actions
+        """
+        mocked_target_object = mommy.make('tasking.Task')
+
+        # test that you need authentication for creating a task
         good_data = {
             'name': 'Cow price',
             'description': 'Some description',
@@ -142,3 +197,8 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(
             'Authentication credentials were not provided.',
             six.text_type(response3.data['detail']))
+
+        # retrieve
+        # list
+        # destroy
+        # update
