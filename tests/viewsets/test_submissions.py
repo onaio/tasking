@@ -543,3 +543,63 @@ class TestSubmissionViewSet(TestBase):
             response.data[-1]['submission_time'],
             Submission.objects.order_by(
                 '-submission_time').last().submission_time.isoformat())
+
+    def test_valid_sorting(self):
+        """
+        Test that you can sort by valid
+        """
+        user = mommy.make('auth.User')
+
+        # make a bunch of submissions
+        mommy.make('tasking.Submission', valid=False, _quantity=7)
+
+        # make one submission using the task
+        submission = mommy.make('tasking.Submission', valid=True)
+
+        # check that we have 8 submissions
+        # pylint: disable=no-member
+        self.assertEqual(Submission.objects.all().count(), 8)
+
+        view = SubmissionViewSet.as_view({'get': 'list'})
+
+        # test sorting by valid
+        request = self.factory.get('/submissions', {'ordering': 'valid'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 8)
+        self.assertEqual(
+            response.data[0]['id'],
+            Submission.objects.order_by('valid').first().id)
+        self.assertEqual(len(response.data), 8)
+        self.assertEqual(response.data[-1]['id'], submission.id)
+
+    def test_approved_sorting(self):
+        """
+        Test that you can sort by approved
+        """
+        user = mommy.make('auth.User')
+
+        # make a bunch of submissions
+        mommy.make('tasking.Submission', approved=True, _quantity=7)
+
+        # make one submission using the task
+        submission = mommy.make('tasking.Submission', valid=False)
+
+        # check that we have 8 submissions
+        # pylint: disable=no-member
+        self.assertEqual(Submission.objects.all().count(), 8)
+
+        view = SubmissionViewSet.as_view({'get': 'list'})
+
+        # test sorting by approved
+        request = self.factory.get('/submissions', {'ordering': '-approved'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 8)
+        self.assertEqual(
+            response.data[0]['id'],
+            Submission.objects.order_by('-approved').first().id)
+        self.assertEqual(len(response.data), 8)
+        self.assertEqual(response.data[-1]['id'], submission.id)
