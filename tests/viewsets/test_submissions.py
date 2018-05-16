@@ -394,7 +394,7 @@ class TestSubmissionViewSet(TestBase):
         # make a bunch of submissions
         mommy.make('tasking.Submission', _quantity=7)
 
-        # make one submission using the task
+        # make one submission using the location
         submission = mommy.make('tasking.Submission', location=location)
 
         # check that we have 8 submissions
@@ -403,7 +403,7 @@ class TestSubmissionViewSet(TestBase):
 
         view = SubmissionViewSet.as_view({'get': 'list'})
 
-        # test that we get submissions for our task
+        # test that we get submissions for our location
         request = self.factory.get('/submissions', {'location': location.id})
         force_authenticate(request, user=user)
         response = view(request=request)
@@ -421,7 +421,7 @@ class TestSubmissionViewSet(TestBase):
         # make a bunch of submissions
         mommy.make('tasking.Submission', _quantity=7)
 
-        # make one submission using the task
+        # make one submission using the user mosh
         submission = mommy.make('tasking.Submission', user=mosh)
 
         # check that we have 8 submissions
@@ -430,10 +430,43 @@ class TestSubmissionViewSet(TestBase):
 
         view = SubmissionViewSet.as_view({'get': 'list'})
 
-        # test that we get submissions for our task
+        # test that we get submissions for our user mosh
         request = self.factory.get('/submissions', {'user': mosh.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], submission.id)
+
+    def test_approved_filter(self):
+        """
+        Test that you can filter by task
+        """
+        user = mommy.make('auth.User')
+
+        # make a bunch of submissions
+        mommy.make('tasking.Submission', approved=False, _quantity=7)
+
+        # make one submission using the task
+        submission = mommy.make('tasking.Submission', approved=True)
+
+        # check that we have 8 submissions
+        # pylint: disable=no-member
+        self.assertEqual(Submission.objects.all().count(), 8)
+
+        view = SubmissionViewSet.as_view({'get': 'list'})
+
+        # test that we get approved submissions
+        request = self.factory.get('/submissions', {'approved': 1})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], submission.id)
+
+        # test that we get not approved submissions
+        request = self.factory.get('/submissions', {'approved': 0})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
