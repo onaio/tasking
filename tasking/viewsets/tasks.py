@@ -21,7 +21,10 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     """
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter]
     filter_fields = ['location', 'status', 'project']
     search_fields = ['name', ]
     ordering_fields = ['created', 'status']
