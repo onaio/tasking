@@ -413,7 +413,7 @@ class TestSubmissionViewSet(TestBase):
 
     def test_user_filter(self):
         """
-        Test that you can filter by task
+        Test that you can filter by user
         """
         user = mommy.make('auth.User')
         mosh = mommy.make('auth.User', username='mosh')
@@ -440,7 +440,7 @@ class TestSubmissionViewSet(TestBase):
 
     def test_approved_filter(self):
         """
-        Test that you can filter by task
+        Test that you can filter by approved
         """
         user = mommy.make('auth.User')
 
@@ -466,6 +466,39 @@ class TestSubmissionViewSet(TestBase):
 
         # test that we get not approved submissions
         request = self.factory.get('/submissions', {'approved': 0})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+
+    def test_valid_filter(self):
+        """
+        Test that you can filter by valid
+        """
+        user = mommy.make('auth.User')
+
+        # make a bunch of submissions
+        mommy.make('tasking.Submission', valid=False, _quantity=7)
+
+        # make one submission using the task
+        submission = mommy.make('tasking.Submission', valid=True)
+
+        # check that we have 8 submissions
+        # pylint: disable=no-member
+        self.assertEqual(Submission.objects.all().count(), 8)
+
+        view = SubmissionViewSet.as_view({'get': 'list'})
+
+        # test that we get valid submissions
+        request = self.factory.get('/submissions', {'valid': 1})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], submission.id)
+
+        # test that we get not valid submissions
+        request = self.factory.get('/submissions', {'valid': 0})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
