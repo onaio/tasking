@@ -252,7 +252,6 @@ class TestSubmissionViewSet(TestBase):
         mocked_location = mommy.make('tasking.Location', name='Nairobi')
         mocked_user = mommy.make('auth.User')
         submission = mommy.make('tasking.Submission')
-        submission_data = self._create_submission()
 
         data = {
             'task': mocked_task.id,
@@ -278,23 +277,24 @@ class TestSubmissionViewSet(TestBase):
 
         # test that you need authentication for retrieving a submission
         view2 = SubmissionViewSet.as_view({'get': 'retrieve'})
-        request2 = self.factory.get('/task/{id}'.format(id=data['id']))
-        response2 = view2(request=request2, pk=data['id'])
+        request2 = self.factory.get(
+            '/submissions/{id}'.format(id=submission.id))
+        response2 = view2(request=request2, pk=submission.id)
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
             six.text_type(response2.data['detail']))
 
-        # test that you need authentication for listing a task
+        # test that you need authentication for listing submissions
         view3 = SubmissionViewSet.as_view({'get': 'list'})
-        request3 = self.factory.get('/tasks')
+        request3 = self.factory.get('/submissions')
         response3 = view3(request=request3)
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
             six.text_type(response3.data['detail']))
 
-        # test that you need authentication for deleting a task
+        # test that you need authentication for deleting a submission
         # pylint: disable=no-member
         self.assertTrue(
             Submission.objects.filter(pk=submission.id).exists())
@@ -309,17 +309,15 @@ class TestSubmissionViewSet(TestBase):
             'Authentication credentials were not provided.',
             six.text_type(response4.data['detail']))
 
-        # test that you need authentication for updating a task
+        # test that you need authentication for updating a submission
         data = {
-            'name': "Milk Price",
-            'target_content_type': self.user_type.id,
-            'target_id': mocked_user.id,
+            'approved': False,
             }
 
         view5 = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request5 = self.factory.patch(
-            '/task/{id}'.format(id=data['id']), data=data)
-        response5 = view5(request=request5, pk=submission_data['id'])
+            '/submissions/{id}'.format(id=submission.id), data=data)
+        response5 = view5(request=request5, pk=submission.id)
 
         self.assertEqual(response5.status_code, 403)
         self.assertEqual(
