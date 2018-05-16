@@ -447,6 +447,22 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(
             Task.objects.filter(project=project2.id).count(), 1)
 
+    def test_name_search(self):
+        """
+        Test that you can search by Name
+        """
+        user = mommy.make('auth.User')
+        mommy.make('tasking.Task', name='Cattle Price')
+
+        view = TaskViewSet.as_view({'get': 'list'})
+        request = self.factory.get('/tasks', {'name': 'Cattle Price'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            Task.objects.filter(name='Cattle Price').count(), 1)
+
     def test_task_sorting(self):
         """
         Test that sorting works
