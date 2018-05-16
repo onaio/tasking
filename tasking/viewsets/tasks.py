@@ -25,7 +25,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         DjangoFilterBackend,
         filters.OrderingFilter,
         filters.SearchFilter]
-    filter_fields = ['location', 'status', 'project']
+    filter_fields = ['location', 'status', 'project', 'parent']
     search_fields = ['name', ]
     ordering_fields = ['created', 'status']
     queryset = Task.objects.all()
