@@ -338,8 +338,8 @@ class TestTaskViewSet(TestBase):
         user = mommy.make('auth.User')
         parent1 = mommy.make('tasking.Task')
         parent2 = mommy.make('tasking.Task')
-        for i in range(0, 7):
-            mommy.make('tasking.Task', parent=parent1)
+
+        mommy.make('tasking.Task', parent=parent1, _quantity=7)
 
         view = TaskViewSet.as_view({'get': 'list'})
 
@@ -374,8 +374,7 @@ class TestTaskViewSet(TestBase):
         Test that you can filter by status
         """
         user = mommy.make('auth.User')
-        for i in range(0, 7):
-            mommy.make('tasking.Task', status=Task.DEACTIVATED)
+        mommy.make('tasking.Task', status=Task.DEACTIVATED, _quantity=7)
 
         view = TaskViewSet.as_view({'get': 'list'})
 
@@ -453,9 +452,8 @@ class TestTaskViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         mommy.make('tasking.Task', name='Cattle Price')
+        mommy.make('tasking.Task', name='Chicken Price', _quantity=7)
 
-        for i in range(0, 7):
-            mommy.make('tasking.Task', name='Chicken Price')
         view = TaskViewSet.as_view({'get': 'list'})
         request = self.factory.get('/tasks', {'search': 'Cattle Price'})
         force_authenticate(request, user=user)
