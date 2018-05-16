@@ -410,3 +410,30 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], submission.id)
+
+    def test_user_filter(self):
+        """
+        Test that you can filter by task
+        """
+        user = mommy.make('auth.User')
+        mosh = mommy.make('auth.User', username='mosh')
+
+        # make a bunch of submissions
+        mommy.make('tasking.Submission', _quantity=7)
+
+        # make one submission using the task
+        submission = mommy.make('tasking.Submission', user=mosh)
+
+        # check that we have 8 submissions
+        # pylint: disable=no-member
+        self.assertEqual(Submission.objects.all().count(), 8)
+
+        view = SubmissionViewSet.as_view({'get': 'list'})
+
+        # test that we get submissions for our task
+        request = self.factory.get('/submissions', {'user': mosh.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], submission.id)
