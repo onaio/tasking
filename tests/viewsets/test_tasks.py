@@ -514,6 +514,16 @@ class TestTaskViewSet(TestBase):
             response.data[0]['name'], task2.name)
         self.assertEqual(response.data[0]['id'], task2.id)
 
+        # order by project ascending
+        request = self.factory.get('/tasks', {'project': project2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], task2.name)
+        self.assertEqual(
+            Task.objects.filter(project=project2.id).count(), 1)
+
     def test_search_filter_order(self):
         """
         Test that you can search filter and order at the same time
