@@ -291,3 +291,267 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(
             'Authentication credentials were not provided.',
             six.text_type(response5.data['detail']))
+
+    def test_location_filter(self):
+        """
+        Test that you can filter by location
+        """
+        user = mommy.make('auth.User')
+        nairobi = mommy.make('tasking.Location', name='Nairobi')
+        arusha = mommy.make('tasking.Location', name='Arusha')
+        for i in range(0, 7):
+            task = mommy.make('tasking.Task')
+            task.location.add(nairobi)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        # assert that there are no tasks for Arusha
+        request = self.factory.get('/tasks', {'location': arusha.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(Task.objects.filter(location=arusha).count(), 0)
+
+        # assert that there are 7 tasks for Nairobi
+        request = self.factory.get('/tasks', {'location': nairobi.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(Task.objects.filter(location=nairobi).count(), 7)
+
+        # add one Arusha task and assert that we get it back
+        task2 = mommy.make('tasking.Task')
+        task2.location.add(arusha)
+        request = self.factory.get('/tasks', {'location': arusha.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(Task.objects.filter(location=arusha).count(), 1)
+
+    def test_parent_filter(self):
+        """
+        Test that you can filter by parent
+        """
+        user = mommy.make('auth.User')
+        parent1 = mommy.make('tasking.Task')
+        parent2 = mommy.make('tasking.Task')
+
+        mommy.make('tasking.Task', parent=parent1, _quantity=7)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        # assert that there are no tasks whose parent is parent2
+        request = self.factory.get('/tasks', {'parent': parent2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(Task.objects.filter(parent=parent2.id).count(), 0)
+
+        # assert that there are 7 tasks whose parent is parent1
+        request = self.factory.get('/tasks', {'parent': parent1.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(Task.objects.filter(parent=parent1.id).count(), 7)
+
+        # create a task whose parent is parent2 and assert its there
+        mommy.make('tasking.Task', parent=parent2)
+
+        request = self.factory.get('/tasks', {'parent': parent2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(Task.objects.filter(parent=parent2.id).count(), 1)
+
+    def test_status_filter(self):
+        """
+        Test that you can filter by status
+        """
+        user = mommy.make('auth.User')
+        mommy.make('tasking.Task', status=Task.DEACTIVATED, _quantity=7)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        # assert that there are no tasks with an Active Status
+        request = self.factory.get('/tasks', {'status': Task.ACTIVE})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(Task.objects.filter(status=Task.ACTIVE).count(), 0)
+
+        # assert that there are 7 tasks with an Deactivated Status
+        request = self.factory.get('/tasks', {'status': Task.DEACTIVATED})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(
+            Task.objects.filter(status=Task.DEACTIVATED).count(), 7)
+
+        # add a task with with an Active Status and assert that we get it back
+        mommy.make('tasking.Task', status=Task.ACTIVE)
+        request = self.factory.get('/tasks', {'status': Task.ACTIVE})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(Task.objects.filter(status=Task.ACTIVE).count(), 1)
+
+    def test_project_filter(self):
+        """
+        Test that you can filter by Project
+        """
+        user = mommy.make('auth.User')
+        project1 = mommy.make('tasking.Project', name='Test Case Scenario')
+        project2 = mommy.make('tasking.Project', name='Reality Check')
+        for i in range(0, 7):
+            task = mommy.make('tasking.Task')
+            project1.tasks.add(task)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+        # assert that there are no tasks in project Reality Check
+        request = self.factory.get('/tasks', {'project': project2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(
+            Task.objects.filter(project=project2.id).count(), 0)
+
+        # assert that there are 7 tasks in project Test Case Scenario
+        request = self.factory.get('/tasks', {'project': project1.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(
+            Task.objects.filter(project=project1.id).count(), 7)
+
+        # add a task to project Reality Check and assert its there
+        task2 = mommy.make('tasking.Task')
+        project2.tasks.add(task2)
+
+        request = self.factory.get('/tasks', {'project': project2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            Task.objects.filter(project=project2.id).count(), 1)
+
+    def test_name_search(self):
+        """
+        Test that you can search by Name
+        """
+        user = mommy.make('auth.User')
+        mommy.make('tasking.Task', name='Cattle Price')
+        mommy.make('tasking.Task', name='Chicken Price', _quantity=7)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+        request = self.factory.get('/tasks', {'search': 'Cattle Price'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            Task.objects.filter(name='Cattle Price').count(), 1)
+
+    def test_task_sorting(self):
+        """
+        Test that sorting works
+        """
+        user = mommy.make('auth.User')
+        project1 = mommy.make('tasking.Project')
+        project2 = mommy.make('tasking.Project')
+        task1 = mommy.make(
+            'tasking.Task', name='Milk Production Size', status=Task.DRAFT)
+        for i in range(0, 7):
+            # create other tasks
+            task = mommy.make(
+                'tasking.Task', name='Cow Price', status=Task.DEACTIVATED)
+            project1.tasks.add(task)
+        task2 = mommy.make(
+            'tasking.Task',
+            name='Allocated land for farming', status=Task.ACTIVE)
+        project2.tasks.add(task2)
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        # order by status descending
+        request = self.factory.get('/tasks', {'ordering': '-status'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.data[0]['id'], task1.id)
+        self.assertEqual(response.data[0]['status'], task1.status)
+        self.assertEqual(response.data[-1]['id'], task2.id)
+        self.assertEqual(response.data[-1]['status'], task2.status)
+
+        # order by created ascending
+        request = self.factory.get('/tasks', {'ordering': 'created'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[0]['created'], task1.created.isoformat())
+        self.assertEqual(response.data[0]['id'], task1.id)
+        self.assertEqual(
+            response.data[-1]['created'], task2.created.isoformat())
+        self.assertEqual(response.data[-1]['id'], task2.id)
+
+        # order by name ascending
+        request = self.factory.get('/tasks', {'ordering': 'name'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[-1]['name'], task1.name)
+        self.assertEqual(response.data[-1]['id'], task1.id)
+        self.assertEqual(
+            response.data[0]['name'], task2.name)
+        self.assertEqual(response.data[0]['id'], task2.id)
+
+        # order by project ascending
+        request = self.factory.get('/tasks', {'project': project2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], task2.name)
+        self.assertEqual(
+            Task.objects.filter(project=project2.id).count(), 1)
+
+    def test_search_filter_order(self):
+        """
+        Test that you can search filter and order at the same time
+        """
+        user = mommy.make('auth.User')
+
+        task = mommy.make(
+            'tasking.Task', name='Cattle Price', status=Task.ACTIVE)
+        task2 = mommy.make(
+            'tasking.Task', name='Cattle Price', status=Task.ACTIVE)
+
+        mommy.make('tasking.Task', name='Cattle Price', status=Task.DRAFT)
+
+        for i in range(0, 4):
+            mommy.make(
+                'tasking.Task', name='Cattle Price', status=Task.DEACTIVATED)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        request = self.factory.get(
+            '/tasks?search={name}&status={status}&ordering={order}'.format(
+                name='Cattle Price', status=Task.ACTIVE, order='created'))
+        force_authenticate(request, user=user)
+
+        response = view(request=request)
+
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['status'], task.status)
+        self.assertEqual(response.data[0]['id'], task.id)
+        self.assertEqual(response.data[1]['status'], task2.status)
+        self.assertEqual(response.data[1]['id'], task2.id)
