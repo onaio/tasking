@@ -454,6 +454,8 @@ class TestTaskViewSet(TestBase):
         user = mommy.make('auth.User')
         mommy.make('tasking.Task', name='Cattle Price')
 
+        for i in range(0, 7):
+            mommy.make('tasking.Task', name='Chicken Price')
         view = TaskViewSet.as_view({'get': 'list'})
         request = self.factory.get('/tasks', {'search': 'Cattle Price'})
         force_authenticate(request, user=user)
