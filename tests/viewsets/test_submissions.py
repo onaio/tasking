@@ -68,6 +68,7 @@ class TestSubmissionViewSet(TestBase):
         """
         self._create_submission()
 
+    # pylint: disable=too-many-locals
     def test_create_with_bad_data(self):
         """
         Test that we get appropriate errors when trying to create an object
@@ -138,6 +139,7 @@ class TestSubmissionViewSet(TestBase):
         submission = mommy.make('tasking.Submission')
 
         # assert that submission exists
+        # pylint: disable=no-member
         self.assertTrue(Submission.objects.filter(pk=submission.id).exists())
         # delete submission
         view = SubmissionViewSet.as_view({'delete': 'destroy'})
@@ -240,85 +242,119 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(CANT_EDIT_TASK,
                          six.text_type(response3.data['task'][0]))
 
-        def test_authentication_required(self):
-            """
-            Test that authentication is required for all viewset actions
-            """
-            now = timezone.now()
-            mocked_target_object = mommy.make('auth.User')
-            mocked_task = mommy.make('tasking.Task', name='Cow Prices')
-            mocked_location = mommy.make('tasking.Location', name='Nairobi')
-            mocked_user = mommy.make('auth.User')
-            submission = mommy.make('tasking.Submission')
-            submission_data = self._create_submission()
+    def test_authentication_required(self):
+        """
+        Test that authentication is required for all viewset actions
+        """
+        now = timezone.now()
+        mocked_target_object = mommy.make('auth.User')
+        mocked_task = mommy.make('tasking.Task', name='Cow Prices')
+        mocked_location = mommy.make('tasking.Location', name='Nairobi')
+        mocked_user = mommy.make('auth.User')
+        submission = mommy.make('tasking.Submission')
+        submission_data = self._create_submission()
 
-            data = {
-                'task': mocked_task.id,
-                'location': mocked_location.id,
-                'submission_time': now,
-                'user': mocked_user.id,
-                'comments': 'Approved',
-                'approved': True,
-                'valid': True,
-                'target_content_type': self.user_type.id,
-                'target_id': mocked_target_object.id,
+        data = {
+            'task': mocked_task.id,
+            'location': mocked_location.id,
+            'submission_time': now,
+            'user': mocked_user.id,
+            'comments': 'Approved',
+            'approved': True,
+            'valid': True,
+            'target_content_type': self.user_type.id,
+            'target_id': mocked_target_object.id,
+        }
+
+        # test that you need authentication for creating a submission
+        view = SubmissionViewSet.as_view({'post': 'create'})
+        request = self.factory.post('/submissions', data)
+        response = view(request=request)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response.data['detail']))
+
+        # test that you need authentication for retrieving a submission
+        view2 = SubmissionViewSet.as_view({'get': 'retrieve'})
+        request2 = self.factory.get('/task/{id}'.format(id=data['id']))
+        response2 = view2(request=request2, pk=data['id'])
+        self.assertEqual(response2.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response2.data['detail']))
+
+        # test that you need authentication for listing a task
+        view3 = SubmissionViewSet.as_view({'get': 'list'})
+        request3 = self.factory.get('/tasks')
+        response3 = view3(request=request3)
+        self.assertEqual(response3.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response3.data['detail']))
+
+        # test that you need authentication for deleting a task
+        # pylint: disable=no-member
+        self.assertTrue(
+            Submission.objects.filter(pk=submission.id).exists())
+
+        view4 = SubmissionViewSet.as_view({'delete': 'destroy'})
+        request4 = self.factory.delete(
+            '/tasks/{id}'.format(id=submission.id))
+        response4 = view4(request=request4, pk=submission.id)
+
+        self.assertEqual(response4.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response4.data['detail']))
+
+        # test that you need authentication for updating a task
+        data = {
+            'name': "Milk Price",
+            'target_content_type': self.user_type.id,
+            'target_id': mocked_user.id,
             }
 
-            # test that you need authentication for creating a submission
-            view = SubmissionViewSet.as_view({'post': 'create'})
-            request = self.factory.post('/submissions', data)
-            response = view(request=request)
+        view5 = SubmissionViewSet.as_view({'patch': 'partial_update'})
+        request5 = self.factory.patch(
+            '/task/{id}'.format(id=data['id']), data=data)
+        response5 = view5(request=request5, pk=submission_data['id'])
 
-            self.assertEqual(response.status_code, 403)
-            self.assertEqual(
-                'Authentication credentials were not provided.',
-                six.text_type(response.data['detail']))
+        self.assertEqual(response5.status_code, 403)
+        self.assertEqual(
+            'Authentication credentials were not provided.',
+            six.text_type(response5.data['detail']))
 
-            # test that you need authentication for retrieving a submission
-            view2 = SubmissionViewSet.as_view({'get': 'retrieve'})
-            request2 = self.factory.get('/task/{id}'.format(id=data['id']))
-            response2 = view2(request=request2, pk=data['id'])
-            self.assertEqual(response2.status_code, 403)
-            self.assertEqual(
-                'Authentication credentials were not provided.',
-                six.text_type(response2.data['detail']))
+    def test_search(self):
+        """
+        Test that you can search for submissions.
+        """
+        user = mommy.make('auth.User')
 
-            # test that you need authentication for listing a task
-            view3 = SubmissionViewSet.as_view({'get': 'list'})
-            request3 = self.factory.get('/tasks')
-            response3 = view3(request=request3)
-            self.assertEqual(response3.status_code, 403)
-            self.assertEqual(
-                'Authentication credentials were not provided.',
-                six.text_type(response3.data['detail']))
+        task1 = mommy.make('tasking.Task')
+        task2 = mommy.make('tasking.Task', name='Hyperion')
 
-            # test that you need authentication for deleting a task
-            self.assertTrue(
-                Submission.objects.filter(pk=submission.id).exists())
+        sub1 = mommy.make('tasking.Submission', task=task2)
+        mommy.make('tasking.Submission', task=task1)
 
-            view4 = SubmissionViewSet.as_view({'delete': 'destroy'})
-            request4 = self.factory.delete(
-                '/tasks/{id}'.format(id=submission.id))
-            response4 = view4(request=request4, pk=submission.id)
+        # there are two submissions
+        # pylint: disable=no-member
+        self.assertEqual(Submission.objects.all().count(), 2)
 
-            self.assertEqual(response4.status_code, 403)
-            self.assertEqual(
-                'Authentication credentials were not provided.',
-                six.text_type(response4.data['detail']))
+        view = SubmissionViewSet.as_view({'get': 'list'})
 
-            # test that you need authentication for updating a task
-            data = {
-                'name': "Milk Price",
-                'target_content_type': self.user_type.id,
-                'target_id': user.id,
-                }
+        # Test that we can search by task_name and get back what we expect
+        request = self.factory.get('/submissions', {'search': 'Hyperion'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], sub1.id)
+        self.assertEqual(len(response.data), 1)
 
-            view5 = SubmissionViewSet.as_view({'patch': 'partial_update'})
-            request5 = self.factory.patch(
-                '/task/{id}'.format(id=data['id']), data=data)
-            response5 = view5(request=request5, pk=submission_data['id'])
-
-            self.assertEqual(response5.status_code, 403)
-            self.assertEqual(
-                'Authentication credentials were not provided.',
-                six.text_type(response5.data['detail']))
+        # test that we get no results for a name that doesn't exist
+        request = self.factory.get('/submissions', {'search': 'invalid'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
