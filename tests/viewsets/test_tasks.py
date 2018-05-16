@@ -330,3 +330,37 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(Task.objects.filter(location=arusha).count(), 1)
+
+    def test_task_sorting(self):
+        """
+        Test that sorting works
+        """
+        user = mommy.make('auth.User')
+
+        task = mommy.make('tasking.Task', status=Task.DRAFT)
+        for i in range(0, 7):
+            # create other tasks
+            mommy.make('tasking.Task', status=Task.DEACTIVATED)
+        task2 = mommy.make('tasking.Task', status=Task.ACTIVE)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        # order by status descending
+        request = self.factory.get('/tasks', {'ordering': '-status'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.data[0]['id'], task.id)
+        self.assertEqual(response.data[0]['status'], task.status)
+        self.assertEqual(response.data[-1]['id'], task2.id)
+        self.assertEqual(response.data[-1]['status'], task2.status)
+
+        # order by created ascending
+        request = self.factory.get('/tasks', {'ordering': 'created'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[0]['created'], task.created.isoformat())
+        self.assertEqual(response.data[0]['id'], task.id)
+        self.assertEqual(
+            response.data[-1]['created'], task2.created.isoformat())
+        self.assertEqual(response.data[-1]['id'], task2.id)
