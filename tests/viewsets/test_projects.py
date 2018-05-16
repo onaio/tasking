@@ -284,7 +284,7 @@ class TestProjectViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         mommy.make('tasking.Project', name='Golden Goose')
-        mommy.make('tasking.Task', name='Cattle', _quantity=7)
+        mommy.make('tasking.Project', name='Cattle', _quantity=7)
 
         view = ProjectViewSet.as_view({'get': 'list'})
         request = self.factory.get('/projects', {'search': 'Golden Goose'})
