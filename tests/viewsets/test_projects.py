@@ -277,3 +277,52 @@ class TestProjectViewSet(TestBase):
         self.assertEqual(
             'Authentication credentials were not provided.',
             six.text_type(response5.data['detail']))
+
+    def test_name_search(self):
+        """
+        Test that you can search by Name
+        """
+        user = mommy.make('auth.User')
+        mommy.make('tasking.Project', name='Golden Goose')
+        mommy.make('tasking.Task', name='Cattle', _quantity=7)
+
+        view = ProjectViewSet.as_view({'get': 'list'})
+        request = self.factory.get('/projects', {'search': 'Golden Goose'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            Project.objects.filter(name='Golden Goose').count(), 1)
+
+    def test_project_sorting(self):
+        """
+        Test that sorting works
+        """
+        user = mommy.make('auth.User')
+        project1 = mommy.make('tasking.Project', name='Argicultural')
+        project2 = mommy.make('tasking.Project', name='Racer')
+
+        view = ProjectViewSet.as_view({'get': 'list'})
+
+        # order by name descending
+        request = self.factory.get('/projects', {'ordering': '-name'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[0]['name'], project2.name)
+        self.assertEqual(response.data[0]['id'], project2.id)
+        self.assertEqual(
+            response.data[-1]['name'], project1.name)
+        self.assertEqual(response.data[-1]['id'], project1.id)
+
+        # order by created ascending
+        request = self.factory.get('/projects', {'ordering': 'created'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[0]['created'], project1.created.isoformat())
+        self.assertEqual(response.data[0]['id'], project1.id)
+        self.assertEqual(
+            response.data[-1]['created'], project2.created.isoformat())
+        self.assertEqual(response.data[-1]['id'], project2.id)
