@@ -331,6 +331,44 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(Task.objects.filter(location=arusha).count(), 1)
 
+    def test_parent_filter(self):
+        """
+        Test that you can filter by parent
+        """
+        user = mommy.make('auth.User')
+        parent1 = mommy.make('tasking.Task')
+        parent2 = mommy.make('tasking.Task')
+        for i in range(0, 7):
+            mommy.make('tasking.Task', parent=parent1)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        # assert that there are no tasks whose parent is parent2
+        request = self.factory.get('/tasks', {'parent': parent2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(Task.objects.filter(parent=parent2.id).count(), 0)
+
+        # assert that there are 7 tasks whose parent is parent1
+        request = self.factory.get('/tasks', {'parent': parent1.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(Task.objects.filter(parent=parent1.id).count(), 7)
+
+        # create a task whose parent is parent2 and assert its there
+        mommy.make('tasking.Task', parent=parent2)
+
+        request = self.factory.get('/tasks', {'parent': parent2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(Task.objects.filter(parent=parent2.id).count(), 1)
+
     def test_status_filter(self):
         """
         Test that you can filter by status
