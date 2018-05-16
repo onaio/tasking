@@ -603,3 +603,39 @@ class TestSubmissionViewSet(TestBase):
             Submission.objects.order_by('-approved').first().id)
         self.assertEqual(len(response.data), 8)
         self.assertEqual(response.data[-1]['id'], submission.id)
+
+    def test_created_sorting(self):
+        """
+        Test sorting by created
+        """
+        user = mommy.make('auth.User')
+
+        # create a bunch of submissions
+        mommy.make('tasking.Submission', _quantity=100)
+
+        # check that we have 8 submissions
+        # pylint: disable=no-member
+        self.assertEqual(Submission.objects.all().count(), 100)
+
+        view = SubmissionViewSet.as_view({'get': 'list'})
+
+        # test sorting by created
+        request = self.factory.get('/submissions', {'ordering': '-created'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 100)
+        self.assertEqual(
+            response.data[0]['id'],
+            Submission.objects.order_by('-created').first().id)
+        self.assertEqual(
+            response.data[0]['created'],
+            Submission.objects.order_by(
+                '-created').first().created.isoformat())
+        self.assertEqual(
+            response.data[-1]['id'],
+            Submission.objects.order_by('-created').last().id)
+        self.assertEqual(
+            response.data[-1]['created'],
+            Submission.objects.order_by(
+                '-created').last().created.isoformat())
