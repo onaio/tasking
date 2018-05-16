@@ -468,21 +468,27 @@ class TestTaskViewSet(TestBase):
         Test that sorting works
         """
         user = mommy.make('auth.User')
-
-        task = mommy.make('tasking.Task', status=Task.DRAFT)
+        project1 = mommy.make('tasking.Project')
+        project2 = mommy.make('tasking.Project')
+        task1 = mommy.make(
+            'tasking.Task', name='Milk Production Size', status=Task.DRAFT)
         for i in range(0, 7):
             # create other tasks
-            mommy.make('tasking.Task', status=Task.DEACTIVATED)
-        task2 = mommy.make('tasking.Task', status=Task.ACTIVE)
-
+            task = mommy.make(
+                'tasking.Task', name='Cow Price', status=Task.DEACTIVATED)
+            project1.tasks.add(task)
+        task2 = mommy.make(
+            'tasking.Task',
+            name='Allocated land for farming', status=Task.ACTIVE)
+        project2.tasks.add(task2)
         view = TaskViewSet.as_view({'get': 'list'})
 
         # order by status descending
         request = self.factory.get('/tasks', {'ordering': '-status'})
         force_authenticate(request, user=user)
         response = view(request=request)
-        self.assertEqual(response.data[0]['id'], task.id)
-        self.assertEqual(response.data[0]['status'], task.status)
+        self.assertEqual(response.data[0]['id'], task1.id)
+        self.assertEqual(response.data[0]['status'], task1.status)
         self.assertEqual(response.data[-1]['id'], task2.id)
         self.assertEqual(response.data[-1]['status'], task2.status)
 
@@ -491,8 +497,19 @@ class TestTaskViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(
-            response.data[0]['created'], task.created.isoformat())
-        self.assertEqual(response.data[0]['id'], task.id)
+            response.data[0]['created'], task1.created.isoformat())
+        self.assertEqual(response.data[0]['id'], task1.id)
         self.assertEqual(
             response.data[-1]['created'], task2.created.isoformat())
         self.assertEqual(response.data[-1]['id'], task2.id)
+
+        # order by name ascending
+        request = self.factory.get('/tasks', {'ordering': 'name'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[-1]['name'], task1.name)
+        self.assertEqual(response.data[-1]['id'], task1.id)
+        self.assertEqual(
+            response.data[0]['name'], task2.name)
+        self.assertEqual(response.data[0]['id'], task2.id)
