@@ -639,3 +639,33 @@ class TestSubmissionViewSet(TestBase):
             response.data[-1]['created'],
             Submission.objects.order_by(
                 '-created').last().created.isoformat())
+
+    def test_task_id_sorting(self):
+        """
+        Test sorting by task id
+        """
+        user = mommy.make('auth.User')
+
+        task = mommy.make('tasking.Task')
+        mommy.make('tasking.Task', _quantity=39)  # increase task id counter
+        task2 = mommy.make('tasking.Task')
+        # create a bunch of submissions
+        mommy.make('tasking.Submission', _quantity=17, task=task)
+        # create one submission using task2
+        mommy.make('tasking.Submission', task=task2)
+
+        view = SubmissionViewSet.as_view({'get': 'list'})
+
+        # test task id sorting
+        request = self.factory.get('/submissions', {'ordering': '-task__id'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 18)
+        # pylint: disable=no-member
+        self.assertEqual(
+            response.data[0]['id'],
+            Submission.objects.order_by('-task__id').first().id)
+        self.assertEqual(
+            response.data[0]['task'],
+            task2.id)
