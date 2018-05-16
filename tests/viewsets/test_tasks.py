@@ -455,7 +455,7 @@ class TestTaskViewSet(TestBase):
         mommy.make('tasking.Task', name='Cattle Price')
 
         view = TaskViewSet.as_view({'get': 'list'})
-        request = self.factory.get('/tasks', {'name': 'Cattle Price'})
+        request = self.factory.get('/tasks', {'search': 'Cattle Price'})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
@@ -513,3 +513,35 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(
             response.data[0]['name'], task2.name)
         self.assertEqual(response.data[0]['id'], task2.id)
+
+    def test_search_filter_order(self):
+        """
+        Test that you can search filter and order at the same time
+        """
+        user = mommy.make('auth.User')
+
+        task = mommy.make(
+            'tasking.Task', name='Cattle Price', status=Task.ACTIVE)
+        task2 = mommy.make(
+            'tasking.Task', name='Cattle Price', status=Task.ACTIVE)
+
+        mommy.make('tasking.Task', name='Cattle Price', status=Task.DRAFT)
+
+        for i in range(0, 4):
+            mommy.make(
+                'tasking.Task', name='Cattle Price', status=Task.DEACTIVATED)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        request = self.factory.get(
+            '/tasks?search={name}&status={status}&ordering={order}'.format(
+                name='Cattle Price', status=Task.ACTIVE, order='created'))
+        force_authenticate(request, user=user)
+
+        response = view(request=request)
+
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['status'], task.status)
+        self.assertEqual(response.data[0]['id'], task.id)
+        self.assertEqual(response.data[1]['status'], task2.status)
+        self.assertEqual(response.data[1]['id'], task2.id)
