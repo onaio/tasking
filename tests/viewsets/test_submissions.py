@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 from django.utils import six, timezone
 
+from datetime import timedelta
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
@@ -503,3 +504,42 @@ class TestSubmissionViewSet(TestBase):
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 7)
+
+    def test_submission_time_sorting(self):
+        """
+        Test that you can sort by submission_time
+        """
+        now = timezone.now()
+        user = mommy.make('auth.User')
+        # make some submissions
+        for i in range(0, 7):
+            mommy.make('tasking.Submission', submission_time=now -
+                       timedelta(days=i))
+
+        view = SubmissionViewSet.as_view({'get': 'list'})
+
+        # test sorting
+        request = self.factory.get(
+            '/submissions', {'ordering': '-submission_time'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        # we have the expected number of records
+        self.assertEqual(len(response.data), 7)
+        # the first record is what we expect
+        # pylint: disable=no-member
+        self.assertEqual(
+            response.data[0]['id'],
+            Submission.objects.order_by('-submission_time').first().id)
+        self.assertEqual(
+            response.data[0]['submission_time'],
+            Submission.objects.order_by(
+                '-submission_time').first().submission_time.isoformat())
+        # the last record is what we epxect
+        self.assertEqual(
+            response.data[-1]['id'],
+            Submission.objects.order_by('-submission_time').last().id)
+        self.assertEqual(
+            response.data[-1]['submission_time'],
+            Submission.objects.order_by(
+                '-submission_time').last().submission_time.isoformat())

@@ -23,8 +23,17 @@ class SubmissionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter, filters.SearchFilter,
                        DjangoFilterBackend]
-    filter_fields = ['location', 'task', 'valid', 'approved', 'user']
+    filter_fields = [
+        'location',
+        'task',
+        'valid',
+        'approved',
+        'user']
     search_fields = ['task__name']
-    ordering_fields = ['created', 'valid', 'aproved', 'submission_time',
-                       'task']
+    ordering_fields = [
+        'created',
+        'valid',
+        'aproved',
+        'submission_time',
+        'task__id']
     queryset = Submission.objects.all()  # pylint: disable=no-member
