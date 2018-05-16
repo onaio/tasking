@@ -291,3 +291,42 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(
             'Authentication credentials were not provided.',
             six.text_type(response5.data['detail']))
+
+    def test_location_filter(self):
+        """
+        Test that you can filter by locaiton
+        """
+        user = mommy.make('auth.User')
+        nairobi = mommy.make('tasking.Location', name='Nairobi')
+        arusha = mommy.make('tasking.Location', name='Arusha')
+        for i in range(0, 7):
+            task = mommy.make('tasking.Task')
+            task.location.add(nairobi)
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        # assert that there are no tasks for Arusha
+        request = self.factory.get('/tasks', {'location': arusha.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(Task.objects.filter(location=arusha).count(), 0)
+
+        # assert that there are 7 tasks for Nairobi
+        request = self.factory.get('/tasks', {'location': nairobi.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(Task.objects.filter(location=nairobi).count(), 7)
+
+        # add one Arusha task and assert that we get it back
+        task2 = mommy.make('tasking.Task')
+        task2.location.add(arusha)
+        request = self.factory.get('/tasks', {'location': arusha.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(Task.objects.filter(location=arusha).count(), 1)
