@@ -448,7 +448,7 @@ class TestSubmissionViewSet(TestBase):
         # make a bunch of submissions
         mommy.make('tasking.Submission', approved=False, _quantity=7)
 
-        # make one submission using the task
+        # make one submission where approved is True
         submission = mommy.make('tasking.Submission', approved=True)
 
         # check that we have 8 submissions
@@ -481,7 +481,7 @@ class TestSubmissionViewSet(TestBase):
         # make a bunch of submissions
         mommy.make('tasking.Submission', valid=False, _quantity=7)
 
-        # make one submission using the task
+        # make one submission where valid is True
         submission = mommy.make('tasking.Submission', valid=True)
 
         # check that we have 8 submissions
@@ -553,7 +553,7 @@ class TestSubmissionViewSet(TestBase):
         # make a bunch of submissions
         mommy.make('tasking.Submission', valid=False, _quantity=7)
 
-        # make one submission using the task
+        # make one submission where valid is True
         submission = mommy.make('tasking.Submission', valid=True)
 
         # check that we have 8 submissions
@@ -583,8 +583,8 @@ class TestSubmissionViewSet(TestBase):
         # make a bunch of submissions
         mommy.make('tasking.Submission', approved=True, _quantity=7)
 
-        # make one submission using the task
-        submission = mommy.make('tasking.Submission', valid=False)
+        # make one submission where approved is False
+        submission = mommy.make('tasking.Submission', approved=False)
 
         # check that we have 8 submissions
         # pylint: disable=no-member
