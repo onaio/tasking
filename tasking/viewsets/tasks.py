@@ -4,7 +4,8 @@ Task viewsets
 """
 from __future__ import unicode_literals
 
-from rest_framework import mixins, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from tasking.models import Task
@@ -20,4 +21,11 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     """
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter]
+    filter_fields = ['location', 'status', 'project', 'parent']
+    search_fields = ['name', ]
+    ordering_fields = ['created', 'status', 'name']
     queryset = Task.objects.all()
