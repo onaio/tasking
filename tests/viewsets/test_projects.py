@@ -341,7 +341,7 @@ class TestProjectViewSet(TestBase):
 
         view = ProjectViewSet.as_view({'get': 'list'})
 
-        # assert that there are no projects with StarLord task
+        # assert that there are no projects with Groot task
         request = self.factory.get('/projects?', {'tasks': task1.id})
         force_authenticate(request, user=user)
         response = view(request=request)
@@ -350,7 +350,7 @@ class TestProjectViewSet(TestBase):
         self.assertEqual(
             Project.objects.filter(tasks=task1).count(), 0)
 
-        # add one task to project1 and assert its there
+        # add Groot task to project1 and assert its there
         project1.tasks.add(task1)
 
         request = self.factory.get('/projects', {'tasks': task1.id})
