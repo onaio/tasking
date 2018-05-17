@@ -59,7 +59,6 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
             raise ValidationError({
                 'target_content_type': TARGET_DOES_NOT_EXIST
             })
-
         target_model = target_type.model_class()
 
         try:

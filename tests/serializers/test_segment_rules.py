@@ -61,31 +61,6 @@ class TestSegmentRuleSerializer(TestBase):
         self.assertEqual(set(expected_fields),
                          set(list(serializer_instance.data)))
 
-    def test_segment_rule_validate(self):
-        """
-        Test validate method of SegmentRuleSerializer works as expected
-        """
-
-        attrs = OrderedDict(
-            name='Rule Zero',
-            description='Some description',
-            target_content_type=self.task_type.id,
-            target_field='id',
-            target_field_value=6,
-        )
-        validated_data = SegmentRuleSerializer().validate(attrs)
-
-        expected_contenttype = get_target(
-            app_label='tasking', target_type='task')
-        expected = OrderedDict(
-            name='Rule Zero',
-            description='Some description',
-            target_content_type=expected_contenttype.id,
-            target_field='id',
-            target_field_value=6
-        )
-        self.assertDictEqual(dict(expected), dict(validated_data))
-
     def test_validate_bad_data(self):
         """
         Test validate method of SegmentRuleSerializer works as expected
