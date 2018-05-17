@@ -23,8 +23,8 @@ class ProjectViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     permission_classes = [IsAuthenticated]
     filter_backends = [
         DjangoFilterBackend,
-        filters.OrderingFilter,
-        filters.SearchFilter]
+        filters.SearchFilter,
+        filters.OrderingFilter]
     filter_fields = ['tasks']
     search_fields = ['name', ]
     ordering_fields = ['name', 'created']
