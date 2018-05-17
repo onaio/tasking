@@ -17,15 +17,20 @@ class LocationSerializer(serializers.ModelSerializer):
     Location serializer class
     """
 
-    def validate_geopoint(self, value):
+    def is_valid(self, *args, **kwargs):
         """
-        Custom validation for Geopoint
+        Custom validation for Location Serializer
         """
-        split_value = value.split(',')
-        long = int(split_value[0])
-        lat = int(split_value[1])
-        geopoint = Point(long, lat)
-        return geopoint
+        geopoint = self.initial_data.get('geopoint')
+
+        if geopoint is not None:
+            geopoint_split = geopoint.split(',')
+            long = int(geopoint_split[0])
+            lat = int(geopoint_split[1])
+            geopoint = Point(long, lat)
+            self.initial_data['geopoint'] = geopoint
+
+        return super(LocationSerializer, self).is_valid(*args, **kwargs)
 
     def validate(self, attrs):
         """
@@ -59,7 +64,7 @@ class LocationSerializer(serializers.ModelSerializer):
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
-        Meta options for TaskSerializer
+        Meta options for LocationSerializer
         """
         model = Location
         fields = [
