@@ -106,7 +106,7 @@ class Task(BaseTask):
         blank=True,
         default=None
     )
-    location = models.ManyToManyField(
+    locations = models.ManyToManyField(
         'tasking.Location',
         verbose_name=_('Location'),
         blank=True,
