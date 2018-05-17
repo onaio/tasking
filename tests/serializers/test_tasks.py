@@ -114,7 +114,7 @@ class TestTaskSerializer(TestBase):
             'target_content_type',
             'target_id',
             'segment_rules',
-            'location',
+            'locations',
         ]
         self.assertEqual(set(expected_fields),
                          set(list(serializer_instance.data.keys())))
@@ -152,13 +152,12 @@ class TestTaskSerializer(TestBase):
             'description': 'Some description',
             'start': now,
             'total_submission_target': 10,
-            'location': location.id,
             'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             'target_content_type': self.task_type.id,
             'target_id': mocked_target_object.id,
         }
         data_with_location = data.copy()
-        data_with_location['location'] = [location.id]
+        data_with_location['locations'] = [location.id]
 
         serializer_instance = TaskSerializer(data=data_with_location)
 
@@ -166,7 +165,7 @@ class TestTaskSerializer(TestBase):
 
         task = serializer_instance.save()
 
-        self.assertEqual(location, task.location.get(id=location.id))
+        self.assertEqual(location, task.locations.get(id=location.id))
 
     def test_task_parent_link(self):
         """

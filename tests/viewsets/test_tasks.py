@@ -301,35 +301,35 @@ class TestTaskViewSet(TestBase):
         arusha = mommy.make('tasking.Location', name='Arusha')
         for i in range(0, 7):
             task = mommy.make('tasking.Task')
-            task.location.add(nairobi)
+            task.locations.add(nairobi)
 
         view = TaskViewSet.as_view({'get': 'list'})
 
         # assert that there are no tasks for Arusha
-        request = self.factory.get('/tasks', {'location': arusha.id})
+        request = self.factory.get('/tasks', {'locations': arusha.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
-        self.assertEqual(Task.objects.filter(location=arusha).count(), 0)
+        self.assertEqual(Task.objects.filter(locations=arusha).count(), 0)
 
         # assert that there are 7 tasks for Nairobi
-        request = self.factory.get('/tasks', {'location': nairobi.id})
+        request = self.factory.get('/tasks', {'locations': nairobi.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 7)
-        self.assertEqual(Task.objects.filter(location=nairobi).count(), 7)
+        self.assertEqual(Task.objects.filter(locations=nairobi).count(), 7)
 
         # add one Arusha task and assert that we get it back
         task2 = mommy.make('tasking.Task')
-        task2.location.add(arusha)
-        request = self.factory.get('/tasks', {'location': arusha.id})
+        task2.locations.add(arusha)
+        request = self.factory.get('/tasks', {'locations': arusha.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(Task.objects.filter(location=arusha).count(), 1)
+        self.assertEqual(Task.objects.filter(locations=arusha).count(), 1)
 
     def test_parent_filter(self):
         """
