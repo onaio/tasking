@@ -299,7 +299,7 @@ class TestTaskViewSet(TestBase):
         user = mommy.make('auth.User')
         nairobi = mommy.make('tasking.Location', name='Nairobi')
         arusha = mommy.make('tasking.Location', name='Arusha')
-        for i in range(0, 7):
+        for _ in range(0, 7):
             task = mommy.make('tasking.Task')
             task.locations.add(nairobi)
 
@@ -411,7 +411,7 @@ class TestTaskViewSet(TestBase):
         user = mommy.make('auth.User')
         project1 = mommy.make('tasking.Project', name='Test Case Scenario')
         project2 = mommy.make('tasking.Project', name='Reality Check')
-        for i in range(0, 7):
+        for _ in range(0, 7):
             task = mommy.make('tasking.Task')
             project1.tasks.add(task)
 
@@ -472,7 +472,7 @@ class TestTaskViewSet(TestBase):
         project2 = mommy.make('tasking.Project')
         task1 = mommy.make(
             'tasking.Task', name='Milk Production Size', status=Task.DRAFT)
-        for i in range(0, 7):
+        for _ in range(0, 7):
             # create other tasks
             task = mommy.make(
                 'tasking.Task', name='Cow Price', status=Task.DEACTIVATED)
@@ -537,7 +537,7 @@ class TestTaskViewSet(TestBase):
 
         mommy.make('tasking.Task', name='Cattle Price', status=Task.DRAFT)
 
-        for i in range(0, 4):
+        for _ in range(0, 4):
             mommy.make(
                 'tasking.Task', name='Cattle Price', status=Task.DEACTIVATED)
 
