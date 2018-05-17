@@ -40,7 +40,6 @@ class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
         _('GeoPoint'),
         null=True,
         blank=True,
-        max_length=255,
         default=None,
         help_text=_('This represents the Geographical Point of the Location.'))
     radius = models.DecimalField(
