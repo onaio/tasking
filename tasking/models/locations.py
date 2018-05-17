@@ -8,7 +8,6 @@ from django_countries.fields import CountryField
 from mptt.models import MPTTModel, TreeForeignKey
 
 from django.contrib.gis.db import models
-from django.core.validators import validate_comma_separated_integer_list
 from django.utils.translation import ugettext as _
 from django.utils.encoding import python_2_unicode_compatible
 from tasking.models.base import GeoTimeStampedModel
@@ -37,12 +36,11 @@ class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
         blank=True,
         default='',
         help_text=_('This represents the Country.'))
-    geopoint = models.CharField(
+    geopoint = models.PointField(
         _('GeoPoint'),
-        max_length=255,
-        validators=[validate_comma_separated_integer_list],
         null=True,
         blank=True,
+        max_length=255,
         default=None,
         help_text=_('This represents the Geographical Point of the Location.'))
     radius = models.DecimalField(
