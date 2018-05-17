@@ -82,14 +82,14 @@ class TestLocationSerializer(TestCase):
             _fill_optional=['shapefile'])
         missing_radius = OrderedDict(
             name='Nairobi',
-            geopoint='POINT(30 10)')
+            geopoint='30,10')
         missing_geopoint = OrderedDict(
             name='Montreal',
             radius=45.678)
         shapefile_radius = OrderedDict(
             name='Arusha',
             radius=56.6789,
-            geopoint='POINT(30 10)',
+            geopoint='30,10',
             shapefile=mocked_location_with_shapefile.shapefile)
 
         with self.assertRaises(ValidationError) as missing_radius_cm:
@@ -130,10 +130,9 @@ class TestLocationSerializer(TestCase):
         Test validate method of TaskSerializer works as expecter for
         geopoint and radius
         """
-        point = Point(0.0, 0.0)
         data = OrderedDict(
             name='Spain',
-            geopoint=point,
+            geopoint='30,10',
             radius=45.986,
             )
         validated_data = LocationSerializer().validate(data)

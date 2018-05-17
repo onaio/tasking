@@ -9,7 +9,6 @@ from django.utils import six, timezone
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
-from django.contrib.gis.geos import Point
 
 from tasking.common_tags import RADIUS_MISSING, GEOPOINT_MISSING
 from tasking.common_tags import GEODETAILS_ONLY
@@ -36,7 +35,6 @@ class TestLocationViewSet(TestBase):
             'name': 'Nairobi',
             'country': 'KE',
         }
-
         view = LocationViewSet.as_view({'post': 'create'})
         request = self.factory.post('/locations', data)
         # Need authenticated user
@@ -69,12 +67,14 @@ class TestLocationViewSet(TestBase):
 
         data_missing_radius = dict(
             name='Nairobi',
-            geopoint='POINT(30 10)',
+            geopoint='30,10'
             )
         view = LocationViewSet.as_view({'post': 'create'})
         request = self.factory.post('/locations', data_missing_radius)
         # Need authenticated user
         force_authenticate(request, user=bob_user)
+        # make request mutable
+        request.POST._mutable = True
         response = view(request=request)
 
         self.assertEqual(response.status_code, 400)
@@ -100,13 +100,16 @@ class TestLocationViewSet(TestBase):
         data_shapefile = dict(
             name='Arusha',
             radius=56.6789,
-            geopoint='POINT(30 10)',
-            shapefile=mocked_location_with_shapefile.shapefile)
+            geopoint='30,10',
+            shapefile=mocked_location_with_shapefile.shapefile,
+            )
 
         view2 = LocationViewSet.as_view({'post': 'create'})
         request2 = self.factory.post('/locations', data_shapefile)
         # Need authenticated user
         force_authenticate(request2, user=alice_user)
+        # make request mutable
+        request2.POST._mutable = True
         response2 = view2(request=request2)
 
         self.assertEqual(response2.status_code, 400)
