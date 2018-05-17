@@ -17,20 +17,20 @@ class LocationSerializer(serializers.ModelSerializer):
     Location serializer class
     """
 
-    def is_valid(self, *args, **kwargs):
+    def to_internal_value(self, data):
         """
         Custom validation for Location Serializer
         """
-        geopoint = self.initial_data.get('geopoint')
+        geopoint = data.get('geopoint')
 
         if geopoint is not None:
             geopoint_split = geopoint.split(',')
             long = int(geopoint_split[0])
             lat = int(geopoint_split[1])
             geopoint = Point(long, lat)
-            self.initial_data['geopoint'] = geopoint
+            data['geopoint'] = geopoint
 
-        return super(LocationSerializer, self).is_valid(*args, **kwargs)
+        return super(LocationSerializer, self).to_internal_value(data)
 
     def validate(self, attrs):
         """
