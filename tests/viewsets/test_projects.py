@@ -326,3 +326,38 @@ class TestProjectViewSet(TestBase):
         self.assertEqual(
             response.data[-1]['created'], project2.created.isoformat())
         self.assertEqual(response.data[-1]['id'], project2.id)
+
+    def test_task_filter(self):
+        """
+        Test that you can filter by task
+        """
+        user = mommy.make('auth.User')
+        project1 = mommy.make('tasking.Project', name='StarLord')
+        project2 = mommy.make('tasking.Project', name='Local income')
+        task1 = mommy.make('tasking.Task', name='Groot')
+        for i in range(0, 7):
+            task = mommy.make('tasking.Task', name='Normal')
+            project2.tasks.add(task)
+
+        view = ProjectViewSet.as_view({'get': 'list'})
+
+        # assert that there are no projects with StarLord task
+        request = self.factory.get('/projects?', {'tasks': task1.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(
+            Project.objects.filter(tasks=task1).count(), 0)
+
+        # add one task to project1 and assert its there
+        project1.tasks.add(task1)
+
+        request = self.factory.get('/projects', {'tasks': task1.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], project1.name)
+        self.assertEqual(
+            Project.objects.filter(tasks=task1).count(), 1)
