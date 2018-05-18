@@ -50,7 +50,7 @@ class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
         decimal_places=4,
         max_digits=64,
         help_text=_('This represents the radius from the geopoint.'))
-    shapefile = models.MultiPolygonField(
+    shapefile = models.PolygonField(
         srid=4326,
         verbose_name=_('Shapefile'),
         null=True,
