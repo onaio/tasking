@@ -5,6 +5,7 @@ Tests Location viewsets.
 from __future__ import unicode_literals
 
 from django.utils import six, timezone
+from django.contrib.gis.gdal import DataSource
 
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -51,6 +52,34 @@ class TestLocationViewSet(TestBase):
         Test POST /locations adding a new location.
         """
         self._create_location()
+
+    def test_create_location_with_shapefile(self):
+        """
+        Test that we can create a Location Object with a shapefile
+        """
+        user = mommy.make('auth.User')
+        # Import Shapefile
+        ds = DataSource('tests/fixtures/County.shp')
+        lyr = ds[0]
+        # Transform First Data Entry into wkt format
+        item_wkt = lyr[1].geom.wkt
+
+        data = {
+            'name': 'Nairobi',
+            'country': 'KE',
+            'shapefile': item_wkt
+        }
+        view = LocationViewSet.as_view({'post': 'create'})
+        request = self.factory.post('/locations', data)
+        # Need authenticated user
+        force_authenticate(request, user=user)
+        response = view(request=request)
+
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual('Nairobi', response.data['name'])
+        self.assertEqual(item_wkt, response.data['shapefile'])
+        self.assertDictContainsSubset(data, response.data)
+        return response.data
 
     def test_create_with_bad_data(self):
         """
