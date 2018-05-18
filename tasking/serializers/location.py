@@ -4,8 +4,10 @@ Location Serializers
 """
 from __future__ import unicode_literals
 
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from rest_framework import serializers
 from django.contrib.gis.geos import Point
+from django_countries import Countries
 
 from tasking.common_tags import RADIUS_MISSING, GEODETAILS_ONLY
 from tasking.common_tags import GEOPOINT_MISSING
@@ -32,11 +34,22 @@ class GeopointField(serializers.Field):
         return Point(lon, lat)
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class SerializableCountryField(serializers.ChoiceField):
+    """
+    Custom Serialization for Country Field
+    """
+
+    def to_representation(self, value):
+        if value in ('', None):
+            return ''  # instead of `value` as Country(u'') is not serializable
+        return super(SerializableCountryField, self).to_representation(value)
+
+
+class LocationSerializer(GeoFeatureModelSerializer):
     """
     Location serializer class
     """
-    geopoint = GeopointField(required=False)
+    country = SerializableCountryField(allow_blank=True, choices=Countries())
 
     def validate(self, attrs):
         """
@@ -73,6 +86,7 @@ class LocationSerializer(serializers.ModelSerializer):
         Meta options for LocationSerializer
         """
         model = Location
+        geo_field = "shapefile"
         fields = [
             'id',
             'name',
