@@ -25,6 +25,7 @@ class ShapeFileField(GeometryField):
     Custom Field for Shapefile
     """
 
+    # pylint: disable=W0221
     def to_internal_value(self, data):
         zip_file = zipfile.ZipFile(data.temporary_file_path())
         shpfile = get_shpname(zip_file)
