@@ -12,25 +12,31 @@ from tasking.common_tags import GEOPOINT_MISSING
 from tasking.models import Location
 
 
-class LocationSerializer(serializers.ModelSerializer):
+# pylint: disable=W0223
+class GeopointField(serializers.Field):
     """
-    Location serializer class
+    Custom Field for Geopoint
     """
 
     def to_internal_value(self, data):
         """
-        Custom validation for Location Serializer
+        Custom conversion for Geopoint field
         """
-        geopoint = data.get('geopoint')
+        geopoint = data
 
         if geopoint is not None:
             geopoint_split = geopoint.split(',')
-            long = int(geopoint_split[0])
+            lon = int(geopoint_split[0])
             lat = int(geopoint_split[1])
-            geopoint = Point(long, lat)
-            data['geopoint'] = geopoint
 
-        return super(LocationSerializer, self).to_internal_value(data)
+        return Point(lon, lat)
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    """
+    Location serializer class
+    """
+    geopoint = GeopointField(required=False)
 
     def validate(self, attrs):
         """
