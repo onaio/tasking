@@ -59,7 +59,7 @@ class TestLocationViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         # Import Shapefile
-        ds = DataSource('tests/fixtures/County.shp')
+        ds = DataSource('tests/fixtures/test_shapefile.shp')
         lyr = ds[0]
         # Transform First Data Entry into wkt format
         item_wkt = lyr[1].geom.wkt
