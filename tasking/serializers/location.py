@@ -49,7 +49,8 @@ class LocationSerializer(GeoFeatureModelSerializer):
     """
     Location serializer class
     """
-    country = SerializableCountryField(allow_blank=True, choices=Countries())
+    country = SerializableCountryField(
+        allow_blank=True, required=False, choices=Countries())
 
     def validate(self, attrs):
         """
