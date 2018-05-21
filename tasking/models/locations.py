@@ -37,7 +37,7 @@ class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
         default='',
         help_text=_('This represents the Country.'))
     geopoint = models.PointField(
-        verbose_name=_('GeoPoint'),
+        _('GeoPoint'),
         null=True,
         blank=True,
         default=None,

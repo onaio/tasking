@@ -9,7 +9,6 @@ from django.utils import six, timezone
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
-from django.contrib.gis.geos import Point
 
 from tasking.common_tags import RADIUS_MISSING, GEOPOINT_MISSING
 from tasking.common_tags import GEODETAILS_ONLY
@@ -36,7 +35,6 @@ class TestLocationViewSet(TestBase):
             'name': 'Nairobi',
             'country': 'KE',
         }
-
         view = LocationViewSet.as_view({'post': 'create'})
         request = self.factory.post('/locations', data)
         # Need authenticated user
@@ -66,11 +64,10 @@ class TestLocationViewSet(TestBase):
             'tasking.Location',
             name='Nairobi',
             _fill_optional=['shapefile'])
-
-        data_missing_radius = dict(
-            name='Nairobi',
-            geopoint='POINT(30 10)',
-            )
+        data_missing_radius = {
+            'name': 'Nairobi',
+            'geopoint': '30,10',
+            }
         view = LocationViewSet.as_view({'post': 'create'})
         request = self.factory.post('/locations', data_missing_radius)
         # Need authenticated user
@@ -82,9 +79,10 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(RADIUS_MISSING,
                          six.text_type(response.data['radius'][0]))
 
-        data_missing_geopoint = dict(
-            name='Montreal',
-            radius=45.678)
+        data_missing_geopoint = {
+            'name': 'Montreal',
+            'radius': 45.678
+            }
 
         view1 = LocationViewSet.as_view({'post': 'create'})
         request1 = self.factory.post('/locations', data_missing_geopoint)
@@ -97,11 +95,12 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(GEOPOINT_MISSING,
                          six.text_type(response1.data['geopoint'][0]))
 
-        data_shapefile = dict(
-            name='Arusha',
-            radius=56.6789,
-            geopoint='POINT(30 10)',
-            shapefile=mocked_location_with_shapefile.shapefile)
+        data_shapefile = {
+            'name': 'Arusha',
+            'radius': 56.6789,
+            'geopoint': '30,10',
+            'shapefile': mocked_location_with_shapefile.shapefile,
+            }
 
         view2 = LocationViewSet.as_view({'post': 'create'})
         request2 = self.factory.post('/locations', data_shapefile)

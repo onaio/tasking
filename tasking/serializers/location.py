@@ -5,22 +5,43 @@ Location Serializers
 from __future__ import unicode_literals
 
 from rest_framework import serializers
+from django.contrib.gis.geos import Point
 
 from tasking.common_tags import RADIUS_MISSING, GEODETAILS_ONLY
 from tasking.common_tags import GEOPOINT_MISSING
 from tasking.models import Location
 
 
+# pylint: disable=W0223
+class GeopointField(serializers.Field):
+    """
+    Custom Field for Geopoint
+    """
+
+    def to_internal_value(self, data):
+        """
+        Custom conversion for Geopoint field
+        """
+        geopoint = data
+
+        if geopoint is not None:
+            geopoint_split = geopoint.split(',')
+            lon = int(geopoint_split[0])
+            lat = int(geopoint_split[1])
+
+        return Point(lon, lat)
+
+
 class LocationSerializer(serializers.ModelSerializer):
     """
     Location serializer class
     """
+    geopoint = GeopointField(required=False)
 
     def validate(self, attrs):
         """
         Custom Validation for Location Serializer
         """
-
         geopoint = attrs.get('geopoint')
         radius = attrs.get('radius')
         shapefile = attrs.get('shapefile')
@@ -49,7 +70,7 @@ class LocationSerializer(serializers.ModelSerializer):
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
-        Meta options for TaskSerializer
+        Meta options for LocationSerializer
         """
         model = Location
         fields = [
