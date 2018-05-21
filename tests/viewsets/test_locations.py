@@ -4,7 +4,15 @@ Tests Location viewsets.
 """
 from __future__ import unicode_literals
 
+<<<<<<< HEAD
 from django.utils import six
+=======
+import os
+
+from django.utils import six, timezone
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+>>>>>>> Change tests that use shapefile to work with changes in LocationSerializer
 
 import pytz
 from model_mommy import mommy
@@ -58,27 +66,23 @@ class TestLocationViewSet(TestBase):
         Test that we can create a Location Object with a shapefile
         """
         user = mommy.make('auth.User')
-        # Import Shapefile
-        ds = DataSource('tests/fixtures/test_shapefile.shp')
-        lyr = ds[0]
-        # Transform First Data Entry into wkt format
-        item_wkt = lyr[1].geom.wkt
+        path = 'tests/fixtures/test_shapefile.zip'
 
-        data = {
-            'name': 'Nairobi',
-            'country': 'KE',
-            'shapefile': item_wkt
-        }
-        view = LocationViewSet.as_view({'post': 'create'})
-        request = self.factory.post('/locations', data)
-        # Need authenticated user
-        force_authenticate(request, user=user)
-        response = view(request=request)
+        with open(path, 'r+b') as shapefile:
+            data = {
+                'name': 'Nairobi',
+                'country': 'KE',
+                'shapefile': shapefile
+            }
+            view = LocationViewSet.as_view({'post': 'create'})
+            request = self.factory.post('/locations', data)
+            # Need authenticated user
+            force_authenticate(request, user=user)
+            response = view(request=request)
 
-        self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual('Nairobi', response.data['properties']['name'])
-        self.assertEqual('Polygon', response.data['geometry']['type'])
-        return response.data
+            self.assertEqual(response.status_code, 201, response.data)
+            self.assertEqual('Nairobi', response.data['properties']['name'])
+            self.assertEqual('Polygon', response.data['geometry']['type'])
 
     def test_create_with_bad_data(self):
         """
@@ -88,10 +92,7 @@ class TestLocationViewSet(TestBase):
         bob_user = mommy.make('auth.User')
         alice_user = mommy.make('auth.User')
         liz_user = mommy.make('auth.User')
-        mocked_location_with_shapefile = mommy.make(
-            'tasking.Location',
-            name='Nairobi',
-            _fill_optional=['shapefile'])
+        
         data_missing_radius = {
             'name': 'Nairobi',
             'geopoint': '30,10',
@@ -123,23 +124,26 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(GEOPOINT_MISSING,
                          six.text_type(response1.data['geopoint'][0]))
 
-        data_shapefile = {
-            'name': 'Arusha',
-            'radius': 56.6789,
-            'geopoint': '30,10',
-            'shapefile': mocked_location_with_shapefile.shapefile,
-            }
+        path = 'tests/fixtures/test_shapefile.zip'
 
-        view2 = LocationViewSet.as_view({'post': 'create'})
-        request2 = self.factory.post('/locations', data_shapefile)
-        # Need authenticated user
-        force_authenticate(request2, user=alice_user)
-        response2 = view2(request=request2)
+        with open(path, 'r+b') as shapefile:
+            data_shapefile = dict(
+                name='Arusha',
+                radius=56.6789,
+                geopoint='POINT(30 10)',
+                shapefile=shapefile
+                )
 
-        self.assertEqual(response2.status_code, 400)
-        self.assertIn('shapefile', response2.data.keys())
-        self.assertEqual(GEODETAILS_ONLY,
-                         six.text_type(response2.data['shapefile'][0]))
+            view2 = LocationViewSet.as_view({'post': 'create'})
+            request2 = self.factory.post('/locations', data_shapefile)
+            # Need authenticated user
+            force_authenticate(request2, user=alice_user)
+            response2 = view2(request=request2)
+
+            self.assertEqual(response2.status_code, 400)
+            self.assertIn('shapefile', response2.data.keys())
+            self.assertEqual(GEODETAILS_ONLY,
+                             six.text_type(response2.data['shapefile'][0]))
 
     def test_delete_location(self):
         """
