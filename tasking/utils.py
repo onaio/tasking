@@ -4,8 +4,6 @@ Utility functions for tasking
 """
 from __future__ import unicode_literals
 
-import zipfile
-
 from django.contrib.contenttypes.models import ContentType
 
 from dateutil.rrule import rrulestr
@@ -40,6 +38,7 @@ def get_target(app_label, target_type):
         raise TargetDoesNotExist()
 
 
+# pylint: disable=inconsistent-return-statements
 def get_shpname(geofile):
     """
     Returns the filename of ShapeFile
@@ -50,8 +49,8 @@ def get_shpname(geofile):
     if len(names) > 3:
         raise UnnecessaryFiles()
     if len(names) == 3:
-        for x in names:
-            file_shp = x.split('.')
+        for file in names:
+            file_shp = file.split('.')
             if file_shp[1] == 'shp':
                 return ".".join(file_shp)
     else:
