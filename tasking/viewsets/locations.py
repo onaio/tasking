@@ -4,7 +4,8 @@ Location viewsets
 """
 from __future__ import unicode_literals
 
-from rest_framework import mixins, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from tasking.models import Location
@@ -20,4 +21,11 @@ class LocationViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     """
     serializer_class = LocationSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [
+        filters.SearchFilter,
+        DjangoFilterBackend,
+        filters.OrderingFilter]
+    filter_fields = ['parent', 'country']
+    search_fields = ['name']
+    ordering_fields = ['name', 'created']
     queryset = Location.objects.all()
