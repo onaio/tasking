@@ -43,8 +43,8 @@ class TestLocationViewSet(TestBase):
         response = view(request=request)
 
         self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual('Nairobi', response.data['name'])
-        self.assertDictContainsSubset(data, response.data)
+        self.assertEqual('Nairobi', response.data['properties']['name'])
+        self.assertDictContainsSubset(data, response.data['properties'])
         return response.data
 
     def test_create_location(self):
@@ -76,9 +76,8 @@ class TestLocationViewSet(TestBase):
         response = view(request=request)
 
         self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual('Nairobi', response.data['name'])
-        self.assertEqual(item_wkt, response.data['shapefile'])
-        self.assertDictContainsSubset(data, response.data)
+        self.assertEqual('Nairobi', response.data['properties']['name'])
+        self.assertEqual('Polygon', response.data['geometry']['type'])
         return response.data
 
     def test_create_with_bad_data(self):
@@ -189,7 +188,8 @@ class TestLocationViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(response.data.pop(), location_data)
+        resp = response.data.pop('features').pop()
+        self.assertDictEqual(resp, location_data)
 
     def test_update_location(self):
         """
@@ -210,8 +210,8 @@ class TestLocationViewSet(TestBase):
         response = view(request=request, pk=location_data['id'])
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual('Arusha', response.data['name'])
-        self.assertEqual('TZ', response.data['country'])
+        self.assertEqual('Arusha', response.data['properties']['name'])
+        self.assertEqual('TZ', response.data['properties']['country'])
 
     def test_parent_filter(self):
         """
