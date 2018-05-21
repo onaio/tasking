@@ -185,6 +185,140 @@ class TestLocationViewSet(TestBase):
         self.assertEqual('Arusha', response.data['name'])
         self.assertEqual('TZ', response.data['country'])
 
+    def test_parent_filter(self):
+        """
+        Test that you can filter by parent
+        """
+        user = mommy.make('auth.User')
+        location1 = mommy.make('tasking.Location', name='Eldorado')
+        location2 = mommy.make('tasking.Location', name='Africa')
+
+        mommy.make(
+            'tasking.Location',
+            name='Market Town', parent=location2, _quantity=7)
+
+        view = LocationViewSet.as_view({'get': 'list'})
+
+        # assert that there are no locations with location1 as a parent
+        request = self.factory.get('/locations?', {'parent': location1.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(
+            Location.objects.filter(parent=location1).count(), 0)
+
+        # assert that there are 7 locations with location2 as parent
+        request = self.factory.get('/locations?', {'parent': location2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(
+            Location.objects.filter(parent=location2).count(), 7)
+
+        # create a new location and make its parent location1 and assert that
+        # it's there
+        mommy.make('tasking.Location', name='Africa', parent=location1)
+
+        request = self.factory.get('/locations?', {'parent': location1.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            Location.objects.filter(parent=location1).count(), 1)
+
+    def test_country_filter(self):
+        """
+        Test that you can filter by country
+        """
+        user = mommy.make('auth.User')
+
+        mommy.make(
+            'tasking.Location',
+            name='Market Town', country='US', _quantity=7)
+
+        view = LocationViewSet.as_view({'get': 'list'})
+
+        # assert that there are no locations in Kenya(KE)
+        request = self.factory.get('/locations?', {'country': 'KE'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(
+            Location.objects.filter(country='KE').count(), 0)
+
+        # assert that there are 7 locations in the United States(US)
+        request = self.factory.get('/locations?', {'country': 'US'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(
+            Location.objects.filter(country='US').count(), 7)
+
+        # create a new location with country Kenya(KE) and assert its there
+        mommy.make('tasking.Location', name='Nairobi', country='KE')
+
+        request = self.factory.get('/locations?', {'country': 'KE'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            Location.objects.filter(country='KE').count(), 1)
+
+    def test_name_search(self):
+        """
+        Test that you can search by Name
+        """
+        user = mommy.make('auth.User')
+        mommy.make('tasking.Location', name='Eldorado')
+        mommy.make('tasking.Location', name='Market', _quantity=7)
+
+        view = LocationViewSet.as_view({'get': 'list'})
+        request = self.factory.get('/locations', {'search': 'Eldorado'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            Location.objects.filter(name='Eldorado').count(), 1)
+
+    def test_location_sorting(self):
+        """
+        Test that sorting works
+        """
+        user = mommy.make('auth.User')
+        project1 = mommy.make('tasking.Location', name='Nairobi')
+        project2 = mommy.make('tasking.Location', name='Arusha')
+
+        view = LocationViewSet.as_view({'get': 'list'})
+
+        # order by name descending
+        request = self.factory.get('/locations', {'ordering': '-name'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[0]['name'], project1.name)
+        self.assertEqual(response.data[0]['id'], project1.id)
+        self.assertEqual(
+            response.data[-1]['name'], project2.name)
+        self.assertEqual(response.data[-1]['id'], project2.id)
+
+        # order by created ascending
+        request = self.factory.get('/locations', {'ordering': 'created'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[0]['created'], project1.created.isoformat())
+        self.assertEqual(response.data[0]['id'], project1.id)
+        self.assertEqual(
+            response.data[-1]['created'], project2.created.isoformat())
+        self.assertEqual(response.data[-1]['id'], project2.id)
+
     def test_authentication_required(self):
         """
         Test that authentication is required for all viewset actions
