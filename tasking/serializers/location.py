@@ -4,14 +4,48 @@ Location Serializers
 """
 from __future__ import unicode_literals
 
+from tempfile import TemporaryDirectory
+import zipfile
+
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
+from rest_framework_gis.serializers import GeometryField
 from rest_framework import serializers
 from django.contrib.gis.geos import Point
 from django_countries import Countries
+from django.contrib.gis.gdal import DataSource
 
 from tasking.common_tags import RADIUS_MISSING, GEODETAILS_ONLY
 from tasking.common_tags import GEOPOINT_MISSING
 from tasking.models import Location
+from tasking.utils import get_shpname
+
+
+class ShapeFileField(GeometryField):
+    """
+    Custom Field for Shapefile
+    """
+
+    def to_internal_value(self, data):
+        zip_file = zipfile.ZipFile(data.temporary_file_path())
+        shpfile = get_shpname(zip_file)
+        # Setup a Temporary Directory to store Shapefiles
+        tdir = TemporaryDirectory()
+        tpath = tdir.name
+        # Extract all files to Temporary Directory
+        zip_file.extractall(tpath)
+        shp_path = tpath+'/'+shpfile
+
+        data_source = DataSource(shp_path)
+        layer = data_source[0]
+        # Get the first item of shapefile and turn to WKT
+        item = layer[1].geom.wkt
+
+        return item
+
+    def to_representation(self, value):
+        if value in ('', None):
+            return ''
+        return super(ShapeFileField, self).to_representation(value)
 
 
 # pylint: disable=W0223
@@ -51,6 +85,8 @@ class LocationSerializer(GeoFeatureModelSerializer):
     """
     country = SerializableCountryField(
         allow_blank=True, required=False, choices=Countries())
+
+    shapefile = ShapeFileField(required=False)
 
     def validate(self, attrs):
         """
