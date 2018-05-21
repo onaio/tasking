@@ -4,11 +4,13 @@ Tests for tasking utils
 """
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from django.test import TestCase
 from django.utils import timezone
 
-from dateutil.rrule import rrulestr
 from dateutil.parser import parse
+from dateutil.rrule import rrulestr
 
 from tasking.exceptions import TargetDoesNotExist
 from tasking.models import Task
@@ -71,3 +73,30 @@ class TestUtils(TestCase):
         self.assertEqual(now.month, start2.month)
         self.assertEqual(now.day, start2.day)
         self.assertEqual(now.hour, start2.hour)
+
+    def test_get_rrule_end(self):
+        """
+        Test that get_rrule_end returns the rrule end correctly
+        """
+        # when until is provided
+        rule1 = \
+            'FREQ=YEARLY;BYDAY=SU;BYSETPOS=1;BYMONTH=1;UNTIL=20180521T210000Z'
+        end1 = get_rrule_end(rrulestr(rule1))
+        # must be timezone aware
+        self.assertTrue(timezone.is_aware(end1))
+        # must be 21 may 2018
+        self.assertEqual(2018, end1.year)
+        self.assertEqual(5, end1.month)
+        self.assertEqual(21, end1.day)
+
+        # when count is provided instead
+        rule2 = 'RRULE:FREQ=DAILY;COUNT=5'
+        end2 = get_rrule_end(rrulestr(rule2))
+        # must be timezone aware
+        self.assertTrue(timezone.is_aware(end2))
+        # must be 4 days from now (5 occurrences with today as the first)
+        now = timezone.now()
+        then = now + timedelta(days=4)
+        self.assertEqual(then.year, end2.year)
+        self.assertEqual(then.month, end2.month)
+        self.assertEqual(then.day, end2.day)
