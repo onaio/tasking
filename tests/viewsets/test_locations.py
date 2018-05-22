@@ -4,17 +4,22 @@ Tests Location viewsets.
 """
 from __future__ import unicode_literals
 
+import os
+
 from django.utils import six
 
 import pytz
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework_gis.fields import GeoJsonDict
 from tests.base import TestBase
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
                                  RADIUS_MISSING)
 from tasking.models import Location
 from tasking.viewsets import LocationViewSet
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 class TestLocationViewSet(TestBase):
@@ -53,7 +58,30 @@ class TestLocationViewSet(TestBase):
         """
         self._create_location()
 
-    # pylint: disable=too-many-locals
+    def test_create_location_with_shapefile(self):
+        """
+        Test that we can create a Location Object with a shapefile
+        """
+        user = mommy.make('auth.User')
+        path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_shapefile.zip')
+
+        with open(path, 'r+b') as shapefile:
+            data = {
+                'name': 'Nairobi',
+                'country': 'KE',
+                'shapefile': shapefile
+            }
+            view = LocationViewSet.as_view({'post': 'create'})
+            request = self.factory.post('/locations', data)
+            # Need authenticated user
+            force_authenticate(request, user=user)
+            response = view(request=request)
+
+            self.assertEqual(response.status_code, 201, response.data)
+            self.assertEqual('Nairobi', response.data['name'])
+            self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+
     def test_create_with_bad_data(self):
         """
         Test that we get appropriate errors when trying to create an object
@@ -62,10 +90,7 @@ class TestLocationViewSet(TestBase):
         bob_user = mommy.make('auth.User')
         alice_user = mommy.make('auth.User')
         liz_user = mommy.make('auth.User')
-        mocked_location_with_shapefile = mommy.make(
-            'tasking.Location',
-            name='Nairobi',
-            _fill_optional=['shapefile'])
+
         data_missing_radius = {
             'name': 'Nairobi',
             'geopoint': '30,10',
@@ -97,23 +122,27 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(GEOPOINT_MISSING,
                          six.text_type(response1.data['geopoint'][0]))
 
-        data_shapefile = {
-            'name': 'Arusha',
-            'radius': 56.6789,
-            'geopoint': '30,10',
-            'shapefile': mocked_location_with_shapefile.shapefile,
-            }
+        path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_shapefile.zip')
 
-        view2 = LocationViewSet.as_view({'post': 'create'})
-        request2 = self.factory.post('/locations', data_shapefile)
-        # Need authenticated user
-        force_authenticate(request2, user=alice_user)
-        response2 = view2(request=request2)
+        with open(path, 'r+b') as shapefile:
+            data_shapefile = dict(
+                name='Arusha',
+                radius=56.6789,
+                geopoint='30,10',
+                shapefile=shapefile
+                )
 
-        self.assertEqual(response2.status_code, 400)
-        self.assertIn('shapefile', response2.data.keys())
-        self.assertEqual(GEODETAILS_ONLY,
-                         six.text_type(response2.data['shapefile'][0]))
+            view2 = LocationViewSet.as_view({'post': 'create'})
+            request2 = self.factory.post('/locations', data_shapefile)
+            # Need authenticated user
+            force_authenticate(request2, user=alice_user)
+            response2 = view2(request=request2)
+
+            self.assertEqual(response2.status_code, 400)
+            self.assertIn('shapefile', response2.data.keys())
+            self.assertEqual(GEODETAILS_ONLY,
+                             six.text_type(response2.data['shapefile'][0]))
 
     def test_delete_location(self):
         """
@@ -162,7 +191,8 @@ class TestLocationViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(response.data.pop(), location_data)
+        resp = response.data.pop()
+        self.assertDictEqual(resp, location_data)
 
     def test_update_location(self):
         """

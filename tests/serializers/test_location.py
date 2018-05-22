@@ -4,18 +4,22 @@ Tests for LocationSerializer
 """
 from __future__ import unicode_literals
 
+import os
+
 from collections import OrderedDict
 
 from django.test import TestCase
 from django.utils import six
 
-from django.contrib.gis.geos import Point
 from rest_framework.exceptions import ValidationError
+from rest_framework_gis.fields import GeoJsonDict
 from model_mommy import mommy
 
 from tasking.serializers import LocationSerializer
 from tasking.common_tags import RADIUS_MISSING, GEOPOINT_MISSING
 from tasking.common_tags import GEODETAILS_ONLY
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 class TestLocationSerializer(TestCase):
@@ -41,15 +45,15 @@ class TestLocationSerializer(TestCase):
         self.assertEqual('Kenya - Nairobi', six.text_type(location))
 
         expected_fields = [
-            'created',
-            'name',
-            'modified',
-            'country',
-            'shapefile',
-            'geopoint',
             'id',
+            'modified',
+            'parent',
             'radius',
-            'parent'
+            'country',
+            'created',
+            'geopoint',
+            'name',
+            'shapefile'
         ]
         self.assertEqual(set(expected_fields),
                          set(list(serializer_instance.data)))
@@ -137,3 +141,37 @@ class TestLocationSerializer(TestCase):
             )
         validated_data = LocationSerializer().validate(data)
         self.assertDictEqual(dict(data), dict(validated_data))
+
+    def test_geopoint_field_output(self):
+        """
+        Test the geopoint field outputs valid GEOJSON
+        """
+        data = OrderedDict(
+            name='Spain',
+            geopoint='30,10',
+            radius=45.986,
+            )
+        serializer_instance = LocationSerializer(data=data)
+
+        self.assertTrue(serializer_instance.is_valid())
+        self.assertEqual(
+            type(serializer_instance.data['geopoint']), GeoJsonDict)
+
+    def test_shapefile_field_output(self):
+        """
+        Test the shapefile field outputs valid GEOJSON
+        """
+        path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_shapefile.zip')
+
+        with open(path, 'r+b') as shapefile:
+            data = OrderedDict(
+                name='Nairobi',
+                country='KE',
+                shapefile=shapefile
+            )
+            serializer_instance = LocationSerializer(data=data)
+
+            self.assertTrue(serializer_instance.is_valid())
+            self.assertEqual(
+                type(serializer_instance.data['shapefile']), GeoJsonDict)
