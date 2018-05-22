@@ -26,21 +26,37 @@ class ShapeFileField(GeometryField):
     """
 
     def to_internal_value(self, value):
-        zip_file = zipfile.ZipFile(value.temporary_file_path())
-        shpfile = get_shapefile(zip_file)
-        # Setup a Temporary Directory to store Shapefiles
-        tdir = TemporaryDirectory()
-        tpath = tdir.name
-        # Extract all files to Temporary Directory
-        zip_file.extractall(tpath)
-        shp_path = tpath+'/'+shpfile
+        """
+        Custom Conversion for shapefile field
+        """
+        shapefile = value
 
-        data_source = DataSource(shp_path)
-        layer = data_source[0]
-        # Get the first item of shapefile and turn to WKT
-        item = layer[1].geom.wkt
+        if shapefile is not None:
+            zip_file = zipfile.ZipFile(value.temporary_file_path())
 
-        return item
+            # Call get_shapefile method to get the .shp files name
+            shpfile = get_shapefile(zip_file)
+
+            # Setup a Temporary Directory to store Shapefiles
+            tdir = TemporaryDirectory()
+            tpath = tdir.name
+
+            # Extract all files to Temporary Directory
+            zip_file.extractall(tpath)
+
+            # concatenate Shapefile path
+            shp_path = "{tpath}/{shp}".format(tpath=tpath, shp=shpfile)
+
+            # Make the shapefile a DataSource
+            data_source = DataSource(shp_path)
+            layer = data_source[0]
+
+            # Get the first item of shapefile and turn to WKT
+            item = layer[1].geom.wkt
+
+            shapefile = item
+
+        return shapefile
 
     def to_representation(self, value):
         if value in ('', None):
