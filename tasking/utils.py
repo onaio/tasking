@@ -74,23 +74,25 @@ def get_target(app_label, target_type):
         raise TargetDoesNotExist()
 
 
-# pylint: disable=inconsistent-return-statements
 def get_shapefile(geofile):
     """
     Returns the filename of ShapeFile
     """
-    names = geofile.namelist()
+    name_list = geofile.namelist()
     name = None
 
-    if len(names) > 3:
+    if len(name_list) > 3:
         raise UnnecessaryFiles()
-    if len(names) == 3:
-        for file in names:
-            file_shp = file.split('.')
-            if file_shp[1] == 'shp':
-                return ".".join(file_shp)
-    else:
+    elif len(name_list) < 3:
         raise MissingFiles()
+    elif len(name_list) == 3:
+        for item in name_list:
+            arr = item.split('.')
+
+            if arr[1] == 'shp':
+                name = '.'.join(arr)
 
     if name is None:
         raise ShapeFileNotFound()
+    else:
+        return name
