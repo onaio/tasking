@@ -8,10 +8,12 @@ from collections import OrderedDict
 
 from django.utils import timezone
 
+from dateutil.rrule import rrulestr
 from model_mommy import mommy
-
 from tests.base import TestBase
+
 from tasking.serializers import TaskSerializer
+from tasking.utils import get_rrule_end, get_rrule_start
 
 
 class TestTaskSerializer(TestBase):
@@ -54,18 +56,18 @@ class TestTaskSerializer(TestBase):
         """
         Test that the serializer can create Task objects
         """
-        now = timezone.now()
         mocked_target_object = mommy.make('tasking.Task')
 
         rule1 = mommy.make('tasking.SegmentRule')
         rule2 = mommy.make('tasking.SegmentRule')
 
+        rrule = 'DTSTART:20180521T210000Z RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
+
         data = {
             'name': 'Cow price',
             'description': 'Some description',
-            'start': now,
             'total_submission_target': 10,
-            'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+            'timing_rule': rrule,
             'target_content_type': self.task_type.id,
             'target_id': mocked_target_object.id,
         }
@@ -78,8 +80,9 @@ class TestTaskSerializer(TestBase):
 
         task = serializer_instance.save()
 
-        # the start field is going to be converted to isformat
-        data['start'] = now.isoformat()
+        # the start and end fields are going to be from the timing rule
+        start = get_rrule_start(rrulestr(rrule))
+        end = get_rrule_end(rrulestr(rrule))
 
         # the order of segment_rules may have changed so a dict comparison
         # may fail, we use `data` that does not include segment rules
@@ -91,7 +94,8 @@ class TestTaskSerializer(TestBase):
 
         self.assertEqual('Cow price', task.name)
         self.assertEqual('Some description', task.description)
-        self.assertEqual(now, task.start)
+        self.assertEqual(start, task.start)
+        self.assertEqual(end, task.end)
         self.assertEqual(10, task.total_submission_target)
 
         # test that the segment rules for the task are as we expect

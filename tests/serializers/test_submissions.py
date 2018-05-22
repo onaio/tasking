@@ -6,9 +6,10 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
-from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
+import pytz
 from model_mommy import mommy
 from tests.base import TestBase
 
@@ -50,8 +51,8 @@ class TestSubmissionSerializer(TestBase):
         submission = serializer_instance.save()
 
         # the submission_time field is going to be converted to isformat
-        data['submission_time'] = now.isoformat()
-
+        data['submission_time'] = now.astimezone(
+            pytz.timezone('Africa/Nairobi')).isoformat()
         self.assertDictContainsSubset(data, serializer_instance.data)
 
         self.assertEqual(mocked_task, submission.task)

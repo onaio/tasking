@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 from django.utils import six, timezone
 
+import pytz
+from dateutil.parser import parse
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
@@ -28,7 +30,6 @@ class TestTaskViewSet(TestBase):
         """
         Helper to create a single task
         """
-        now = timezone.now()
         mocked_target_object = mommy.make('tasking.Task')
 
         rule1 = mommy.make('tasking.SegmentRule')
@@ -39,7 +40,6 @@ class TestTaskViewSet(TestBase):
         data = {
             'name': 'Cow price',
             'description': 'Some description',
-            'start': now,
             'total_submission_target': 10,
             'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             'target_content_type': self.task_type.id,
@@ -54,8 +54,6 @@ class TestTaskViewSet(TestBase):
         # Need authenticated user
         force_authenticate(request, user=user)
         response = view(request=request)
-        # Convert start to an isoformat
-        data['start'] = now.isoformat()
 
         # we test that we do have our segment rules
         self.assertEqual(set([rule1.id, rule2.id]),
@@ -64,6 +62,20 @@ class TestTaskViewSet(TestBase):
         # the order of segment_rules may have changed so a dict comparison
         # may fail, we use `data` that does not include segment rules
         self.assertDictContainsSubset(data, response.data)
+
+        # start and end were gotten from timing_rule
+        # lets check that they are correct by compating it to the start and
+        # end values of the Task object that was created
+        the_task = Task.objects.get(pk=response.data['id'])
+
+        # the start and end in the_task are UTC, we convert response.data to
+        # UTC so that we can compare
+        utc_start = parse(response.data['start']).astimezone(pytz.utc)
+        utc_end = parse(response.data['end']).astimezone(pytz.utc)
+
+        self.assertEqual(utc_start, the_task.start)
+        self.assertEqual(utc_end, the_task.end)
+
         return response.data
 
     def test_create_task(self):
@@ -497,10 +509,12 @@ class TestTaskViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(
-            response.data[0]['created'], task1.created.isoformat())
+            parse(response.data[0]['created']).astimezone(pytz.utc),
+            task1.created)
         self.assertEqual(response.data[0]['id'], task1.id)
         self.assertEqual(
-            response.data[-1]['created'], task2.created.isoformat())
+            parse(response.data[-1]['created']).astimezone(pytz.utc),
+            task2.created)
         self.assertEqual(response.data[-1]['id'], task2.id)
 
         # order by name ascending

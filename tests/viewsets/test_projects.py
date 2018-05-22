@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 from django.utils import six
 
+import pytz
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
@@ -292,6 +293,7 @@ class TestProjectViewSet(TestBase):
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
+        # pylint: disable=no-member
         self.assertEqual(
             Project.objects.filter(name='Golden Goose').count(), 1)
 
@@ -321,10 +323,14 @@ class TestProjectViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(
-            response.data[0]['created'], project1.created.isoformat())
+            response.data[0]['created'],
+            project1.created.astimezone(
+                pytz.timezone('Africa/Nairobi')).isoformat())
         self.assertEqual(response.data[0]['id'], project1.id)
         self.assertEqual(
-            response.data[-1]['created'], project2.created.isoformat())
+            response.data[-1]['created'],
+            project2.created.astimezone(
+                pytz.timezone('Africa/Nairobi')).isoformat())
         self.assertEqual(response.data[-1]['id'], project2.id)
 
     def test_task_filter(self):
@@ -335,7 +341,7 @@ class TestProjectViewSet(TestBase):
         project1 = mommy.make('tasking.Project', name='StarLord')
         project2 = mommy.make('tasking.Project', name='Local income')
         task1 = mommy.make('tasking.Task', name='Groot')
-        for i in range(0, 7):
+        for _ in range(0, 7):
             task = mommy.make('tasking.Task', name='Normal')
             project2.tasks.add(task)
 
@@ -347,6 +353,7 @@ class TestProjectViewSet(TestBase):
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+        # pylint: disable=no-member
         self.assertEqual(
             Project.objects.filter(tasks=task1).count(), 0)
 

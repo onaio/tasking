@@ -4,29 +4,20 @@ Tasking Serializers
 """
 from __future__ import unicode_literals
 
+from dateutil.rrule import rrulestr
 from rest_framework import serializers
 
 from tasking.common_tags import INVALID_TIMING_RULE
 from tasking.models import Task
-from tasking.utils import validate_rrule
 from tasking.serializers.base import GenericForeignKeySerializer
+from tasking.utils import get_rrule_end, get_rrule_start, validate_rrule
 
 
 class TaskSerializer(GenericForeignKeySerializer):
     """
     Task serializer class
     """
-
-    # pylint: disable=no-self-use
-    def validate_timing_rule(self, value):
-        """
-        Validate timing rule
-        """
-        if validate_rrule(value) is True:
-            return value
-        raise serializers.ValidationError(
-            {'timing_rule': INVALID_TIMING_RULE}
-        )
+    start = serializers.DateTimeField(required=False)
 
     # pylint: disable=too-few-public-methods
     class Meta(object):
@@ -51,4 +42,36 @@ class TaskSerializer(GenericForeignKeySerializer):
             'segment_rules',
             'locations',
         ]
+
         model = Task
+
+    # pylint: disable=no-self-use
+    def validate_timing_rule(self, value):
+        """
+        Validate timing rule
+        """
+        if validate_rrule(value) is True:
+            return value
+        raise serializers.ValidationError(
+            {'timing_rule': INVALID_TIMING_RULE}
+        )
+
+    def validate(self, attrs):
+        """
+        Object level validation method for TaskSerializer
+        """
+
+        # if timing_rule is provided, we extract start and end from its value
+        if self.instance is not None:
+            # we are doing an update
+            timing_rule = attrs.get('timing_rule', self.instance.timing_rule)
+        else:
+            # we are creating a new object
+            timing_rule = attrs.get('timing_rule')
+
+        if timing_rule is not None:
+            # get start and end values from timing_rule
+            attrs['start'] = get_rrule_start(rrulestr(timing_rule))
+            attrs['end'] = get_rrule_end(rrulestr(timing_rule))
+
+        return super(TaskSerializer, self).validate(attrs)
