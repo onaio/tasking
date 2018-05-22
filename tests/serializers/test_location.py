@@ -41,10 +41,15 @@ class TestLocationSerializer(TestCase):
         self.assertEqual('Kenya - Nairobi', six.text_type(location))
 
         expected_fields = [
-            'properties',
-            'type',
-            'geometry',
             'id',
+            'modified',
+            'parent',
+            'radius',
+            'country',
+            'created',
+            'geopoint',
+            'name',
+            'shapefile'
         ]
         self.assertEqual(set(expected_fields),
                          set(list(serializer_instance.data)))
