@@ -9,6 +9,7 @@ from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
 
+import pytz
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 
@@ -68,7 +69,7 @@ class TestUtils(TestCase):
         # must be timezone aware
         self.assertTrue(timezone.is_aware(start2))
         # check that it matches today
-        now = timezone.now()
+        now = timezone.now().astimezone(pytz.timezone('Africa/Nairobi'))
         self.assertEqual(now.year, start2.year)
         self.assertEqual(now.month, start2.month)
         self.assertEqual(now.day, start2.day)
@@ -79,8 +80,8 @@ class TestUtils(TestCase):
         Test that get_rrule_end returns the rrule end correctly
         """
         # when until is provided
-        rule1 = \
-            'FREQ=YEARLY;BYDAY=SU;BYSETPOS=1;BYMONTH=1;UNTIL=20180521T210000Z'
+        # pylint: disable=line-too-long
+        rule1 = 'DTSTART:20180501T210000Z RRULE:FREQ=YEARLY;BYDAY=SU;BYSETPOS=1;BYMONTH=1;UNTIL=20180521T210000Z'  # noqa
         end1 = get_rrule_end(rrulestr(rule1))
         # must be timezone aware
         self.assertTrue(timezone.is_aware(end1))
@@ -95,7 +96,7 @@ class TestUtils(TestCase):
         # must be timezone aware
         self.assertTrue(timezone.is_aware(end2))
         # must be 4 days from now (5 occurrences with today as the first)
-        now = timezone.now()
+        now = timezone.now().astimezone(pytz.timezone('Africa/Nairobi'))
         then = now + timedelta(days=4)
         self.assertEqual(then.year, end2.year)
         self.assertEqual(then.month, end2.month)
