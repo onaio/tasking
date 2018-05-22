@@ -6,12 +6,15 @@ from __future__ import unicode_literals
 
 from django.utils import six, timezone
 
+from dateutil.parser import parse
+from dateutil.rrule import rrulestr
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
 
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
 from tasking.models import Task
+from tasking.utils import get_rrule_end, get_rrule_start
 from tasking.viewsets import TaskViewSet
 
 
@@ -28,7 +31,6 @@ class TestTaskViewSet(TestBase):
         """
         Helper to create a single task
         """
-        now = timezone.now()
         mocked_target_object = mommy.make('tasking.Task')
 
         rule1 = mommy.make('tasking.SegmentRule')
@@ -39,7 +41,6 @@ class TestTaskViewSet(TestBase):
         data = {
             'name': 'Cow price',
             'description': 'Some description',
-            'start': now,
             'total_submission_target': 10,
             'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             'target_content_type': self.task_type.id,
@@ -54,8 +55,6 @@ class TestTaskViewSet(TestBase):
         # Need authenticated user
         force_authenticate(request, user=user)
         response = view(request=request)
-        # Convert start to an isoformat
-        data['start'] = now.isoformat()
 
         # we test that we do have our segment rules
         self.assertEqual(set([rule1.id, rule2.id]),
@@ -64,6 +63,17 @@ class TestTaskViewSet(TestBase):
         # the order of segment_rules may have changed so a dict comparison
         # may fail, we use `data` that does not include segment rules
         self.assertDictContainsSubset(data, response.data)
+
+        # start and end were gotten from timing_rule
+        # lets check that they are correct
+        import ipdb; ipdb.set_trace()
+        self.assertEqual(
+            get_rrule_start(rrulestr(data['timing_rule'])),
+            parse(response.data['start']))
+        self.assertEqual(
+            get_rrule_end(rrulestr(data['timing_rule'])),
+            parse(response.data['end']))
+
         return response.data
 
     def test_create_task(self):
