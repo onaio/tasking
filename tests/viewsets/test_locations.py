@@ -24,6 +24,8 @@ from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
 from tasking.models import Location
 from tasking.viewsets import LocationViewSet
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 
 class TestLocationViewSet(TestBase):
     """
@@ -66,7 +68,8 @@ class TestLocationViewSet(TestBase):
         Test that we can create a Location Object with a shapefile
         """
         user = mommy.make('auth.User')
-        path = 'tests/fixtures/test_shapefile.zip'
+        path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_shapefile.zip')
 
         with open(path, 'r+b') as shapefile:
             data = {
