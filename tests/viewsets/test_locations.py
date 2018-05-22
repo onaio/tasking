@@ -4,8 +4,7 @@ Tests Location viewsets.
 """
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import Point
-from django.utils import six, timezone
+from django.utils import six
 
 import pytz
 from model_mommy import mommy
@@ -54,6 +53,7 @@ class TestLocationViewSet(TestBase):
         """
         self._create_location()
 
+    # pylint: disable=too-many-locals
     def test_create_with_bad_data(self):
         """
         Test that we get appropriate errors when trying to create an object
@@ -324,6 +324,7 @@ class TestLocationViewSet(TestBase):
                 pytz.timezone('Africa/Nairobi')).isoformat())
         self.assertEqual(response.data[-1]['id'], project2.id)
 
+    # pylint: disable=too-many-locals
     def test_authentication_required(self):
         """
         Test that authentication is required for all viewset actions
