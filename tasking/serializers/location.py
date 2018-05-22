@@ -32,33 +32,36 @@ class ShapeFileField(GeometryField):
         shapefile = value
 
         if shapefile is not None:
-            zip_file = zipfile.ZipFile(value.temporary_file_path())
-
+            try:
+                zip_file = zipfile.ZipFile(value.temporary_file_path())
+            except AttributeError:
+                zip_file = zipfile.ZipFile(value)
             # Call get_shapefile method to get the .shp files name
             shpfile = get_shapefile(zip_file)
 
             # Setup a Temporary Directory to store Shapefiles
-            tdir = TemporaryDirectory()
-            tpath = tdir.name
+            with TemporaryDirectory() as temp_dir:
+                tpath = temp_dir
 
-            # Extract all files to Temporary Directory
-            zip_file.extractall(tpath)
+                # Extract all files to Temporary Directory
+                zip_file.extractall(tpath)
 
-            # concatenate Shapefile path
-            shp_path = "{tpath}/{shp}".format(tpath=tpath, shp=shpfile)
+                # concatenate Shapefile path
+                shp_path = "{tpath}/{shp}".format(tpath=tpath, shp=shpfile)
 
-            # Make the shapefile a DataSource
-            data_source = DataSource(shp_path)
-            layer = data_source[0]
+                # Make the shapefile a DataSource
+                data_source = DataSource(shp_path)
+                layer = data_source[0]
 
-            # Get the first item of shapefile and turn to WKT
-            item = layer[1].geom.wkt
-
-            shapefile = item
+                # Get the first item of shapefile and turn to a Polygon Object
+                shapefile = layer[1].geom.geos
 
         return shapefile
 
     def to_representation(self, value):
+        """
+        Custom conversion to representation for ShapeFileField
+        """
         if value in ('', None):
             return ''
         return super(ShapeFileField, self).to_representation(value)
@@ -71,7 +74,7 @@ class GeopointField(GeometryField):
 
     def to_internal_value(self, value):
         """
-        Custom conversion for Geopoint field
+        Custom conversion for GeopointField
         """
         geopoint = value
         if geopoint is not None:
@@ -82,6 +85,9 @@ class GeopointField(GeometryField):
         return Point(lon, lat)
 
     def to_representation(self, value):
+        """
+        Custom conversion to representation for GeopointField
+        """
         if value in ('', None):
             return ''
         return super(GeopointField, self).to_representation(value)
