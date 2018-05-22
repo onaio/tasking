@@ -144,7 +144,7 @@ class TestLocationSerializer(TestCase):
 
     def test_geopoint_field_output(self):
         """
-        Test geopoint field outputs valid GEOJSON
+        Test the geopoint field outputs valid GEOJSON
         """
         data = OrderedDict(
             name='Spain',
@@ -159,7 +159,7 @@ class TestLocationSerializer(TestCase):
 
     def test_shapefile_field_output(self):
         """
-        Is present the shapefile field must output valid GEOJSON
+        Test the shapefile field outputs valid GEOJSON
         """
         path = os.path.join(
             BASE_DIR, 'fixtures', 'test_shapefile.zip')
