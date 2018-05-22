@@ -17,7 +17,7 @@ from rest_framework_gis.serializers import GeometryField
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
                                  RADIUS_MISSING)
 from tasking.models import Location
-from tasking.utils import get_shpname
+from tasking.utils import get_shapefile
 
 
 class ShapeFileField(GeometryField):
@@ -25,10 +25,9 @@ class ShapeFileField(GeometryField):
     Custom Field for Shapefile
     """
 
-    # pylint: disable=W0221
-    def to_internal_value(self, data):
-        zip_file = zipfile.ZipFile(data.temporary_file_path())
-        shpfile = get_shpname(zip_file)
+    def to_internal_value(self, value):
+        zip_file = zipfile.ZipFile(value.temporary_file_path())
+        shpfile = get_shapefile(zip_file)
         # Setup a Temporary Directory to store Shapefiles
         tdir = TemporaryDirectory()
         tpath = tdir.name
@@ -49,23 +48,27 @@ class ShapeFileField(GeometryField):
         return super(ShapeFileField, self).to_representation(value)
 
 
-# pylint: disable=W0223
-class GeopointField(serializers.Field):
+class GeopointField(GeometryField):
     """
     Custom Field for Geopoint
     """
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, value):
         """
         Custom conversion for Geopoint field
         """
-        geopoint = data
+        geopoint = value
         if geopoint is not None:
             geopoint_split = geopoint.split(',')
             lon = int(geopoint_split[0])
             lat = int(geopoint_split[1])
 
         return Point(lon, lat)
+
+    def to_representation(self, value):
+        if value in ('', None):
+            return ''
+        return super(GeopointField, self).to_representation(value)
 
 
 class SerializableCountryField(serializers.ChoiceField):
