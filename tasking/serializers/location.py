@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 from tempfile import TemporaryDirectory
 import zipfile
 
-from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from rest_framework_gis.serializers import GeometryField
 from rest_framework import serializers
 from django.contrib.gis.geos import Point

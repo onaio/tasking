@@ -85,7 +85,6 @@ class TestLocationViewSet(TestBase):
 
             self.assertEqual(response.status_code, 201, response.data)
             self.assertEqual('Nairobi', response.data['name'])
-            # self.assertEqual('Polygon', response.data['geometry']['type'])
 
     def test_create_with_bad_data(self):
         """
