@@ -4,14 +4,16 @@ Tests Location viewsets.
 """
 from __future__ import unicode_literals
 
+from django.contrib.gis.geos import Point
 from django.utils import six, timezone
 
+import pytz
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
 
-from tasking.common_tags import RADIUS_MISSING, GEOPOINT_MISSING
-from tasking.common_tags import GEODETAILS_ONLY
+from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
+                                 RADIUS_MISSING)
 from tasking.models import Location
 from tasking.viewsets import LocationViewSet
 
@@ -312,10 +314,14 @@ class TestLocationViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(
-            response.data[0]['created'], project1.created.isoformat())
+            response.data[0]['created'],
+            project1.created.astimezone(
+                pytz.timezone('Africa/Nairobi')).isoformat())
         self.assertEqual(response.data[0]['id'], project1.id)
         self.assertEqual(
-            response.data[-1]['created'], project2.created.isoformat())
+            response.data[-1]['created'],
+            project2.created.astimezone(
+                pytz.timezone('Africa/Nairobi')).isoformat())
         self.assertEqual(response.data[-1]['id'], project2.id)
 
     def test_authentication_required(self):
