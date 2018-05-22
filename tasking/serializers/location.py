@@ -4,17 +4,18 @@ Location Serializers
 """
 from __future__ import unicode_literals
 
-from tempfile import TemporaryDirectory
 import zipfile
 
-from rest_framework_gis.serializers import GeometryField
-from rest_framework import serializers
-from django.contrib.gis.geos import Point
-from django_countries import Countries
 from django.contrib.gis.gdal import DataSource
+from django.contrib.gis.geos import Point
 
-from tasking.common_tags import RADIUS_MISSING, GEODETAILS_ONLY
-from tasking.common_tags import GEOPOINT_MISSING
+from backports.tempfile import TemporaryDirectory
+from django_countries import Countries
+from rest_framework import serializers
+from rest_framework_gis.serializers import GeometryField
+
+from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
+                                 RADIUS_MISSING)
 from tasking.models import Location
 from tasking.utils import get_shpname
 
