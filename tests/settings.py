@@ -42,6 +42,7 @@ REST_FRAMEWORK = {
 SECRET_KEY = "secret_key_for_testing"
 
 FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
 
