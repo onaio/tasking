@@ -99,6 +99,9 @@ class SerializableCountryField(serializers.ChoiceField):
     """
 
     def to_representation(self, value):
+        """
+        Custom conversion to representation for Country Field
+        """
         if value in ('', None):
             return ''  # instead of `value` as Country(u'') is not serializable
         return super(SerializableCountryField, self).to_representation(value)
