@@ -75,7 +75,7 @@ def get_target(app_label, target_type):
 
 
 # pylint: disable=inconsistent-return-statements
-def get_shpname(geofile):
+def get_shapefile(geofile):
     """
     Returns the filename of ShapeFile
     """
