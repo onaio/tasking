@@ -29,9 +29,15 @@ class TestContentTypeViewSet(TestBase):
         view = ContentTypeViewSet.as_view({'get': 'list'})
 
         expected_data = [
+            OrderedDict([('name', 'group')]),
+            OrderedDict([('name', 'user')]),
+            OrderedDict([('name', 'location')]),
+            OrderedDict([('name', 'project')]),
+            OrderedDict([('name', 'segment rule')]),
             OrderedDict([('name', 'submission')]),
             OrderedDict([('name', 'task')])
-            ]
+        ]
+
 
         request = self.factory.get('/contenttypes')
         force_authenticate(request, user=user)
