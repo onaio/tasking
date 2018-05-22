@@ -9,7 +9,6 @@ from collections import OrderedDict
 from django.test import TestCase
 from django.utils import six
 
-from django.contrib.gis.geos import Point
 from rest_framework.exceptions import ValidationError
 from model_mommy import mommy
 

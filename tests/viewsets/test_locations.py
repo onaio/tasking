@@ -4,15 +4,9 @@ Tests Location viewsets.
 """
 from __future__ import unicode_literals
 
-<<<<<<< HEAD
-from django.utils import six
-=======
 import os
 
-from django.utils import six, timezone
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
->>>>>>> Change tests that use shapefile to work with changes in LocationSerializer
+from django.utils import six
 
 import pytz
 from model_mommy import mommy
