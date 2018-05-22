@@ -78,21 +78,34 @@ def get_shapefile(geofile):
     """
     Returns the filename of ShapeFile
     """
+    # Takes the inputted geofile(zipfile) and lists all items in it
     name_list = geofile.namelist()
+    # Initializes name variable
     name = None
 
+    # Check if zipfile has more than 3 files
     if len(name_list) > 3:
+        # Raise UnnecessaryFiles Exception if files exceed 3
         raise UnnecessaryFiles()
+    # Check if zipfile has less than the 3 required files
     elif len(name_list) < 3:
+        # Raise MissingFiles Exeption if it has less than the required files
         raise MissingFiles()
+    # Check if zipfile has 3 files only
     elif len(name_list) == 3:
+        # Iterate through the names of items to find the .shp file
         for item in name_list:
+            # Split the elements of the name_list in order to have an array
+            # Of filename and extension name
             arr = item.split('.')
-
+            # Check if the extension of the file is .shp
             if arr[1] == 'shp':
+                # Set name to the name of the .shp file
                 name = '.'.join(arr)
-
+    # Check if name has changed from its initial value
     if name is None:
+        # Raise ShapeFileNotFound exception if name hasn't changed from initial
         raise ShapeFileNotFound()
     else:
+        # Return name
         return name
