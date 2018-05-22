@@ -17,6 +17,7 @@ class TaskSerializer(GenericForeignKeySerializer):
     """
     Task serializer class
     """
+    start = serializers.DateTimeField(required=False)
 
     # pylint: disable=too-few-public-methods
     class Meta(object):
@@ -41,13 +42,7 @@ class TaskSerializer(GenericForeignKeySerializer):
             'segment_rules',
             'locations',
         ]
-        read_only_fields = [
-            'start',
-            'end',
-            'id',
-            'created',
-            'modified'
-        ]
+
         model = Task
 
     # pylint: disable=no-self-use

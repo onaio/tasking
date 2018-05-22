@@ -6,15 +6,14 @@ from __future__ import unicode_literals
 
 from django.utils import six, timezone
 
+import pytz
 from dateutil.parser import parse
-from dateutil.rrule import rrulestr
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
 
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
 from tasking.models import Task
-from tasking.utils import get_rrule_end, get_rrule_start
 from tasking.viewsets import TaskViewSet
 
 
@@ -65,14 +64,17 @@ class TestTaskViewSet(TestBase):
         self.assertDictContainsSubset(data, response.data)
 
         # start and end were gotten from timing_rule
-        # lets check that they are correct
-        import ipdb; ipdb.set_trace()
-        self.assertEqual(
-            get_rrule_start(rrulestr(data['timing_rule'])),
-            parse(response.data['start']))
-        self.assertEqual(
-            get_rrule_end(rrulestr(data['timing_rule'])),
-            parse(response.data['end']))
+        # lets check that they are correct by compating it to the start and
+        # end values of the Task object that was created
+        the_task = Task.objects.get(pk=response.data['id'])
+
+        # the start and end in the_task are UTC, we convert response.data to
+        # UTC so that we can compare
+        utc_start = parse(response.data['start']).astimezone(pytz.utc)
+        utc_end = parse(response.data['end']).astimezone(pytz.utc)
+
+        self.assertEqual(utc_start, the_task.start)
+        self.assertEqual(utc_end, the_task.end)
 
         return response.data
 
@@ -507,10 +509,12 @@ class TestTaskViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(
-            response.data[0]['created'], task1.created.isoformat())
+            parse(response.data[0]['created']).astimezone(pytz.utc),
+            task1.created)
         self.assertEqual(response.data[0]['id'], task1.id)
         self.assertEqual(
-            response.data[-1]['created'], task2.created.isoformat())
+            parse(response.data[-1]['created']).astimezone(pytz.utc),
+            task2.created)
         self.assertEqual(response.data[-1]['id'], task2.id)
 
         # order by name ascending
