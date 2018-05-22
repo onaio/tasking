@@ -11,6 +11,7 @@ from django.utils import six
 import pytz
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework_gis.fields import GeoJsonDict
 from tests.base import TestBase
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
@@ -79,6 +80,7 @@ class TestLocationViewSet(TestBase):
 
             self.assertEqual(response.status_code, 201, response.data)
             self.assertEqual('Nairobi', response.data['name'])
+            self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
 
     def test_create_with_bad_data(self):
         """
@@ -120,7 +122,8 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(GEOPOINT_MISSING,
                          six.text_type(response1.data['geopoint'][0]))
 
-        path = 'tests/fixtures/test_shapefile.zip'
+        path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_shapefile.zip')
 
         with open(path, 'r+b') as shapefile:
             data_shapefile = dict(
