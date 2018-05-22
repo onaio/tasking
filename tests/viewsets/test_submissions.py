@@ -4,14 +4,16 @@ Tests Submission viewsets.
 """
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from django.utils import six, timezone
 
-from datetime import timedelta
+import pytz
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
 
-from tasking.common_tags import TARGET_DOES_NOT_EXIST, CANT_EDIT_TASK
+from tasking.common_tags import CANT_EDIT_TASK, TARGET_DOES_NOT_EXIST
 from tasking.models import Submission
 from tasking.viewsets import SubmissionViewSet
 
@@ -53,7 +55,8 @@ class TestSubmissionViewSet(TestBase):
         force_authenticate(request, user=mocked_user)
         response = view(request=request)
         # Convert start to an isoformat
-        data['submission_time'] = now.isoformat()
+        data['submission_time'] = now.astimezone(
+            pytz.timezone('Africa/Nairobi')).isoformat()
 
         self.assertEqual(response.status_code, 201, response.data)
         self.assertEqual(mocked_task.id, response.data['task'])
@@ -534,7 +537,8 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(
             response.data[0]['submission_time'],
             Submission.objects.order_by(
-                '-submission_time').first().submission_time.isoformat())
+                '-submission_time').first().submission_time.astimezone(
+                    pytz.timezone('Africa/Nairobi')).isoformat())
         # the last record is what we epxect
         self.assertEqual(
             response.data[-1]['id'],
@@ -542,7 +546,8 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(
             response.data[-1]['submission_time'],
             Submission.objects.order_by(
-                '-submission_time').last().submission_time.isoformat())
+                '-submission_time').last().submission_time.astimezone(
+                    pytz.timezone('Africa/Nairobi')).isoformat())
 
     def test_valid_sorting(self):
         """
@@ -631,14 +636,16 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(
             response.data[0]['created'],
             Submission.objects.order_by(
-                '-created').first().created.isoformat())
+                '-created').first().created.astimezone(
+                    pytz.timezone('Africa/Nairobi')).isoformat())
         self.assertEqual(
             response.data[-1]['id'],
             Submission.objects.order_by('-created').last().id)
         self.assertEqual(
             response.data[-1]['created'],
             Submission.objects.order_by(
-                '-created').last().created.isoformat())
+                '-created').last().created.astimezone(
+                    pytz.timezone('Africa/Nairobi')).isoformat())
 
     def test_task_id_sorting(self):
         """
