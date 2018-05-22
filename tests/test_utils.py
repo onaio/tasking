@@ -4,12 +4,10 @@ Tests for tasking utils
 """
 from __future__ import unicode_literals
 
-<<<<<<< HEAD
 from datetime import timedelta
-=======
+
 import os
 import zipfile
->>>>>>> Add tests for get_shapefile in TestUtils
 
 from django.test import TestCase
 from django.utils import timezone
@@ -21,14 +19,11 @@ from dateutil.rrule import rrulestr
 from tasking.exceptions import TargetDoesNotExist, ShapeFileNotFound
 from tasking.exceptions import MissingFiles, UnnecessaryFiles
 from tasking.models import Task
-<<<<<<< HEAD
+
 from tasking.utils import (get_rrule_end, get_rrule_start, get_target,
-                           validate_rrule)
-=======
-from tasking.utils import get_target, validate_rrule, get_shapefile
+                           validate_rrule, get_shapefile)
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
->>>>>>> Add tests for get_shapefile in TestUtils
 
 
 class TestUtils(TestCase):
