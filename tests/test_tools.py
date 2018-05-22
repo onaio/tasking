@@ -4,10 +4,10 @@ Tests for tasking tools
 """
 from __future__ import unicode_literals
 
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from tasking.tools import get_allowed_contenttypes
-from django.contrib.contenttypes.models import ContentType
 
 
 class TestTools(TestCase):
