@@ -127,7 +127,6 @@ class LocationSerializer(serializers.ModelSerializer):
         Meta options for LocationSerializer
         """
         model = Location
-        geo_field = "shapefile"
         fields = [
             'id',
             'name',
