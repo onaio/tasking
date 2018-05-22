@@ -22,6 +22,7 @@ setup(
         'djangorestframework-gis',  # for location model
         'django_countries',  # for location model
         'django-mptt',  # For MPTT
+        'backports.tempfile',  # TemporaryDirectory support in py27
     ],
     classifiers=[
         'Programming Language :: Python',
