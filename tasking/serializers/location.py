@@ -60,7 +60,6 @@ class GeopointField(serializers.Field):
         Custom conversion for Geopoint field
         """
         geopoint = data
-
         if geopoint is not None:
             geopoint_split = geopoint.split(',')
             lon = int(geopoint_split[0])
@@ -80,7 +79,7 @@ class SerializableCountryField(serializers.ChoiceField):
         return super(SerializableCountryField, self).to_representation(value)
 
 
-class LocationSerializer(GeoFeatureModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
     """
     Location serializer class
     """
@@ -88,6 +87,7 @@ class LocationSerializer(GeoFeatureModelSerializer):
         allow_blank=True, required=False, choices=Countries())
 
     shapefile = ShapeFileField(required=False)
+    geopoint = GeopointField(required=False)
 
     def validate(self, attrs):
         """

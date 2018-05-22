@@ -48,8 +48,8 @@ class TestLocationViewSet(TestBase):
         response = view(request=request)
 
         self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual('Nairobi', response.data['properties']['name'])
-        self.assertDictContainsSubset(data, response.data['properties'])
+        self.assertEqual('Nairobi', response.data['name'])
+        self.assertDictContainsSubset(data, response.data)
         return response.data
 
     def test_create_location(self):
@@ -79,8 +79,8 @@ class TestLocationViewSet(TestBase):
             response = view(request=request)
 
             self.assertEqual(response.status_code, 201, response.data)
-            self.assertEqual('Nairobi', response.data['properties']['name'])
-            self.assertEqual('Polygon', response.data['geometry']['type'])
+            self.assertEqual('Nairobi', response.data['name'])
+            # self.assertEqual('Polygon', response.data['geometry']['type'])
 
     def test_create_with_bad_data(self):
         """
@@ -90,7 +90,7 @@ class TestLocationViewSet(TestBase):
         bob_user = mommy.make('auth.User')
         alice_user = mommy.make('auth.User')
         liz_user = mommy.make('auth.User')
-        
+
         data_missing_radius = {
             'name': 'Nairobi',
             'geopoint': '30,10',
@@ -128,7 +128,7 @@ class TestLocationViewSet(TestBase):
             data_shapefile = dict(
                 name='Arusha',
                 radius=56.6789,
-                geopoint='POINT(30 10)',
+                geopoint='30,10',
                 shapefile=shapefile
                 )
 
@@ -190,7 +190,7 @@ class TestLocationViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
-        resp = response.data.pop('features').pop()
+        resp = response.data.pop()
         self.assertDictEqual(resp, location_data)
 
     def test_update_location(self):
@@ -212,8 +212,8 @@ class TestLocationViewSet(TestBase):
         response = view(request=request, pk=location_data['id'])
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual('Arusha', response.data['properties']['name'])
-        self.assertEqual('TZ', response.data['properties']['country'])
+        self.assertEqual('Arusha', response.data['name'])
+        self.assertEqual('TZ', response.data['country'])
 
     def test_parent_filter(self):
         """
