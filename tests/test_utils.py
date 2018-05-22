@@ -4,7 +4,12 @@ Tests for tasking utils
 """
 from __future__ import unicode_literals
 
+<<<<<<< HEAD
 from datetime import timedelta
+=======
+import os
+import zipfile
+>>>>>>> Add tests for get_shapefile in TestUtils
 
 from django.test import TestCase
 from django.utils import timezone
@@ -13,10 +18,17 @@ import pytz
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 
-from tasking.exceptions import TargetDoesNotExist
+from tasking.exceptions import TargetDoesNotExist, ShapeFileNotFound
+from tasking.exceptions import MissingFiles, UnnecessaryFiles
 from tasking.models import Task
+<<<<<<< HEAD
 from tasking.utils import (get_rrule_end, get_rrule_start, get_target,
                            validate_rrule)
+=======
+from tasking.utils import get_target, validate_rrule, get_shapefile
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+>>>>>>> Add tests for get_shapefile in TestUtils
 
 
 class TestUtils(TestCase):
@@ -101,3 +113,36 @@ class TestUtils(TestCase):
         self.assertEqual(then.year, end2.year)
         self.assertEqual(then.month, end2.month)
         self.assertEqual(then.day, end2.day)
+
+    def test_get_shapefile(self):
+        """
+        Test get_shapefile
+        """
+        path = os.path.join(
+            BASE_DIR, 'tests', 'fixtures', 'test_shapefile.zip')
+        zip_file = zipfile.ZipFile(path)
+
+        path = os.path.join(
+            BASE_DIR, 'tests', 'fixtures', 'test_shapefile_not_found.zip')
+        zip_file1 = zipfile.ZipFile(path)
+
+        path = os.path.join(
+            BASE_DIR, 'tests', 'fixtures', 'test_missing_files.zip')
+        zip_file2 = zipfile.ZipFile(path)
+
+        path = os.path.join(
+            BASE_DIR, 'tests', 'fixtures', 'test_unnecessary_files.zip')
+        zip_file3 = zipfile.ZipFile(path)
+
+        # test that we can get valid shapefile
+        self.assertEqual(get_shapefile(zip_file), 'test_shapefile.shp')
+
+        # test that we get ShapeFileNotFound when shapefile cant be located
+        with self.assertRaises(ShapeFileNotFound):
+            get_shapefile(zip_file1)
+        # test that we get MissingFiles when zipfile is missing files
+        with self.assertRaises(MissingFiles):
+            get_shapefile(zip_file2)
+        # test that we get UnnecessaryFiles when zipfile exceeds needed files
+        with self.assertRaises(UnnecessaryFiles):
+            get_shapefile(zip_file3)
