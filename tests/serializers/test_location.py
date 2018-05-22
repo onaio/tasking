@@ -137,3 +137,15 @@ class TestLocationSerializer(TestCase):
             )
         validated_data = LocationSerializer().validate(data)
         self.assertDictEqual(dict(data), dict(validated_data))
+
+    def test_geopoint_field_output(self):
+        """
+        Is present the geopoint field must output valid GEOJSON
+        """
+        self.fail("TODO")
+
+    def test_shapefile_field_output(self):
+        """
+        Is present the shapefile field must output valid GEOJSON
+        """
+        self.fail("TODO")
