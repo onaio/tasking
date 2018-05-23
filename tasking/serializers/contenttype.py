@@ -16,6 +16,7 @@ class ContentTypeSerializer(serializers.ModelSerializer):
     Serializer for ContentType ViewSet
     """
     id = serializers.IntegerField()
+
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
@@ -23,7 +24,7 @@ class ContentTypeSerializer(serializers.ModelSerializer):
         """
         model = ContentType
         fields = [
-            'id',                     
+            'id',
             'app_label',
             'model',
         ]
