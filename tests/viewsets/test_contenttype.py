@@ -10,6 +10,7 @@ from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
 
+from tasking.tools import get_allowed_contenttypes
 from tasking.viewsets import ContentTypeViewSet
 
 
@@ -34,6 +35,6 @@ class TestContentTypeViewSet(TestBase):
         response = view(request=request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 7)
+        self.assertEqual(len(response.data), get_allowed_contenttypes().count())
         self.assertTrue(
             ContentType.objects.filter(pk=response.data[1]['id']).exists())
