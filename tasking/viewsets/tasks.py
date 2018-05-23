@@ -8,6 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
+from tasking.filters import TaskFilterSet
 from tasking.models import Task
 from tasking.serializers import TaskSerializer
 
@@ -25,7 +26,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         DjangoFilterBackend,
         filters.OrderingFilter,
         filters.SearchFilter]
-    filter_fields = ['locations', 'status', 'project', 'parent']
+    filter_class = TaskFilterSet
     search_fields = ['name', ]
     ordering_fields = [
         'created',
