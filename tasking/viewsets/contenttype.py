@@ -21,4 +21,4 @@ class ContentTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = get_allowed_contenttypes()
 
     def get_queryset(self):
-        return self.queryset.order_by('model')
+        return self.queryset.order_by('app_label','model')
