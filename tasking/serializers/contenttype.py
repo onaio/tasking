@@ -7,14 +7,12 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.models import ContentType
 
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 
 class ContentTypeSerializer(serializers.ModelSerializer):
     """
     Serializer for ContentType ViewSet
     """
-    id = serializers.IntegerField()
 
     # pylint: disable=too-few-public-methods
     class Meta(object):
@@ -26,10 +24,4 @@ class ContentTypeSerializer(serializers.ModelSerializer):
             'id',
             'app_label',
             'model',
-        ]
-        validators = [
-            UniqueTogetherValidator(
-                queryset=ContentType.objects.all(),
-                fields=('app_label', 'model', 'id')
-            )
         ]
