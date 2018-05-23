@@ -30,17 +30,18 @@ class TestContentTypeViewSet(TestBase):
 
         expected_data = [
             OrderedDict([('name', 'group')]),
-            OrderedDict([('name', 'user')]),
             OrderedDict([('name', 'location')]),
             OrderedDict([('name', 'project')]),
             OrderedDict([('name', 'segment rule')]),
             OrderedDict([('name', 'submission')]),
-            OrderedDict([('name', 'task')])
+            OrderedDict([('name', 'task')]),
+            OrderedDict([('name', 'user')])
         ]
-
 
         request = self.factory.get('/contenttypes')
         force_authenticate(request, user=user)
         response = view(request=request)
 
-        self.assertEqual(expected_data, response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(
+            expected_data, response.data)
