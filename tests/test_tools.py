@@ -82,10 +82,6 @@ class TestTools(TestCase):
                 item.start_time.minute,
                 task1.start.astimezone(
                     timezone.get_current_timezone()).time().minute)
-            self.assertEqual(
-                item.start_time.second,
-                task1.start.astimezone(
-                    timezone.get_current_timezone()).time().second)
             self.assertEqual(item.end_time, time(23, 59, 59, 999999))
 
         # we should have 30 occurrences
