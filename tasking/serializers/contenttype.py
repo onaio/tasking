@@ -10,7 +10,6 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 
-# pylint: disable=abstract-method
 class ContentTypeSerializer(serializers.ModelSerializer):
     """
     Serializer for ContentType ViewSet
