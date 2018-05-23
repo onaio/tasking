@@ -55,6 +55,9 @@ def get_rrule_end(rrule_obj):
     elif count is not None:
         # if count is set instead we use the last ocurrence
         end = rrule_obj[-1]  # might be slow if many occurrences
+        # we must strip the time because we should only infer the date
+        # when using count, we set it to the very end of the day
+        end = end.replace(hour=23, minute=59, second=59, microsecond=999999)
     else:
         return None
 

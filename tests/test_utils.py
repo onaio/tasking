@@ -88,12 +88,12 @@ class TestUtils(TestCase):
         """
         # when until is provided
         # pylint: disable=line-too-long
-        rule1 = 'DTSTART:20180501T210000Z RRULE:FREQ=YEARLY;BYDAY=SU;BYSETPOS=1;BYMONTH=1;UNTIL=20180521T210000Z'  # noqa
+        rule1 = 'DTSTART:20180501T210000Z RRULE:FREQ=YEARLY;BYDAY=SU;BYSETPOS=1;BYMONTH=1;UNTIL=20480521T210000Z'  # noqa
         end1 = get_rrule_end(rrulestr(rule1))
         # must be timezone aware
         self.assertTrue(timezone.is_aware(end1))
         # must be 21 may 2018
-        self.assertEqual(2018, end1.year)
+        self.assertEqual(2048, end1.year)
         self.assertEqual(5, end1.month)
         self.assertEqual(21, end1.day)
 
