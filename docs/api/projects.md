@@ -50,8 +50,16 @@ curl -X GET https://example.com/api/v1/projects/18
 
 This request will return a response containing the specific project.
 
-```console
-{'id': 18, 'name': 'Livestock prices', 'tasks': [30, 31], 'created': '2018-05-23T12:37:01.252225+03:00', 'modified': '2018-05-23T12:37:01.252243+03:00', 'target_content_type': 9, 'target_id': 29}
+```json
+{
+    'id': 18,
+    'name': 'Livestock prices',
+    'tasks': [30, 31],
+    'created': '2018-05-23T12:37:01.252225+03:00',
+    'modified': '2018-05-23T12:37:01.252243+03:00'
+    'target_content_type': 9,
+    'target_id': 29
+}
 ```
 
 ### DELETE /api/v1/projects/[pk]
