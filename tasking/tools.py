@@ -59,12 +59,22 @@ def generate_task_occurrences(task):
             * the very last task occurrence will have the same end_time as
               the end_time from the timing_rule
         - occurrences with the same setart_time and end_time will not be
-          created, they will be skipped sliently
+          created, they will be skipped silently
+        - only works for valid rrules
 
     Returns a Queryset of TaskOccurrences
     """
     # get the rrule
-    task_rrule = rrulestr(task.timing_rule)
+    try:
+        task_rrule = rrulestr(task.timing_rule)
+    except ValueError:
+        # not valid rrule string
+        # pylint: disable=no-member
+        return TaskOccurrence.objects.none()
+    except TypeError:
+        # not a string
+        # pylint: disable=no-member
+        return TaskOccurrence.objects.none()
 
     # get the max occurrences we can make right now
     occurrence_count = min(task_rrule.count(), MAX_OCCURRENCES)
