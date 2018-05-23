@@ -36,4 +36,4 @@ class TestContentTypeSerializer(TestCase):
         }
 
         self.assertEqual(set(expected_fields),
-                         set(list(serializer_instance.data)))
+                         set(list(serializer_instance.data.keys())))
