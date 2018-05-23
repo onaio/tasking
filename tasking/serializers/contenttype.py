@@ -4,20 +4,18 @@ ContentType serializer
 """
 from __future__ import unicode_literals
 
-from rest_framework import serializers
-
 from django.contrib.contenttypes.models import ContentType
+
+from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 
 # pylint: disable=abstract-method
-class ContentTypeSerializer(serializers.Serializer):
+class ContentTypeSerializer(serializers.ModelSerializer):
     """
     Serializer for ContentType ViewSet
     """
-    app_label = serializers.CharField(max_length=255)
-    model = serializers.CharField(max_length=255)
     id = serializers.IntegerField()
-
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
@@ -25,7 +23,13 @@ class ContentTypeSerializer(serializers.Serializer):
         """
         model = ContentType
         fields = [
+            'id',                     
             'app_label',
             'model',
-            'id'
+        ]
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ContentType.objects.all(),
+                fields=('app_label', 'model', 'id')
+            )
         ]
