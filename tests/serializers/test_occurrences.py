@@ -33,7 +33,7 @@ class TestTaskOccurrenceSerializer(TestBase):
         self.assertTrue(serializer_instance.is_valid())
         occurrence = serializer_instance.save()
 
-        # response.data will return the time fields with seconds
+        # serializer_instance.data will return the time fields with seconds
         data['start_time'] = '07:00:00'
         data['end_time'] = '19:00:00'
 

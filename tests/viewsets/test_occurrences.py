@@ -224,3 +224,51 @@ class TestTaskOccurrenceViewSet(TestBase):
         response3 = view(request=request3)
         self.assertEqual(response3.status_code, 200)
         self.assertEqual(len(response3.data), 5)
+
+    def test_occurrence_sorting(self):
+        """
+        Test that we can sort occurrences
+        """
+        user = mommy.make('auth.User')
+        view = TaskOccurrenceViewSet.as_view({'get': 'list'})
+
+        # make some occurrences that have different dates and start and end
+        # times
+        for i in range(1, 7):
+            mommy.make(
+                'tasking.TaskOccurrence',
+                date='2018-05-0{}'.format(i),
+                start_time='0{}:00'.format(i),
+                end_time='{}:00'.format(i + 10)
+            )
+
+        # test sorting by date ascending
+        request = self.factory.get(
+            '/occurrences', {'ordering': 'date'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        # pylint: disable=no-member
+        self.assertEqual(len(response.data), TaskOccurrence.objects.count())
+        self.assertEqual('2018-05-01', response.data[0]['date'])
+        self.assertEqual('2018-05-06', response.data[-1]['date'])
+
+        # test sorting by start_time descending
+        request = self.factory.get(
+            '/occurrences', {'ordering': '-start_time'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), TaskOccurrence.objects.count())
+        self.assertEqual('06:00:00', response.data[0]['start_time'])
+        self.assertEqual('01:00:00', response.data[-1]['start_time'])
+
+        # test sorting by end_time descending
+        request = self.factory.get(
+            '/occurrences', {'ordering': '-end_time'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), TaskOccurrence.objects.count())
+        self.assertEqual('16:00:00', response.data[0]['end_time'])
+        self.assertEqual('11:00:00', response.data[-1]['end_time'])
