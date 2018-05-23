@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
+from model_mommy import mommy
+
 from tasking.serializers import ContentTypeSerializer
 
 
@@ -18,15 +20,15 @@ class TestContentTypeSerializer(TestCase):
         """
         Test that the serializer returns the expected fields
         """
+        mocked_task = mommy.make('tasking.Task')
         data = {
             'app_label': 'tasking',
             'model': 'task',
-            'id': '1'
+            'id': mocked_task.id,
         }
 
         serializer_instance = ContentTypeSerializer(data=data)
         self.assertTrue(serializer_instance.is_valid())
-
         expected_fields = {
             'app_label',
             'model',
