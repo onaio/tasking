@@ -19,3 +19,8 @@ class ContentTypeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ContentTypeSerializer
     permission_classes = [IsAuthenticated]
     queryset = get_allowed_contenttypes()
+
+    def filter_queryset(self, queryset):
+        # Order output of ViewSet
+        queryset = super(ContentTypeViewSet, self).filter_queryset(queryset)
+        return queryset.order_by('model')
