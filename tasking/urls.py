@@ -8,7 +8,7 @@ from rest_framework import routers
 
 from tasking.viewsets import (LocationViewSet, ProjectViewSet,
                               SegmentRuleViewSet, SubmissionViewSet,
-                              TaskViewSet)
+                              TaskViewSet, ContentTypeViewSet)
 
 # pylint: disable=invalid-name
 router = routers.DefaultRouter(trailing_slash=False)
@@ -17,6 +17,7 @@ router.register(r'tasks', TaskViewSet)
 router.register(r'submissions', SubmissionViewSet)
 router.register(r'locations', LocationViewSet)
 router.register(r'projects', ProjectViewSet)
+router.register(r'contenttpes', ContentTypeViewSet)
 
 urlpatterns = [
     url(r'^api/v1/', include(router.urls)),

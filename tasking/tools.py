@@ -13,9 +13,9 @@ from django.contrib.contenttypes.models import ContentType
 DEFAULT_ALLOWED_CONTENTTYPES = [
     {'app_label': 'tasking', 'model': 'task'},
     {'app_label': 'tasking', 'model': 'location'},
-    {'app_label': 'tasking', 'model': 'tasklist'},
+    {'app_label': 'tasking', 'model': 'project'},
     {'app_label': 'tasking', 'model': 'segmentrule'},
-    {'app_label': 'tasking', 'model': 'tasksubmission'},
+    {'app_label': 'tasking', 'model': 'submission'},
     {'app_label': 'auth', 'model': 'user'},
     {'app_label': 'auth', 'model': 'group'},
     {'app_label': 'logger', 'model': 'xform'},
