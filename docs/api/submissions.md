@@ -22,6 +22,12 @@ Returns a list of all submissions
 curl -X GET https://example.com/api/v1/submissions
 ```
 
+Returns a list of submissions for a specific task name if given `search` query parameter.
+
+```console
+curl -X GET https://example.com/api/v1/projects?search=exampletask
+```
+
 Returns a list of submissions for a specific task if given `task` query parameter. The `task` is a target identifier.
 
 ```console
@@ -32,12 +38,6 @@ Returns a list of submissions for a specific location if given `location` query 
 
 ```console
 curl -X GET https://example.com/api/v1/submissions?location=46
-```
-
-Returns a list of submissions for a specific task if given `search` query parameter.
-
-```console
-curl -X GET https://example.com/api/v1/projects?search=exampletask
 ```
 
 Returns a list of submissions from a specific user if given `user` query parameter. The `user` is a target identifier.
