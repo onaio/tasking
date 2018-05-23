@@ -18,6 +18,7 @@ class ContentTypeSerializer(serializers.Serializer):
     model = serializers.CharField(max_length=255)
     id = serializers.IntegerField()
 
+    # pylint: disable=too-few-public-methods
     class Meta(object):
         """
         Meta Options for ContentTypeSerializer
