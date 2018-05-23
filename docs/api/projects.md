@@ -52,13 +52,13 @@ This request will return a response containing the specific project.
 
 ```json
 {
-    'id': 18,
-    'name': 'Livestock prices',
-    'tasks': [30, 31],
-    'created': '2018-05-23T12:37:01.252225+03:00',
-    'modified': '2018-05-23T12:37:01.252243+03:00'
-    'target_content_type': 9,
-    'target_id': 29
+    "id": 18,
+    "name": "Livestock prices",
+    "tasks": [30, 31],
+    "created": "2018-05-23T12:37:01.252225+03:00",
+    "modified": "2018-05-23T12:37:01.252243+03:00",
+    "target_content_type": 9,
+    "target_id": 29
 }
 ```
 
