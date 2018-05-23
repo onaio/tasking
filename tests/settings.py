@@ -17,7 +17,7 @@ INSTALLED_APPS = (
     'django_countries',  # Required for CountryField in Location Model
     'mptt',
     # custom
-    'tasking',
+    'tasking.apps.TaskingConfig',
 )
 
 DATABASES = {
