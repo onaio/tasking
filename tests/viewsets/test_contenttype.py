@@ -29,13 +29,13 @@ class TestContentTypeViewSet(TestBase):
         view = ContentTypeViewSet.as_view({'get': 'list'})
 
         expected_data = [
-            OrderedDict([('name', 'group')]),
-            OrderedDict([('name', 'location')]),
-            OrderedDict([('name', 'project')]),
-            OrderedDict([('name', 'segment rule')]),
-            OrderedDict([('name', 'submission')]),
-            OrderedDict([('name', 'task')]),
-            OrderedDict([('name', 'user')])
+            OrderedDict([('app_label', 'auth'), ('model', 'group'), ('id', 2)]),
+            OrderedDict([('app_label', 'auth'), ('model', 'user'), ('id', 3)]),
+            OrderedDict([('app_label', 'tasking'), ('model', 'location'), ('id', 5)]),
+            OrderedDict([('app_label', 'tasking'), ('model', 'project'), ('id', 6)]),
+            OrderedDict([('app_label', 'tasking'), ('model', 'segmentrule'), ('id', 7)]),
+            OrderedDict([('app_label', 'tasking'), ('model', 'submission'), ('id', 8)]),
+            OrderedDict([('app_label', 'tasking'), ('model', 'task'), ('id', 9)])
         ]
 
         request = self.factory.get('/contenttypes')
