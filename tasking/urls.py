@@ -17,7 +17,7 @@ router.register(r'tasks', TaskViewSet)
 router.register(r'submissions', SubmissionViewSet)
 router.register(r'locations', LocationViewSet)
 router.register(r'projects', ProjectViewSet)
-router.register(r'contenttpes', ContentTypeViewSet)
+router.register(r'contenttypes', ContentTypeViewSet)
 
 urlpatterns = [
     url(r'^api/v1/', include(router.urls)),
