@@ -141,7 +141,7 @@ class TestProjectViewSet(TestBase):
         project_data = self._create_project()
         view = ProjectViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get(
-            '/project/{id}'.format(id=project_data['id']))
+            '/projects/{id}'.format(id=project_data['id']))
         force_authenticate(request, user=user)
         response = view(request=request, pk=project_data['id'])
         self.assertEqual(response.status_code, 200)
@@ -178,7 +178,7 @@ class TestProjectViewSet(TestBase):
 
         view = ProjectViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/project/{id}'.format(id=project_data['id']), data=data)
+            '/projects/{id}'.format(id=project_data['id']), data=data)
         force_authenticate(request, user=user)
         response = view(request=request, pk=project_data['id'])
 
@@ -198,7 +198,7 @@ class TestProjectViewSet(TestBase):
 
         view2 = ProjectViewSet.as_view({'patch': 'partial_update'})
         request2 = self.factory.patch(
-            '/project/{id}'.format(id=project_data2['id']), data=data2)
+            '/projects/{id}'.format(id=project_data2['id']), data=data2)
         force_authenticate(request2, user=user2)
         response2 = view2(request=request2, pk=project_data2['id'])
 
@@ -233,7 +233,7 @@ class TestProjectViewSet(TestBase):
         # test that you need authentication for retrieving a project
         view2 = ProjectViewSet.as_view({'get': 'retrieve'})
         request2 = self.factory.get(
-            '/project/{id}'.format(id=project_data['id']))
+            '/projects/{id}'.format(id=project_data['id']))
         response2 = view2(request=request2, pk=project_data['id'])
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
@@ -271,7 +271,7 @@ class TestProjectViewSet(TestBase):
 
         view5 = ProjectViewSet.as_view({'patch': 'partial_update'})
         request5 = self.factory.patch(
-            '/project/{id}'.format(id=project_data['id']), data=data)
+            '/projects/{id}'.format(id=project_data['id']), data=data)
         response5 = view5(request=request5, pk=project_data['id'])
 
         self.assertEqual(response5.status_code, 403)

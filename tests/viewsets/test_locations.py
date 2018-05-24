@@ -171,7 +171,7 @@ class TestLocationViewSet(TestBase):
 
         view = LocationViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get(
-            '/location/{id}'.format(id=location_data['id']))
+            '/locations/{id}'.format(id=location_data['id']))
         force_authenticate(request, user=user)
         response = view(request=request, pk=location_data['id'])
 
@@ -208,7 +208,7 @@ class TestLocationViewSet(TestBase):
 
         view = LocationViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/location/{id}'.format(id=location_data['id']), data=data)
+            '/locations/{id}'.format(id=location_data['id']), data=data)
         force_authenticate(request, user=user)
         response = view(request=request, pk=location_data['id'])
 
@@ -381,7 +381,7 @@ class TestLocationViewSet(TestBase):
         # test that you need authentication for retrieving a location
         view1 = LocationViewSet.as_view({'get': 'retrieve'})
         request1 = self.factory.get(
-            '/location/{id}'.format(id=location_data['id']))
+            '/locations/{id}'.format(id=location_data['id']))
         response1 = view1(request=request1, pk=location_data['id'])
 
         self.assertEqual(response1.status_code, 403)
@@ -421,7 +421,7 @@ class TestLocationViewSet(TestBase):
 
         view4 = LocationViewSet.as_view({'patch': 'partial_update'})
         request4 = self.factory.patch(
-            '/location/{id}'.format(id=location1_data['id']), data=data2)
+            '/locations/{id}'.format(id=location1_data['id']), data=data2)
         response4 = view4(request=request4, pk=location1_data['id'])
 
         self.assertEqual(response4.status_code, 403)

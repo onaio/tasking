@@ -39,7 +39,7 @@ class TestSegmentRuleViewSet(TestBase):
         }
 
         view = SegmentRuleViewSet.as_view({'post': 'create'})
-        request = self.factory.post('/segment-rule', data)
+        request = self.factory.post('/segment-rules', data)
         # Need authenticated user
         force_authenticate(request, user=user)
         response = view(request=request)
@@ -72,7 +72,7 @@ class TestSegmentRuleViewSet(TestBase):
         }
 
         view = SegmentRuleViewSet.as_view({'post': 'create'})
-        request = self.factory.post('/segment-rule', bad_content_type)
+        request = self.factory.post('/segment-rules', bad_content_type)
         # Need authenticated user
         force_authenticate(request, user=alice_user)
         response = view(request=request)
@@ -98,7 +98,7 @@ class TestSegmentRuleViewSet(TestBase):
         # delete segment rule
         view = SegmentRuleViewSet.as_view({'delete': 'destroy'})
         request = self.factory.delete(
-            '/segment-rule/{id}'.format(id=segment_rule.id))
+            '/segment-rules/{id}'.format(id=segment_rule.id))
         force_authenticate(request, user=user)
         response = view(request=request, pk=segment_rule.id)
         # assert that segment rule was deleted
@@ -108,13 +108,13 @@ class TestSegmentRuleViewSet(TestBase):
 
     def test_retrieve_segment_rule(self):
         """
-        Test GET /segment-rule/[pk] return a segment rule matching pk.
+        Test GET /segment-rules/[pk] return a segment rule matching pk.
         """
         user = mommy.make('auth.User')
         segment_rule_data = self._create_segment_rule()
         view = SegmentRuleViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get(
-            '/segment-rule/{id}'.format(id=segment_rule_data['id']))
+            '/segment-rules/{id}'.format(id=segment_rule_data['id']))
         force_authenticate(request, user=user)
         response = view(request=request, pk=segment_rule_data['id'])
         self.assertEqual(response.status_code, 200)
@@ -122,13 +122,13 @@ class TestSegmentRuleViewSet(TestBase):
 
     def test_list_segment_rules(self):
         """
-        Test GET /segment-rule listing of segment rules for specific forms.
+        Test GET /segment-rules listing of segment rules for specific forms.
         """
         user = mommy.make('auth.User')
         segment_rule_data = self._create_segment_rule()
         view = SegmentRuleViewSet.as_view({'get': 'list'})
 
-        request = self.factory.get('/segment-rule')
+        request = self.factory.get('/segment-rules')
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
@@ -152,7 +152,7 @@ class TestSegmentRuleViewSet(TestBase):
 
         view = SegmentRuleViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/segment-rule/{id}'.format(id=segment_rule_data['id']), data=data)
+            '/segment-rules/{id}'.format(id=segment_rule_data['id']), data=data)
         force_authenticate(request, user=user)
         response = view(request=request, pk=segment_rule_data['id'])
 
@@ -183,7 +183,7 @@ class TestSegmentRuleViewSet(TestBase):
             'active': True
         }
         view = SegmentRuleViewSet.as_view({'post': 'create'})
-        request = self.factory.post('/segment-rule', good_data)
+        request = self.factory.post('/segment-rules', good_data)
         response = view(request=request)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
@@ -193,7 +193,7 @@ class TestSegmentRuleViewSet(TestBase):
         # test that you need authentication for retrieving a segment rule
         view2 = SegmentRuleViewSet.as_view({'get': 'retrieve'})
         request2 = self.factory.get(
-            '/segment-rule/{id}'.format(id=segment_rule_data['id']))
+            '/segment-rules/{id}'.format(id=segment_rule_data['id']))
         response2 = view2(request=request2, pk=segment_rule_data['id'])
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
@@ -202,7 +202,7 @@ class TestSegmentRuleViewSet(TestBase):
 
         # test that you need authentication for listing a segment rule
         view3 = SegmentRuleViewSet.as_view({'get': 'list'})
-        request3 = self.factory.get('/segment-rule')
+        request3 = self.factory.get('/segment-rules')
         response3 = view3(request=request3)
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
@@ -216,7 +216,7 @@ class TestSegmentRuleViewSet(TestBase):
 
         view4 = SegmentRuleViewSet.as_view({'delete': 'destroy'})
         request4 = self.factory.delete(
-            '/segment-rule/{id}'.format(id=segment_rule.id))
+            '/segment-rules/{id}'.format(id=segment_rule.id))
         response4 = view4(request=request4, pk=segment_rule.id)
 
         self.assertEqual(response4.status_code, 403)
@@ -230,7 +230,7 @@ class TestSegmentRuleViewSet(TestBase):
         }
         view5 = SegmentRuleViewSet.as_view({'patch': 'partial_update'})
         request5 = self.factory.patch(
-            '/segment-rule/{id}'.format(id=segment_rule_data['id']), data=data)
+            '/segment-rules/{id}'.format(id=segment_rule_data['id']), data=data)
         response5 = view5(request=request5, pk=segment_rule_data['id'])
 
         self.assertEqual(response5.status_code, 403)
