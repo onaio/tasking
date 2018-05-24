@@ -14,7 +14,13 @@ Creates a Task, requires a `name`, `timing_rule`, `target_content_type` and `tar
 curl -X POST -H "Content-Type:application/json" '{"name": "Cow price", "description": "Some description", "total_submission_target": 10, "timing_rule": "RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5", "target_content_type": "task", "target_id": 234}' https://example.com/api/v1/tasks
 ```
 
-The `target_content_type` is a *string* and can be any of the allowed content types, `timing_rule` is a [standard rrule](https://tools.ietf.org/html/rfc2445) *string* and `target_id` is an *integer* for the target unique identifier. It can take additional optional inputs in the content such as:
+`target_content_type`: *string*, is any of the allowed content types.
+
+`timing_rule`: *string*, is a [standard rrule](https://tools.ietf.org/html/rfc2445) *string*.
+
+`target_id`: *integer*, is the target contents unique identifier.
+
+It can take additional optional inputs in the content such as:
 
 - `status`: *string*, can be either an **a** for ACTIVE, **b**    for DEACTIVATED, **c** for EXPIRED or **d** for DRAFT.
 - `parent`: *integer*, is the unique identifier for a parent task object.
