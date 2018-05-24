@@ -68,24 +68,6 @@ class BaseSubmission(GenericFKModel, TimeStampedModel, models.Model):
         This is the meta options class for the abstract Submission model
         """
         abstract = True
-    
-    def get_approved(self, status):
-        """
-        Class method that gets the value of approved property
-        """
-        if status == self.APPROVED:
-            return True
-        elif status == self.REJECTED:
-            return False
-        else:
-            return None
-
-    @property
-    def approved(self):
-        """
-        Approved class property for submission
-        """
-        return self.get_approved(self.status)
 
 
 @python_2_unicode_compatible
@@ -126,3 +108,21 @@ class Submission(BaseSubmission):
         """
         return "{task} submission {submission_id}".format(
             submission_id=self.pk, task=self.task)
+
+    def get_approved(self, status):
+        """
+        Class method that gets the value of approved property
+        """
+        if status == self.APPROVED:
+            return True
+        elif status == self.REJECTED:
+            return False
+        else:
+            return None
+
+    @property
+    def approved(self):
+        """
+        Approved class property for submission
+        """
+        return self.get_approved(self.status)
