@@ -117,8 +117,8 @@ class Submission(BaseSubmission):
             return True
         elif status == self.REJECTED:
             return False
-        else:
-            return None
+
+        return None
 
     @property
     def approved(self):
