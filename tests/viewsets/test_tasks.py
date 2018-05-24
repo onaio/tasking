@@ -590,3 +590,123 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(response.data[0]['id'], task.id)
         self.assertEqual(response.data[1]['status'], task2.status)
         self.assertEqual(response.data[1]['id'], task2.id)
+
+    def test_date_filter(self):
+        """
+        Test that you can filter by date
+        """
+        user = mommy.make('auth.User')
+        task = mommy.make('tasking.Task')
+        task2 = mommy.make('tasking.Task')
+
+        # remove any autocreated task occurrences
+        # pylint: disable=no-member
+        task.taskoccurrence_set.all().delete()
+        task2.taskoccurrence_set.all().delete()
+
+        # make a bunch of occurrences
+        mommy.make(
+            'tasking.TaskOccurrence',
+            _quantity=7,
+            task=task,
+            date='2018-07-12')
+
+        # make one occurrence using a unique date
+        mommy.make('tasking.TaskOccurrence', task=task2, date='2017-09-09')
+
+        view = TaskViewSet.as_view({'get': 'list'})
+
+        # test that we get the task with our unique date
+        request = self.factory.get('/tasks',
+                                   {'date': '2017-09-09'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], task2.id)
+
+        # make some tasks that happen after 2018-07-12
+        mommy.make(
+            'tasking.TaskOccurrence',
+            _quantity=5,
+            task=task,
+            date='2018-11-11')
+
+        # test that we can get tasks before or after a certain date
+        request2 = self.factory.get('/tasks',
+                                    {'date__gt': '2018-07-13', 'xxx': 23})
+        force_authenticate(request2, user=user)
+        response2 = view(request=request2)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(len(response2.data), 1)
+        self.assertEqual(response2.data[0]['id'], task.id)
+
+    def test_start_time_filter(self):
+        """
+        Test that you can filter by start_time
+        """
+        user = mommy.make('auth.User')
+        view = TaskViewSet.as_view({'get': 'list'})
+        task = mommy.make('tasking.Task')
+        task2 = mommy.make('tasking.Task')
+
+        # remove any autocreated tasks
+        # pylint: disable=no-member
+        task.taskoccurrence_set.all().delete()
+        task2.taskoccurrence_set.all().delete()
+
+        # make some occurrences that start at 7
+        mommy.make(
+            'tasking.TaskOccurrence', _quantity=5, task=task,
+            start_time='07:00')
+
+        # make some occurrences that happen after 9:00
+        mommy.make(
+            'tasking.TaskOccurrence', _quantity=6, task=task2,
+            start_time='09:15')
+
+        # test that we can get tasks before or after a certain time
+        request2 = self.factory.get(
+            '/tasks', {'start_time__gte': '09:15'})
+        force_authenticate(request2, user=user)
+        response2 = view(request=request2)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(len(response2.data), 1)
+        self.assertEqual(response2.data[0]['id'], task2.id)
+
+        request3 = self.factory.get(
+            '/tasks', {'start_time__lt': '09:15'})
+        force_authenticate(request3, user=user)
+        response3 = view(request=request3)
+        self.assertEqual(response3.status_code, 200)
+        self.assertEqual(len(response3.data), 1)
+        self.assertEqual(response3.data[0]['id'], task.id)
+
+#     def test_end_time_filter(self):
+#         """
+#         Test that you can filter by end_time
+#         """
+#         user = mommy.make('auth.User')
+#         view = TaskViewSet.as_view({'get': 'list'})
+#         # make some ptasks that end at 5pm
+#         mommy.make(
+#             'tasking.TaskOccurrence', _quantity=5, end_time='17:00')
+
+#         # make some tasks that end after 9pm
+#         mommy.make(
+#             'tasking.TaskOccurrence', _quantity=6, end_time='21:15')
+
+#         # test that we can get tasks before or after a certain time
+#         request2 = self.factory.get(
+#             '/tasks', {'taskoccurrence__end_time__gte': '21:15'})
+#         force_authenticate(request2, user=user)
+#         response2 = view(request=request2)
+#         self.assertEqual(response2.status_code, 200)
+#         self.assertEqual(len(response2.data), 6)
+
+#         request3 = self.factory.get(
+#             '/tasks', {'taskoccurrence__end_time__lt': '21:15'})
+#         force_authenticate(request3, user=user)
+#         response3 = view(request=request3)
+#         self.assertEqual(response3.status_code, 200)
+#         self.assertEqual(len(response3.data), 5)
