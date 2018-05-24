@@ -22,6 +22,17 @@ class BaseSubmission(GenericFKModel, TimeStampedModel, models.Model):
     to your own project. It only implements the bare minimum of
     what a Submission could be.
     """
+    APPROVED = 'a'
+    REJECTED = 'b'
+    UNDER_REVIEW = 'c'
+    PENDING = 'd'
+
+    STATUS_CHOICES = (
+        (APPROVED, _('Approved')),
+        (REJECTED, _('Rejected')),
+        (UNDER_REVIEW, _('Under Review')),
+        (PENDING, _('Pending Review'))
+    )
     user = models.ForeignKey(
         USER,
         verbose_name=_('User'),
@@ -37,11 +48,12 @@ class BaseSubmission(GenericFKModel, TimeStampedModel, models.Model):
         default=False,
         help_text=_('This represents whether submission is valid or not.')
     )
-    approved = models.BooleanField(
-        verbose_name=_('Approved'),
-        default=False,
-        help_text=_('This represents whether submission is approved or not.')
-    )
+    status = models.CharField(
+        verbose_name=_('Status'),
+        choices=STATUS_CHOICES,
+        default=PENDING,
+        max_length=1,
+        help_text=_('The status of the Submission'))
     comments = models.TextField(
         _('Comments'),
         blank=True,
@@ -56,6 +68,24 @@ class BaseSubmission(GenericFKModel, TimeStampedModel, models.Model):
         This is the meta options class for the abstract Submission model
         """
         abstract = True
+    
+    def get_approved(self, status):
+        """
+        Class method that gets the value of approved property
+        """
+        if status == self.APPROVED:
+            return True
+        elif status == self.REJECTED:
+            return False
+        else:
+            return None
+
+    @property
+    def approved(self):
+        """
+        Approved class property for submission
+        """
+        return self.get_approved(self.status)
 
 
 @python_2_unicode_compatible
