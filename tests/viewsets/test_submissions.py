@@ -163,7 +163,7 @@ class TestSubmissionViewSet(TestBase):
         submission_data = self._create_submission()
         view = SubmissionViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get(
-            '/submission/{id}'.format(id=submission_data['id']))
+            '/submissions/{id}'.format(id=submission_data['id']))
 
         force_authenticate(request, user=user)
 
@@ -204,7 +204,7 @@ class TestSubmissionViewSet(TestBase):
         # test that target_content_type and target_id can be changed
         view = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/submission/{id}'.format(id=submission_data['id']), data=data)
+            '/submissions/{id}'.format(id=submission_data['id']), data=data)
         force_authenticate(request, user=user)
         response = view(request=request, pk=submission_data['id'])
 
@@ -221,7 +221,7 @@ class TestSubmissionViewSet(TestBase):
 
         view2 = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request2 = self.factory.patch(
-            '/submission/{id}'.format(id=submission_data2['id']), data=data2)
+            '/submissions/{id}'.format(id=submission_data2['id']), data=data2)
         force_authenticate(request2, user=user2)
         response2 = view2(request=request2, pk=submission_data2['id'])
 
@@ -237,7 +237,7 @@ class TestSubmissionViewSet(TestBase):
         # test an error is raised when trying to change task
         view3 = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request3 = self.factory.patch(
-            '/submission/{id}'.format(id=submission_data3['id']), data=data3)
+            '/submissions/{id}'.format(id=submission_data3['id']), data=data3)
         force_authenticate(request3, user=user3)
         response3 = view3(request=request3, pk=submission_data3['id'])
 
@@ -305,7 +305,7 @@ class TestSubmissionViewSet(TestBase):
 
         view4 = SubmissionViewSet.as_view({'delete': 'destroy'})
         request4 = self.factory.delete(
-            '/tasks/{id}'.format(id=submission.id))
+            '/submissions/{id}'.format(id=submission.id))
         response4 = view4(request=request4, pk=submission.id)
 
         self.assertEqual(response4.status_code, 403)

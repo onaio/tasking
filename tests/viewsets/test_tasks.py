@@ -80,7 +80,7 @@ class TestTaskViewSet(TestBase):
 
     def test_create_task(self):
         """
-        Test POST /task adding a new task.
+        Test POST /tasks adding a new task.
         """
         self._create_task()
 
@@ -164,7 +164,7 @@ class TestTaskViewSet(TestBase):
         user = mommy.make('auth.User')
         task_data = self._create_task()
         view = TaskViewSet.as_view({'get': 'retrieve'})
-        request = self.factory.get('/task/{id}'.format(id=task_data['id']))
+        request = self.factory.get('/tasks/{id}'.format(id=task_data['id']))
         force_authenticate(request, user=user)
         response = view(request=request, pk=task_data['id'])
         self.assertEqual(response.status_code, 200)
@@ -201,7 +201,7 @@ class TestTaskViewSet(TestBase):
 
         view = TaskViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/task/{id}'.format(id=task_data['id']), data=data)
+            '/tasks/{id}'.format(id=task_data['id']), data=data)
         force_authenticate(request, user=user)
         response = view(request=request, pk=task_data['id'])
 
@@ -219,7 +219,7 @@ class TestTaskViewSet(TestBase):
 
         view2 = TaskViewSet.as_view({'patch': 'partial_update'})
         request2 = self.factory.patch(
-            '/task/{id}'.format(id=task_data2['id']), data=data2)
+            '/tasks/{id}'.format(id=task_data2['id']), data=data2)
         force_authenticate(request2, user=user2)
         response2 = view2(request=request2, pk=task_data2['id'])
 
@@ -259,7 +259,7 @@ class TestTaskViewSet(TestBase):
 
         # test that you need authentication for retrieving a task
         view2 = TaskViewSet.as_view({'get': 'retrieve'})
-        request2 = self.factory.get('/task/{id}'.format(id=task_data['id']))
+        request2 = self.factory.get('/tasks/{id}'.format(id=task_data['id']))
         response2 = view2(request=request2, pk=task_data['id'])
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
@@ -296,7 +296,7 @@ class TestTaskViewSet(TestBase):
 
         view5 = TaskViewSet.as_view({'patch': 'partial_update'})
         request5 = self.factory.patch(
-            '/task/{id}'.format(id=task_data['id']), data=data)
+            '/tasks/{id}'.format(id=task_data['id']), data=data)
         response5 = view5(request=request5, pk=task_data['id'])
 
         self.assertEqual(response5.status_code, 403)
