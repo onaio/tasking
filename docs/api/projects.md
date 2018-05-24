@@ -11,7 +11,7 @@ Once a Project is created it's stored in the database and can be retrieved via t
 Creates a new project, requires a `name` , `target_content_type` and `target_id`. The `target_content_type` can be any of the allowed content types and `target_id` is the target identifier.
 
 ```console
-curl -X POST -H "Content-Type:application/json" -d '{"name": "Example Project", "target_content_type": "task", "target_id": "3"}' https://example.com/api/v1/locations
+curl -X POST -H "Content-Type:application/json" -d '{"name": "Example Project", "target_content_type": "task", "target_id": "3"}' https://example.com/api/v1/projects
 ```
 
 ### GET /api/v1/projects
