@@ -8,11 +8,26 @@ Once a Segment Rule is created it's stored in the database and can be retrieved 
 
 ### POST /api/v1/segment-rules
 
-Creates a new segment rule, requires a `name`, `active` `target_content_type`, `target_field` and `target_field_value`. The `target_content_type` can be any of the allowed content types, `target_field` is a valid field of defined `target_content_type`, `active` has either true or false and `target_field_value` is desired value for `target_field`.
+Creates a new segment rule, requires a `name`, `active`,  `target_content_type`, `target_field` and `target_field_value`.
 
 ```console
 curl -X POST -H "Content-Type:application/json" -d '{"name": "Rule Zero", "target_content_type": "task", "target_field": "id", "target_field_value": "6", "active": true}' https://example.com/api/v1/segment-rules
 ```
+
+`name`: *string*.
+
+`target_content_type`: *string*, is any of the allowed content types.
+
+`target_field`: *string*, is a valid field of defined `target_content_type`.
+
+`active`: *boolean*.
+
+`target_field_value`: Type of *input* depends on `target_field`. It's the desired value for `target_field`.
+
+It can take additional inputs in the content such as:
+
+- `description`: *string*.
+- `active`: *boolean*.
 
 ### GET /api/v1/segment-rules
 
@@ -57,7 +72,7 @@ curl -X DELETE https://example.com/api/v1/segment-rules/45
 
 ### PATCH /api/v1/segment-rules/[pk]
 
-Partially Updates a specific segment rule with matching pk.
+Partially Updates a specific segment rule with matching pk. Takes the same inputs as POST create segment rule request but has an additional segment rule `id` in the url.
 
 ```console
 curl -X PATCH -H "Content-Type:application/json" -d '{"name": "Beta Rule"}' https://example.com/api/v1/segment-rules/17
