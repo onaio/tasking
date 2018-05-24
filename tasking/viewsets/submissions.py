@@ -27,13 +27,13 @@ class SubmissionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         'location',
         'task',
         'valid',
-        'approved',
+        'status',
         'user']
     search_fields = ['task__name']
     ordering_fields = [
         'created',
         'valid',
-        'aproved',
+        'status',
         'submission_time',
         'task__id']
     queryset = Submission.objects.all()  # pylint: disable=no-member

@@ -14,6 +14,7 @@ from model_mommy import mommy
 from tests.base import TestBase
 
 from tasking.serializers import SubmissionSerializer
+from tasking.models import Submission
 
 USER = get_user_model()
 
@@ -39,7 +40,7 @@ class TestSubmissionSerializer(TestBase):
             'submission_time': now,
             'user': mocked_user.id,
             'comments': 'Approved',
-            'approved': True,
+            'status': Submission.REJECTED,
             'valid': True,
             'target_content_type': self.user_type.id,
             'target_id': mocked_target_object.id,
@@ -50,7 +51,7 @@ class TestSubmissionSerializer(TestBase):
 
         submission = serializer_instance.save()
 
-        # the submission_time field is going to be converted to isformat
+        # the subsmission_time field is going to be converted to isformat
         data['submission_time'] = now.astimezone(
             pytz.timezone('Africa/Nairobi')).isoformat()
         self.assertDictContainsSubset(data, serializer_instance.data)
@@ -60,8 +61,15 @@ class TestSubmissionSerializer(TestBase):
         self.assertEqual(mocked_user, submission.user)
         self.assertEqual(now, submission.submission_time)
         self.assertEqual('Approved', submission.comments)
-        self.assertTrue(submission.approved)
+        self.assertEqual(Submission.REJECTED, submission.status)
         self.assertTrue(submission.valid)
+
+        # assert Submission approved property is False when status is REJECTED
+        self.assertFalse(submission.approved)
+
+        # set Submission status to APPROVED and test that approved is True
+        submission.status = Submission.APPROVED
+        self.assertTrue(submission.approved)
 
         expected_fields = {
             'task',
@@ -69,7 +77,7 @@ class TestSubmissionSerializer(TestBase):
             'submission_time',
             'user',
             'comments',
-            'approved',
+            'status',
             'valid',
             'target_content_type',
             'target_id',
@@ -98,7 +106,7 @@ class TestSubmissionSerializer(TestBase):
             submission_time=now,
             user=mocked_user.id,
             comments='Approved',
-            approved=True,
+            status=Submission.APPROVED,
             valid=True,
             target_content_type=self.user_type.id,
             target_id=5487,
@@ -112,7 +120,7 @@ class TestSubmissionSerializer(TestBase):
             submission_time=now,
             user=mocked_user.id,
             comments='Approved',
-            approved=True,
+            status=Submission.APPROVED,
             valid=True,
             target_content_type='foobar',
             target_id=mocked_target_object.id,

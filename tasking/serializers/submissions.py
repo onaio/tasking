@@ -44,7 +44,7 @@ class SubmissionSerializer(GenericForeignKeySerializer):
             'user',
             'submission_time',
             'valid',
-            'approved',
+            'status',
             'comments',
             'target_content_type',
             'target_id',

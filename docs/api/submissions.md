@@ -27,7 +27,7 @@ curl -X POST -H "Content-Type:application/json" -d '{"task": 25, "target_content
 It can take additional inputs in the content such as:
 
 - `comments`: *string*.
-- `approved`: *boolean*, on creation of submission defaults to False.
+- `status`: *string*, is a choice between four strings, **a** for Approved, **b** for Rejected Status, **c** for Under Review, **d** for Pending Review. On creation of submission defaults to **d**.
 - `valid`: *boolean*, on creation of submission defaults to False.
 
 ### GET /api/v1/submissions
@@ -62,22 +62,22 @@ Returns a list of submissions from a specific user if given `user` query paramet
 curl -X GET https://example.com/api/v1/submissions?user=17
 ```
 
-Returns a list of all approved or disapproved submissions if given `approved` query parameter. The `aprroved` query parameter takes a *boolean*.
+Returns a list of submissions with a specific status if given `status` query parameter. The `status` query parameter takes a *string* which can be either **a** for Approved, **b** for Rejected Status, **c** for Under Review, **d** for Pending Review.
 
 ```console
-curl -X GET https://example.com/api/v1/submissions?approved=1
+curl -X GET https://example.com/api/v1/submissions?status=b
 ```
 
-Returns a list of all valid or invalid submissions if given `approved` query parameter. The `valid` query parameter takes a *boolean*.
+Returns a list of all valid or invalid submissions if given `valid` query parameter. The `valid` query parameter takes a *boolean*.
 
 ```console
 curl -X GET https://example.com/api/v1/submissions?valid=0
 ```
 
-Returns a list of all submissions ordered by either creation date, valid status, approved status, time of submission or task if given `ordering` query parameter. The `ordering` can be done in ascending order using either `created`, `valid`, `approved`, `submission_time` or `task__id` and in descending order using either `-created`, `-valid`, `-approved`, `-submission_time` or `-task__id`
+Returns a list of all submissions ordered by either creation date, valid status, submission status, time of submission or task if given `ordering` query parameter. The `ordering` can be done in ascending order using either `created`, `valid`, `status`, `submission_time` or `task__id` and in descending order using either `-created`, `-valid`, `-status`, `-submission_time` or `-task__id`
 
 ```console
-curl -X GET https://example.com/api/v1/submissions?ordering=created,valid,submission_time,task__id,approved
+curl -X GET https://example.com/api/v1/submissions?ordering=-created,valid,submission_time,task__id,status
 ```
 
 ### GET /api/v1/submissions/[pk]
@@ -100,7 +100,7 @@ This request will return a response containing the specific submission.
     "user": 196,
     "submission_time": "2018-05-23T15:32:50.974830+03:00",
     "valid": true,
-    "approved": true,
+    "status": "a",
     "comments": "Approved",
     "target_content_type": 3,
     "target_id": 195

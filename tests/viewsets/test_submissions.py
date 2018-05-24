@@ -43,7 +43,7 @@ class TestSubmissionViewSet(TestBase):
             'submission_time': now,
             'user': mocked_user.id,
             'comments': 'Approved',
-            'approved': True,
+            'status': Submission.APPROVED,
             'valid': True,
             'target_content_type': self.user_type.id,
             'target_id': mocked_target_object.id,
@@ -92,7 +92,7 @@ class TestSubmissionViewSet(TestBase):
             submission_time=now,
             user=mocked_user.id,
             comments='Approved',
-            approved=True,
+            status=Submission.APPROVED,
             valid=True,
             target_content_type=self.user_type.id,
             target_id=5487,
@@ -116,7 +116,7 @@ class TestSubmissionViewSet(TestBase):
             submission_time=now,
             user=mocked_user.id,
             comments='Approved',
-            approved=True,
+            status=Submission.APPROVED,
             valid=True,
             target_content_type=999,
             target_id=mocked_target_object.id,
@@ -263,7 +263,7 @@ class TestSubmissionViewSet(TestBase):
             'submission_time': now,
             'user': mocked_user.id,
             'comments': 'Approved',
-            'approved': True,
+            'status': Submission.APPROVED,
             'valid': True,
             'target_content_type': self.user_type.id,
             'target_id': mocked_target_object.id,
@@ -315,7 +315,7 @@ class TestSubmissionViewSet(TestBase):
 
         # test that you need authentication for updating a submission
         data = {
-            'approved': False,
+            'status': Submission.REJECTED,
             }
 
         view5 = SubmissionViewSet.as_view({'patch': 'partial_update'})
@@ -442,17 +442,17 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], submission.id)
 
-    def test_approved_filter(self):
+    def test_status_filter(self):
         """
-        Test that you can filter by approved
+        Test that you can filter by status
         """
         user = mommy.make('auth.User')
 
         # make a bunch of submissions
-        mommy.make('tasking.Submission', approved=False, _quantity=7)
+        mommy.make('tasking.Submission', status=Submission.PENDING, _quantity=7)
 
-        # make one submission where approved is True
-        submission = mommy.make('tasking.Submission', approved=True)
+        # make one submission where status is APPROVED
+        submission = mommy.make('tasking.Submission', status=Submission.APPROVED)
 
         # check that we have 8 submissions
         # pylint: disable=no-member
@@ -461,15 +461,15 @@ class TestSubmissionViewSet(TestBase):
         view = SubmissionViewSet.as_view({'get': 'list'})
 
         # test that we get approved submissions
-        request = self.factory.get('/submissions', {'approved': 1})
+        request = self.factory.get('/submissions', {'status': Submission.APPROVED})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], submission.id)
 
-        # test that we get not approved submissions
-        request = self.factory.get('/submissions', {'approved': 0})
+        # test that we get pending submissions
+        request = self.factory.get('/submissions', {'status': Submission.PENDING})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
@@ -579,17 +579,17 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(len(response.data), 8)
         self.assertEqual(response.data[-1]['id'], submission.id)
 
-    def test_approved_sorting(self):
+    def test_status_sorting(self):
         """
-        Test that you can sort by approved
+        Test that you can sort by status
         """
         user = mommy.make('auth.User')
 
         # make a bunch of submissions
-        mommy.make('tasking.Submission', approved=True, _quantity=7)
+        mommy.make('tasking.Submission', status=Submission.REJECTED, _quantity=7)
 
-        # make one submission where approved is False
-        submission = mommy.make('tasking.Submission', approved=False)
+        # make one submission where status is REJECTED
+        submission = mommy.make('tasking.Submission', status=Submission.APPROVED)
 
         # check that we have 8 submissions
         # pylint: disable=no-member
@@ -597,15 +597,15 @@ class TestSubmissionViewSet(TestBase):
 
         view = SubmissionViewSet.as_view({'get': 'list'})
 
-        # test sorting by approved
-        request = self.factory.get('/submissions', {'ordering': '-approved'})
+        # test sorting by status
+        request = self.factory.get('/submissions', {'ordering': '-status'})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 8)
         self.assertEqual(
             response.data[0]['id'],
-            Submission.objects.order_by('-approved').first().id)
+            Submission.objects.order_by('-status').first().id)
         self.assertEqual(len(response.data), 8)
         self.assertEqual(response.data[-1]['id'], submission.id)
 
