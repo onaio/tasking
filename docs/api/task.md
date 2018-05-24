@@ -11,14 +11,14 @@ Once a Task is created it's stored in the database and can be retrieved via the 
 Creates a Task, requires a `name`, `timing_rule`, `target_content_type` and `target_id`.
 
 ```console
-curl -X POST -H "Content-Type:application/json" '{"name": "Cow price", "description": "Some description", "total_submission_target": 10, "timing_rule": "RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5", "target_content_type": "task", "target_id": 234}' https://example.com/api/v1/tasks
+curl -X POST -H "Content-Type:application/json" '{"name": "Cow price", "description": "Some description", "total_submission_target": 10, "timing_rule": "RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5", "target_content_type": 9, "target_id": 234}' https://example.com/api/v1/tasks
 ```
 
-`target_content_type`: *string*, is any of the allowed content types.
+`target_content_type`: *integer*, is a unique identifier for any of the allowed content types.
 
 `timing_rule`: *string*, is a [standard rrule](https://tools.ietf.org/html/rfc2445) *string*.
 
-`target_id`: *integer*, is the target contents unique identifier.
+`target_id`: *integer*, is the target identifier.
 
 It can take additional optional inputs in the content such as:
 
@@ -29,8 +29,8 @@ It can take additional optional inputs in the content such as:
 - `end`: *Date and Time*.
 - `total_submission_target`: *integer*.
 - `user_submission_target`: *integer*.
-- `segment_rules`: *integer*, is the unique identifier for a segment rule.
-- `locations`: *integer*, is the unique identifier for a location.
+- `segment_rules`: *list of integers*, is the unique identifier for a segment rule.
+- `locations`: *list of integers*, is the unique identifier for a location.
 
 ### GET /api/v1/tasks
 
