@@ -11,12 +11,12 @@ Once a Segment Rule is created it's stored in the database and can be retrieved 
 Creates a new segment rule, requires a `name`, `active`,  `target_content_type`, `target_field` and `target_field_value`.
 
 ```console
-curl -X POST -H "Content-Type:application/json" -d '{"name": "Rule Zero", "target_content_type": "task", "target_field": "id", "target_field_value": "6", "active": true}' https://example.com/api/v1/segment-rules
+curl -X POST -H "Content-Type:application/json" -d '{"name": "Rule Zero", "target_content_type": 9, "target_field": "id", "target_field_value": "6", "active": true}' https://example.com/api/v1/segment-rules
 ```
 
 `name`: *string*.
 
-`target_content_type`: *string*, is any of the allowed content types.
+`target_content_type`: *integer*, is a unique identifier for any of the allowed content types.
 
 `target_field`: *string*, is a valid field of defined `target_content_type`.
 
