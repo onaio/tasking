@@ -7,7 +7,7 @@ These signals are not connected by default, you will have to connect them
 """
 from __future__ import unicode_literals
 
-from tasking.tools import generate_task_occurrences
+from tasking.utils import generate_task_occurrences
 
 
 # pylint: disable=unused-argument

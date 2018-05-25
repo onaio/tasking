@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 from rest_framework import serializers
 
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
-from tasking.tools import get_allowed_contenttypes
+from tasking.utils import get_allowed_contenttypes
 
 
 class ContentTypeFieldSerializer(serializers.ModelSerializer):

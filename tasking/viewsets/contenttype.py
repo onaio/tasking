@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from tasking.tools import get_allowed_contenttypes
+from tasking.utils import get_allowed_contenttypes
 from tasking.serializers import ContentTypeSerializer
 
 
