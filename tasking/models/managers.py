@@ -15,7 +15,7 @@ class TaskManager(models.Manager):
 
     def get_queryset(self):
         """
-        Custom get_query set for Task Model
+        Custom get_queryset for Task Model
         """
         queryset = super(TaskManager, self).get_queryset()
         queryset = queryset.annotate(
