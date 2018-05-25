@@ -10,7 +10,8 @@ from rest_framework import serializers
 from tasking.common_tags import INVALID_TIMING_RULE
 from tasking.models import Task
 from tasking.serializers.base import GenericForeignKeySerializer
-from tasking.utils import get_rrule_end, get_rrule_start, validate_rrule
+from tasking.utils import get_rrule_end, get_rrule_start
+from tasking.validators import validate_rrule
 
 
 class TaskSerializer(GenericForeignKeySerializer):

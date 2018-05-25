@@ -23,8 +23,7 @@ from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
 from tasking.models import Task, TaskOccurrence
 from tasking.utils import (MAX_OCCURRENCES, generate_task_occurrences,
                            get_allowed_contenttypes, get_rrule_end,
-                           get_rrule_start, get_shapefile, get_target,
-                           validate_rrule)
+                           get_rrule_start, get_shapefile, get_target)
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -45,20 +44,6 @@ class TestUtils(TestCase):
         # not exist
         with self.assertRaises(TargetDoesNotExist):
             get_target(app_label='foo', target_type='bar')
-
-    def test_validate_rrule(self):
-        """
-        Test validate_rrule
-        """
-        # test that a valid rrule works
-        self.assertTrue(validate_rrule("RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5"))
-        # test that invalid rrules return False
-        self.assertFalse(validate_rrule(1337))
-        self.assertFalse(validate_rrule({}))
-        self.assertFalse(validate_rrule([]))
-        self.assertFalse(validate_rrule((12, 23)))
-        self.assertFalse(validate_rrule("SELECT * FROM auth_user;"))
-        self.assertFalse(validate_rrule("random string"))
 
     def test_get_rrule_start(self):
         """
