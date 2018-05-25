@@ -12,7 +12,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from tasking.models.base import GenericFKModel, TimeStampedModel
 from tasking.models.managers import TaskManager
-from tasking.utils import validate_rrule
+from tasking.validators import validate_rrule
 
 
 class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):

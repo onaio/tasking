@@ -12,11 +12,12 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     # third party
     'rest_framework',
+    'django_filters',
     'rest_framework_gis',  # Required for CountryField in Location Model
     'django_countries',  # Required for CountryField in Location Model
     'mptt',
     # custom
-    'tasking',
+    'tasking.apps.TaskingConfig',
 )
 
 DATABASES = {

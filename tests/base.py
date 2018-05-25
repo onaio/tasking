@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from tasking.tools import get_allowed_contenttypes
+from tasking.utils import get_allowed_contenttypes
 
 
 class TestBase(TestCase):

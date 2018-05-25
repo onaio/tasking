@@ -9,12 +9,16 @@ from django.test import TestCase
 from model_mommy import mommy
 
 
-class TestTaskList(TestCase):
+class TestProject(TestCase):
     """
-    Test class for TaskList models
+    Test class for TaskProject models
     """
 
     def test_project_model_str(self):
+        """
+        Test __str__ method of Project model
+        """
+
         livestock_task_list = mommy.make(
             'tasking.Project',
             name="Livestock tasks")

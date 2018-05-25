@@ -64,9 +64,27 @@ Returns a list of all tasks with a specific parent if given `parent` query param
 curl -X GET https://example.com/api/v1/tasks?parent=43
 ```
 
-Returns a list of all tasks ordered by either creation date, task status, number of submissions or name of task if given a `ordering` query parameter. The `ordering` query parameter takes either `created`, `status`, `submission_count`, `project__id` or `name` for ascending order and either `-created`, `-status`, `-submission_count`, `-project_id` or `-name` for descending order.
+Returns a list of all tasks filtered by date if given `date` query parameter. The `date` query parameter takes a *date* formatted like so "yyyy-mm-dd".  You can use [standard Django lookups](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#field-lookups) when filtering by date.
 
-`project__id`: *integer*, is a unique identifier for a Project object.
+```console
+curl -X GET https://example.com/api/v1/tasks?date__gt=2018-05-21
+
+```
+
+Returns a list of all tasks filtered by time if given `start_time` query parameter. The `start_time` query parameter takes a *time* formatted like so "H:M".  You can use [standard Django lookups](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#field-lookups) when filtering by time.
+
+```console
+curl -X GET https://example.com/api/v1/tasks?start_time__lte=17:27
+
+```
+
+Returns a list of all tasks filtered by time if given `end_time` query parameter. The `end_time` query parameter takes a *time* formatted like so "H:M".  You can use [standard Django lookups](https://docs.djangoproject.com/en/2.0/ref/models/querysets/#field-lookups) when filtering by time.
+
+```console
+curl -X GET https://example.com/api/v1/tasks?end_time=21:00
+```
+
+Returns a list of all tasks ordered by either creation date, task status, number of submissions or name of task if given a `ordering` query parameter. The `ordering` query parameter takes either `created`, `status`, `submission_count`, `project__id` or `name` for ascending order and either `-created`, `-status`, `-submission_count`, `-project_id` or `-name` for descending order.
 
 ```console
 curl -X GET https://example.com/api/v1/tasks?ordering=-created,status,name,submission_count,-project__id

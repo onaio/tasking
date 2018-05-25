@@ -26,5 +26,6 @@ class TestSubmission(TestCase):
             'tasking.Submission',
             task=cattle,
             _fill_optional=['user', 'comment', 'submission_time'])
-        expected = "Cattle Price - 1 submission 1"
+        expected = "Cattle Price - {} submission {}".format(
+            submission.task.id, submission.id)
         self.assertEqual(expected, six.text_type(submission))
