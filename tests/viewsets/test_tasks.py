@@ -484,8 +484,8 @@ class TestTaskViewSet(TestBase):
         project2 = mommy.make('tasking.Project')
         task1 = mommy.make(
             'tasking.Task', name='Milk Production Size', status=Task.DRAFT)
-        
         project1.tasks.add(task1)
+
         for _ in range(0, 7):
             # create other tasks
             task = mommy.make(
