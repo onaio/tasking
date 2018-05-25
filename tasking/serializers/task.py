@@ -18,6 +18,7 @@ class TaskSerializer(GenericForeignKeySerializer):
     Task serializer class
     """
     start = serializers.DateTimeField(required=False)
+    submission_count = serializers.SerializerMethodField()
 
     # pylint: disable=too-few-public-methods
     class Meta(object):
@@ -37,6 +38,7 @@ class TaskSerializer(GenericForeignKeySerializer):
             'total_submission_target',
             'user_submission_target',
             'status',
+            'submission_count',
             'target_content_type',
             'target_id',
             'segment_rules',
@@ -75,3 +77,12 @@ class TaskSerializer(GenericForeignKeySerializer):
             attrs['end'] = get_rrule_end(rrulestr(timing_rule))
 
         return super(TaskSerializer, self).validate(attrs)
+
+    def get_submission_count(self, obj):
+        """
+        Add a custom method to get submission count
+        """
+        try:
+            return obj.submission_count
+        except AttributeError:
+            return obj.submissions
