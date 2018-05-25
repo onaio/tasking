@@ -674,6 +674,7 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(len(response2.data), 1)
         self.assertEqual(response2.data[0]['id'], task2.id)
 
+        # check that we can get tasks before a certain time
         request3 = self.factory.get(
             '/tasks', {'start_time__lt': '09:15'})
         force_authenticate(request3, user=user)
@@ -682,31 +683,38 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(len(response3.data), 1)
         self.assertEqual(response3.data[0]['id'], task.id)
 
-#     def test_end_time_filter(self):
-#         """
-#         Test that you can filter by end_time
-#         """
-#         user = mommy.make('auth.User')
-#         view = TaskViewSet.as_view({'get': 'list'})
-#         # make some ptasks that end at 5pm
-#         mommy.make(
-#             'tasking.TaskOccurrence', _quantity=5, end_time='17:00')
+    def test_end_time_filter(self):
+        """
+        Test that you can filter by end_time
+        """
+        user = mommy.make('auth.User')
+        view = TaskViewSet.as_view({'get': 'list'})
+        task = mommy.make('tasking.Task')
+        task2 = mommy.make('tasking.Task')
 
-#         # make some tasks that end after 9pm
-#         mommy.make(
-#             'tasking.TaskOccurrence', _quantity=6, end_time='21:15')
+        # make some occurrences that end at 5pm
+        mommy.make(
+            'tasking.TaskOccurrence', _quantity=5, task=task, end_time='17:00')
 
-#         # test that we can get tasks before or after a certain time
-#         request2 = self.factory.get(
-#             '/tasks', {'taskoccurrence__end_time__gte': '21:15'})
-#         force_authenticate(request2, user=user)
-#         response2 = view(request=request2)
-#         self.assertEqual(response2.status_code, 200)
-#         self.assertEqual(len(response2.data), 6)
+        # make some tasks that end after 9pm
+        mommy.make(
+            'tasking.TaskOccurrence', _quantity=6, task=task2,
+            end_time='21:15')
 
-#         request3 = self.factory.get(
-#             '/tasks', {'taskoccurrence__end_time__lt': '21:15'})
-#         force_authenticate(request3, user=user)
-#         response3 = view(request=request3)
-#         self.assertEqual(response3.status_code, 200)
-#         self.assertEqual(len(response3.data), 5)
+        # test that we can get tasks before or after a certain time
+        request2 = self.factory.get(
+            '/tasks', {'end_time__gte': '21:15'})
+        force_authenticate(request2, user=user)
+        response2 = view(request=request2)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(len(response2.data), 1)
+        self.assertEqual(response2.data[0]['id'], task2.id)
+
+        # check that we can get tasks before a certain time
+        request3 = self.factory.get(
+            '/tasks', {'end_time__lt': '21:15'})
+        force_authenticate(request3, user=user)
+        response3 = view(request=request3)
+        self.assertEqual(response3.status_code, 200)
+        self.assertEqual(len(response3.data), 1)
+        self.assertEqual(response3.data[0]['id'], task.id)
