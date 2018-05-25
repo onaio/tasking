@@ -64,10 +64,12 @@ Returns a list of all tasks with a specific parent if given `parent` query param
 curl -X GET https://example.com/api/v1/tasks?parent=43
 ```
 
-Returns a list of all tasks ordered by either creation date, task status or name of task if given a `ordering` query parameter. The `ordering` query parameter takes either `created`, `status` or `name` for ascending order and either `-created`, `-status` or `-name` for descending order.
+Returns a list of all tasks ordered by either creation date, task status, number of submissions or name of task if given a `ordering` query parameter. The `ordering` query parameter takes either `created`, `status`, `submission_count`, `project__id` or `name` for ascending order and either `-created`, `-status`, `-submission_count`, `-project_id` or `-name` for descending order.
+
+`project__id`: *integer*, is a unique identifier for a Project object.
 
 ```console
-curl -X GET https://example.com/api/v1/projects?ordering=-created,status,name
+curl -X GET https://example.com/api/v1/tasks?ordering=-created,status,name,submission_count,-project__id
 ```
 
 ### GET /api/v1/tasks/[pk]
