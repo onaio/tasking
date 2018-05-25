@@ -30,7 +30,7 @@ class TestTaskViewSet(TestBase):
         """
         Helper to create a single task
         """
-        mocked_target_object = mommy.make('tasking.Task')
+        mocked_target_object = mommy.make('auth.User')
 
         rule1 = mommy.make('tasking.SegmentRule')
         rule2 = mommy.make('tasking.SegmentRule')
@@ -42,7 +42,7 @@ class TestTaskViewSet(TestBase):
             'description': 'Some description',
             'total_submission_target': 10,
             'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
-            'target_content_type': self.task_type.id,
+            'target_content_type': self.user_type.id,
             'target_id': mocked_target_object.id,
         }
 
@@ -182,6 +182,7 @@ class TestTaskViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
+        # import ipdb; ipdb.set_trace()
         self.assertDictEqual(response.data.pop(), task_data)
 
     def test_update_task(self):
@@ -488,11 +489,17 @@ class TestTaskViewSet(TestBase):
             # create other tasks
             task = mommy.make(
                 'tasking.Task', name='Cow Price', status=Task.DEACTIVATED)
+            mommy.make('tasking.Submission', task=task, _quantity=3)
             project1.tasks.add(task)
         task2 = mommy.make(
             'tasking.Task',
             name='Allocated land for farming', status=Task.ACTIVE)
         project2.tasks.add(task2)
+        
+        # Create and add Submissions to Task1 and Task2
+        mommy.make('tasking.Submission', task=task1, _quantity=4)
+        mommy.make('tasking.Submission', task=task2, _quantity=1)
+
         view = TaskViewSet.as_view({'get': 'list'})
 
         # order by status descending
@@ -533,10 +540,21 @@ class TestTaskViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['name'], task2.name)
         self.assertEqual(
             Task.objects.filter(project=project2.id).count(), 1)
+
+        # order by submissions descending
+        request = self.factory.get('/tasks', {'ordering': '-submission_count'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[0]['name'], task1.name)
+        self.assertEqual(response.data[0]['id'], task1.id)
+        self.assertEqual(
+            response.data[-1]['name'], task2.name)
+        self.assertEqual(response.data[-1]['id'], task2.id)
+        self.assertTrue(task1.submissions > task2.submissions)
 
     def test_search_filter_order(self):
         """
