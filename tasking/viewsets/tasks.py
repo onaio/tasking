@@ -27,5 +27,5 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         filters.SearchFilter]
     filter_fields = ['locations', 'status', 'project', 'parent']
     search_fields = ['name', ]
-    ordering_fields = ['created', 'status', 'name']
-    queryset = Task.objects.all()
+    ordering_fields = ['created', 'status', 'submission_count', 'name']
+    queryset = Task.with_submission_count.all()
