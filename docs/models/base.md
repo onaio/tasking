@@ -3,8 +3,11 @@
 Abstract classes needed by other models in Kaznet.
 
 ## GeoTimeStampedModel
-
-GeoDjango models reexports DateTimeField from django models but we still create a GeoTimeStampedModel so that inheriting classes can inherit other GeoDjango model fields and APIs.
+Re-export timestamp model from django model as well as other geo django apis and fields.  
+Inherits:
+```
+django.contrib.gis.db.Models
+```
 
 ---
   * created `DateTimeField` - _auto added_ creation date and time for a record
@@ -12,7 +15,11 @@ GeoDjango models reexports DateTimeField from django models but we still create 
 
 
 ## TimeStampedModel
-Abstract class to provide creation and modification datetimes for records in subclasses.
+Abstract class to provide creation and modification datetimes for records in subclasses.  
+Inherits:
+```
+django.db.models
+```
 
 ---
   * created `DateTimeField` - _auto added_ creation date and time for a record
@@ -20,7 +27,11 @@ Abstract class to provide creation and modification datetimes for records in sub
 
 
 ## GenericFKModel
-Generic class to DRY out references to other models.
+Generic class to DRY out references to other models.  
+Inherits:
+```
+django.db.models
+```
 
 ---
   * target_content_type `ForeignKey` -
