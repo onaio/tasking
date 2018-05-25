@@ -13,7 +13,6 @@ from model_mommy import mommy
 from tests.base import TestBase
 
 from tasking.serializers import TaskSerializer
-from tasking.models import Submission
 from tasking.utils import get_rrule_end, get_rrule_start
 
 

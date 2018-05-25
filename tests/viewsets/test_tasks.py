@@ -182,7 +182,6 @@ class TestTaskViewSet(TestBase):
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
-        # import ipdb; ipdb.set_trace()
         self.assertDictEqual(response.data.pop(), task_data)
 
     def test_update_task(self):

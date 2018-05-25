@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+
+# pylint: disable=too-few-public-methods
 class TaskManager(models.Manager):
     """
     Custom manager for Task
