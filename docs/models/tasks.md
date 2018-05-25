@@ -1,7 +1,8 @@
 # Task
 
 ## BaseTask
-Abstract class for Tasks.  
+Abstract class for Tasks.
+> The start and end are best generated from the rrule and saved for efficiency seems redundant to expose them in your API.
 Inherits:
 ```
 MPTTModel
@@ -12,14 +13,18 @@ models.Model
 
 ---
   * parent `TreeForeignKey` -
-  * name `CharField` -
-  * description `TextField` -
-  * start `DateTimeField` -
-  * end `DateTimeField` -
-  * timing_rule `TextField` -
-  * total_submission_target `IntegerField` -
-  * user_submission_target `IntegerField` -
-  * status `CharField` -
+  * name `CharField` - _required_ name of the task
+  * description `TextField` - a description of the task
+  * start `DateTimeField` - When the task starts
+  * end `DateTimeField` - When the task ends
+  * timing_rule `TextField` - [recurrence rule](https://tools.ietf.org/html/rfc2445) for the task
+  * total_submission_target `IntegerField` - maximum number of submissions wanted for the entire task
+  * user_submission_target `IntegerField` - maximum number of submissions wanted from each enumerator 
+  * status `CharField` - the status of the task. Has to be one of:  
+    - active
+    - deactivated
+    - expired
+    - draft
 
 
 ## Task
@@ -30,5 +35,5 @@ BaseTask
 ```
 
 ---
-  * segment_rules `ManyToManyField` -
-  * segment_rules `ManyToManyField` -
+  * segment_rules `ManyToManyField` - id of the [segment rule](./segment%20rules.md) you want to associate the task with
+  * segment_rules `ManyToManyField` - id of the location that the task should be carried out in.
