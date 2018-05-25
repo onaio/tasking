@@ -4,13 +4,14 @@ Module for the Task model(s)
 """
 from __future__ import unicode_literals
 
-from mptt.models import MPTTModel, TreeForeignKey
-
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 from tasking.models.base import GenericFKModel, TimeStampedModel
+from tasking.models.managers import TaskManager
 from tasking.utils import validate_rrule
 
 
@@ -113,6 +114,9 @@ class Task(BaseTask):
         default=None,
         help_text=_('This represents the location.'))
 
+    # Custom Manager that has submission_count field
+    with_submission_count = TaskManager()
+
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
     class Meta(object):
@@ -129,3 +133,17 @@ class Task(BaseTask):
         e.g. Cow prices - 1
         """
         return "{name} - {pk}".format(pk=self.pk, name=self.name)
+
+    # pylint: disable=no-member
+    def get_submissions(self):
+        """
+        Custom method to get number of submissions
+        """
+        return self.submission_set.count()
+
+    @property
+    def submissions(self):
+        """
+        Number of Submissions made for this task
+        """
+        return self.get_submissions()
