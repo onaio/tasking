@@ -484,6 +484,8 @@ class TestTaskViewSet(TestBase):
         project2 = mommy.make('tasking.Project')
         task1 = mommy.make(
             'tasking.Task', name='Milk Production Size', status=Task.DRAFT)
+        project1.tasks.add(task1)
+
         for _ in range(0, 7):
             # create other tasks
             task = mommy.make(
@@ -494,7 +496,7 @@ class TestTaskViewSet(TestBase):
             'tasking.Task',
             name='Allocated land for farming', status=Task.ACTIVE)
         project2.tasks.add(task2)
-        
+
         # Create and add Submissions to Task1 and Task2
         mommy.make('tasking.Submission', task=task1, _quantity=4)
         mommy.make('tasking.Submission', task=task2, _quantity=1)
@@ -535,13 +537,15 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(response.data[0]['id'], task2.id)
 
         # order by project ascending
-        request = self.factory.get('/tasks', {'project': project2.id})
+        request = self.factory.get('/tasks', {'ordering': 'project__id'})
         force_authenticate(request, user=user)
         response = view(request=request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['name'], task2.name)
         self.assertEqual(
-            Task.objects.filter(project=project2.id).count(), 1)
+            response.data[0]['name'], task1.name)
+        self.assertEqual(response.data[0]['id'], task1.id)
+        self.assertEqual(
+            response.data[-1]['name'], task2.name)
+        self.assertEqual(response.data[-1]['id'], task2.id)
 
         # order by submissions descending
         request = self.factory.get('/tasks', {'ordering': '-submission_count'})
