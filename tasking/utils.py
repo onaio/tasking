@@ -56,11 +56,11 @@ def generate_task_occurrences(task):
 
     It works this way:
         - gets the start_time from the timing_rule
-        - only generates a maximum og MAX_OCCURRENCES
+        - only generates a maximum of MAX_OCCURRENCES
         - the end time is always 23:59:59
             * the very last task occurrence will have the same end_time as
               the end_time from the timing_rule
-        - occurrences with the same setart_time and end_time will not be
+        - occurrences with the same start_time and end_time will not be
           created, they will be skipped silently
         - only works for valid rrules
 

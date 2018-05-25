@@ -63,6 +63,8 @@ class TaskOccurrence(BaseOccurrence):
         """
         Returns a nice human-readable string that represents that date, start
         and end time
+
+        e.g. 24th May 2018, 7 a.m. to 2:30 p.m.
         """
         date_format_obj = DateFormat(self.date)
         start_format_obj = DateFormat(self.start_time)

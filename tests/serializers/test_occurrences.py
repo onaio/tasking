@@ -25,17 +25,13 @@ class TestTaskOccurrenceSerializer(TestBase):
         data = {
             'task': task.id,
             'date': '2018-05-24',
-            'start_time': '07:00',
-            'end_time': '19:00'
+            'start_time': '07:00:00',
+            'end_time': '19:00:00'
         }
 
         serializer_instance = TaskOccurrenceSerializer(data=data)
         self.assertTrue(serializer_instance.is_valid())
         occurrence = serializer_instance.save()
-
-        # serializer_instance.data will return the time fields with seconds
-        data['start_time'] = '07:00:00'
-        data['end_time'] = '19:00:00'
 
         self.assertDictContainsSubset(data, serializer_instance.data)
         self.assertEqual(

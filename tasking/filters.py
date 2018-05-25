@@ -13,6 +13,7 @@ DATETIME_LOOKUPS = [
     'year__gte', 'year__lte', 'month', 'month__gt', 'month__lt',
     'month__gte', 'month__lte', 'day', 'day__gt', 'day__lt', 'day__gte',
     'day__lte']
+TIME_LOOKUPS = ['exact', 'gt', 'lt', 'gte', 'lte']
 
 
 class TaskOccurrenceFilterSet(filters.FilterSet):
@@ -29,8 +30,8 @@ class TaskOccurrenceFilterSet(filters.FilterSet):
         fields = {
             'task': ['exact'],
             'date': DATETIME_LOOKUPS,
-            'start_time': ['exact', 'gt', 'lt', 'gte', 'lte'],
-            'end_time': ['exact', 'gt', 'lt', 'gte', 'lte']
+            'start_time': TIME_LOOKUPS,
+            'end_time': TIME_LOOKUPS
         }
 
 
@@ -45,12 +46,12 @@ class TaskFilterSet(filters.FilterSet):
     )
     start_time = filters.TimeFilter(
         name='start_time',
-        lookup_expr=['exact', 'gt', 'lt', 'gte', 'lte'],
+        lookup_expr=TIME_LOOKUPS,
         method='filter_timing'
     )
     end_time = filters.TimeFilter(
         name='end_time',
-        lookup_expr=['exact', 'gt', 'lt', 'gte', 'lte'],
+        lookup_expr=TIME_LOOKUPS,
         method='filter_timing'
     )
 
@@ -83,19 +84,18 @@ class TaskFilterSet(filters.FilterSet):
             # this name isn't a valid filter
             return queryset
 
-        # get the lookups
-        lookups = the_filter.lookup_expr
-
         # first try the exact name
         data = self.data.get(name)
         if data is not None:
             query_name = name
         else:
+            # get the lookups
+            lookups = the_filter.lookup_expr
             # loop through lookups to find which one is being used
             if lookups:
                 for lookup in lookups:
                     query_name = self.get_filter_name(name, lookup)
-                    data = self.data.get(query_name, None)
+                    data = self.data.get(query_name)
                     if data is not None:
                         break
 
