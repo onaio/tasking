@@ -12,7 +12,3 @@ class TaskingConfig(AppConfig):
     Tasking App Config Class
     """
     name = 'tasking'
-
-    def ready(self):
-        # pylint: disable=unused-variable
-        import tasking.signals  # noqa

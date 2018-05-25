@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 Signals for tasking
+
+These signals are not connected by default, you will have to connect them
+'manually' in your own code
 """
 from __future__ import unicode_literals
-
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from tasking.tools import generate_task_occurrences
 
 
-@receiver(post_save, sender='tasking.Task')
 # pylint: disable=unused-argument
 def create_occurrences(sender, instance, created, **kwargs):
     """
