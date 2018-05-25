@@ -13,6 +13,7 @@ from model_mommy import mommy
 from tests.base import TestBase
 
 from tasking.serializers import TaskSerializer
+from tasking.models import Submission
 from tasking.utils import get_rrule_end, get_rrule_start
 
 
@@ -92,6 +93,15 @@ class TestTaskSerializer(TestBase):
         self.assertEqual(set([rule1.id, rule2.id]),
                          set(serializer_instance.data['segment_rules']))
 
+        # we test that submissions are equal to 0
+        self.assertEqual(serializer_instance.data['submission_count'], 0)
+        self.assertEqual(task.submissions, 0)
+
+        # Add a submission to task and assert it changes.
+        mocked_submission = mommy.make('tasking.Submission', task=task)
+        self.assertTrue(mocked_submission.task, task)
+        self.assertEqual(task.submissions, 1)
+
         self.assertEqual('Cow price', task.name)
         self.assertEqual('Some description', task.description)
         self.assertEqual(start, task.start)
@@ -115,6 +125,7 @@ class TestTaskSerializer(TestBase):
             'total_submission_target',
             'user_submission_target',
             'status',
+            'submission_count',
             'target_content_type',
             'target_id',
             'segment_rules',
