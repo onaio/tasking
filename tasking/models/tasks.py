@@ -68,7 +68,8 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
         verbose_name=_('Total Submissions Target'),
         null=True,
         blank=True,
-        default=None,        help_text=_(
+        default=None,
+        help_text=_(
             'This is the total number of submissions required for this task. '
             'Set to None if there is no Max.'))
     user_submission_target = models.IntegerField(
