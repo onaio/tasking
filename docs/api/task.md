@@ -22,7 +22,7 @@ curl -X POST -H "Content-Type:application/json" '{"name": "Cow price", "descript
 
 It can take additional optional inputs in the content such as:
 
-- `status`: *string*, can be either an **a** for ACTIVE, **b**    for DEACTIVATED, **c** for EXPIRED or **d** for DRAFT.
+- `status`: *string*, can be either an **a** for ACTIVE, **s** for SCHEDULED, **b** for DEACTIVATED, **c** for EXPIRED or **d** for DRAFT.
 - `parent`: *integer*, is the unique identifier for a parent task object.
 - `description`: *string*.
 - `start`: *Date and Time*.
