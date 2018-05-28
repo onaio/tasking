@@ -28,8 +28,8 @@ models.Model
 
 
 ## Task
-Concrete class for Tasks  
-Inherits
+Concrete class for Tasks
+Inherits:
 ```
 BaseTask
 ```
@@ -37,3 +37,11 @@ BaseTask
 ---
   * segment_rules `ManyToManyField` - id of the [segment rule](./segment%20rules.md) you want to associate the task with
   * segment_rules `ManyToManyField` - id of the location that the task should be carried out in.
+
+### Methods:
+
+`get_submissions`: Returns the number of submissions made for a Task. Sets the value for the `submissions` property.
+
+### Properties:
+
+`submissions`: *Integer*, number of submissions.
