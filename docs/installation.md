@@ -9,7 +9,7 @@ pipenv install -e git+https://github.com/onaio/tasking.git#egg=ona-tasking
 You can also install a specific tag or branch like this:
 
 ```sh
-pipenv install git+https://github.com/onaio/tasking.git@<tag_number OR branch_name>#egg=ona-tasking
+pipenv install -e git+https://github.com/onaio/tasking.git@<tag_number OR branch_name>#egg=ona-tasking
 ```
 
 ## Development version
