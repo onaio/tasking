@@ -28,6 +28,10 @@ django.db.models
 
 ## GenericFKModel
 Generic class to DRY out references to other models.  
+We use [django's contenttypes framework](https://docs.djangoproject.com/en/2.0/ref/contrib/contenttypes)
+to create [generic relations](https://docs.djangoproject.com/en/2.0/ref/contrib/contenttypes/#generic-relations)
+with models which don't exist yet.
+
 Inherits:
 ```
 django.db.models

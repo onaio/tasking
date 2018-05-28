@@ -6,6 +6,10 @@ Model to save real wold places.
 
 We need at least one of geopoint, radius or shapefile
 
+Because locations are hierarchical in nature we use pre-ordered tree traversal to store location model objects.
+These allow for faster reads/retrieval but the trade of being slower writes and modification.
+We use [django-mptt](https://github.com/django-mptt/django-mptt) which has Modified Preorder Tree Traversal support to achieve this.
+
 Inherits:
 ```
 mptt.models.MPTTModel
