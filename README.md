@@ -45,8 +45,8 @@ Once a user does a task, this is what they submit.  It can then be validated and
 
 Because tasks can be varied in how they actually work, task submissions can be very different depending on your particular use-case.  Similar to Tasks above, we have:
 
-* a `TaskSubmission` model that you can use straight out of the box.  It only includes minimal features, however.
-* an abstract `BaseTaskSubmission` model class that you can inherit and extend
+* a `Submission` model that you can use straight out of the box.  It only includes minimal features, however.
+* an abstract `BaseSubmission` model class that you can inherit and extend
 
 ---
 
