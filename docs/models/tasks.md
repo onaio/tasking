@@ -25,6 +25,7 @@ models.Model
     - deactivated
     - expired
     - draft
+    - scheduled
 
 
 ## Task
