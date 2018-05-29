@@ -51,6 +51,7 @@ class TaskOccurrence(BaseOccurrence):
         Meta for TaskOccurrence
         """
         abstract = False
+        app_label = 'tasking'
         ordering = ['task', 'date', 'start_time']
 
     def __str__(self):

@@ -126,6 +126,7 @@ class Task(BaseTask):
         This is the meta options class for the Task model
         """
         abstract = False
+        app_label = 'tasking'
         ordering = ['start', 'name', 'id']
 
     def __str__(self):

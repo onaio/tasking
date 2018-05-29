@@ -50,6 +50,7 @@ class Project(BaseProject):
         """
         abstract = False
         ordering = ['name']
+        app_label = 'tasking'
 
     def __str__(self):
         """

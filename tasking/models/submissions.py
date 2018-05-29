@@ -98,6 +98,7 @@ class Submission(BaseSubmission):
         This is the meta options class for the Submission model
         """
         abstract = False
+        app_label = 'tasking'
         ordering = ['submission_time', 'task__name', 'id']
 
     def __str__(self):
