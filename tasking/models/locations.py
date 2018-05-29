@@ -85,6 +85,7 @@ class Location(BaseLocation):
         This is the meta options class for the Location model
         """
         abstract = False
+        app_label = 'tasking'
         ordering = ['country', 'name', 'id']
 
     # pylint: disable=no-else-return

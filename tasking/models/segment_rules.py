@@ -77,6 +77,7 @@ class SegmentRule(BaseSegmentRule):
         Meta options for SegmentRule
         """
         abstract = False
+        app_label = 'tasking'
         ordering = ['name']
 
     def __str__(self):
