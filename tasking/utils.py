@@ -134,11 +134,8 @@ def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
         # pylint: disable=no-member
         OccurrenceModelClass.objects.bulk_create(occurrence_list)
 
-    # refresh the task object
-    task.refresh_from_db()
-
     # return the task occurrences
-    return task.taskoccurrence_set.all()
+    return OccurrenceModelClass.objects.filter(task=task)
 
 
 def get_rrule_start(rrule_obj):
