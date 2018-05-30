@@ -50,7 +50,7 @@ def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
     return ContentType.objects.none()
 
 
-def generate_task_occurrences(task):
+def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
     """
     Generates TaskOccurrence objects using the Task timing_rule field
 
@@ -64,7 +64,7 @@ def generate_task_occurrences(task):
           created, they will be skipped silently
         - only works for valid rrules
 
-    Returns a Queryset of TaskOccurrences
+    Returns a Queryset of OccurrenceModel class objects
     """
     # get the rrule
     try:
@@ -72,11 +72,11 @@ def generate_task_occurrences(task):
     except ValueError:
         # not valid rrule string
         # pylint: disable=no-member
-        return TaskOccurrence.objects.none()
+        return OccurrenceModelClass.objects.none()
     except TypeError:
         # not a string
         # pylint: disable=no-member
-        return TaskOccurrence.objects.none()
+        return OccurrenceModelClass.objects.none()
 
     # get the max occurrences we can make right now
     occurrence_count = min(task_rrule.count(), MAX_OCCURRENCES)
@@ -114,8 +114,8 @@ def generate_task_occurrences(task):
         # we compare just the hour and minute values because ... well :)
         if (start_time.hour, start_time.minute) !=\
                 (this_end_time.hour, this_end_time.minute):
-            # define the TaskOccurrence object
-            occurrence_obj = TaskOccurrence(
+            # define the OccurrenceModelClass object
+            occurrence_obj = OccurrenceModelClass(
                 task=task,
                 date=rrule_instance.date(),
                 start_time=start_time,
@@ -131,7 +131,7 @@ def generate_task_occurrences(task):
     # bulk create occurrences if that is what we are doing
     if BULK_CREATE_OCCURRENCES and occurrence_list:
         # pylint: disable=no-member
-        TaskOccurrence.objects.bulk_create(occurrence_list)
+        OccurrenceModelClass.objects.bulk_create(occurrence_list)
 
     # refresh the task object
     task.refresh_from_db()
