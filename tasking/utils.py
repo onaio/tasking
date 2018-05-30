@@ -50,6 +50,7 @@ def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
     return ContentType.objects.none()
 
 
+# pylint: disable=invalid-name
 def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
     """
     Generates TaskOccurrence objects using the Task timing_rule field
