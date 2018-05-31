@@ -34,7 +34,7 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
         (DEACTIVATED, _('Deactivated')),
         (EXPIRED, _('Expired')),
         (DRAFT, _('Draft')),
-        (SCHEDULED, _('Scheduled'))
+        (SCHEDULED, _('Scheduled')),
         (ARCHIVED, _('Archived'))
     )
 
