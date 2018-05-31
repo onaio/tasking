@@ -27,13 +27,15 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
     EXPIRED = 'c'
     DRAFT = 'd'
     SCHEDULED = 's'
+    ARCHIVED = 'e'
 
     STATUS_CHOICES = (
         (ACTIVE, _('Active')),
         (DEACTIVATED, _('Deactivated')),
         (EXPIRED, _('Expired')),
         (DRAFT, _('Draft')),
-        (SCHEDULED, _('Scheduled'))
+        (SCHEDULED, _('Scheduled')),
+        (ARCHIVED, _('Archived'))
     )
 
     parent = TreeForeignKey(

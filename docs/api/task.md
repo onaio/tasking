@@ -46,7 +46,7 @@ Returns a list of all tasks with specific locations if given `locations` query p
 curl -X GET https://example.com/api/v1/tasks?locations=1
 ```
 
-Returns a list of all tasks with specific status if given `status` query parameter. The `status` query parameter takes a *string* which can be either an **a** for ACTIVE, **b** for DEACTIVATED, **c** for EXPIRED or **d** for DRAFT.
+Returns a list of all tasks with specific status if given `status` query parameter. The `status` query parameter takes a *string* which can be either an **a** for ACTIVE, **b** for DEACTIVATED, **c** for EXPIRED, **d** for DRAFT, **e** for ARCHIVED or **s** for SCHEDULED.
 
 ```console
 curl -X GET https://example.com/api/v1/tasks?status=b
