@@ -32,6 +32,7 @@ class TaskSerializer(GenericForeignKeySerializer):
             'modified',
             'name',
             'parent',
+            'estimated_time',
             'description',
             'start',
             'end',

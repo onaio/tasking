@@ -5,6 +5,7 @@ Test for TaskSerializer
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from datetime import timedelta
 
 from django.utils import timezone
 
@@ -70,6 +71,7 @@ class TestTaskSerializer(TestBase):
             'timing_rule': rrule,
             'target_content_type': self.task_type.id,
             'target_id': mocked_target_object.id,
+            'estimated_time': 'P4DT1H15M20S',
         }
 
         data_with_segment_rules = data.copy()
@@ -83,6 +85,10 @@ class TestTaskSerializer(TestBase):
         # the start and end fields are going to be from the timing rule
         start = get_rrule_start(rrulestr(rrule))
         end = get_rrule_end(rrulestr(rrule))
+
+        # Change estimated time to DD HH:MM:SS format since Serializer
+        # Changes it to such
+        data['estimated_time'] = '4 01:15:20'
 
         # the order of segment_rules may have changed so a dict comparison
         # may fail, we use `data` that does not include segment rules
@@ -107,6 +113,9 @@ class TestTaskSerializer(TestBase):
         self.assertEqual(end, task.end)
         self.assertEqual(10, task.total_submission_target)
 
+        # assert that the ISO 8601 String was converted to accurately
+        self.assertEqual(task.estimated_time, timedelta(4, 4520))
+
         # test that the segment rules for the task are as we expect
         self.assertEqual(rule1, task.segment_rules.get(id=rule1.id))
         self.assertEqual(rule2, task.segment_rules.get(id=rule2.id))
@@ -121,6 +130,7 @@ class TestTaskSerializer(TestBase):
             'start',
             'end',
             'timing_rule',
+            'estimated_time',
             'total_submission_target',
             'user_submission_target',
             'status',
