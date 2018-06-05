@@ -8,7 +8,6 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
-from datetime import timedelta
 from mptt.models import MPTTModel, TreeForeignKey
 
 from tasking.models.base import GenericFKModel, TimeStampedModel
@@ -95,7 +94,7 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
         verbose_name=_('Estimated Time'),
         null=True,
         blank=True,
-        default=timedelta(),
+        default=None,
         help_text=_(
             'This represents the estimated time it takes to complete'
             ' a task')
