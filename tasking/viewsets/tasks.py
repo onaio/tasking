@@ -31,6 +31,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     ordering_fields = [
         'created',
         'status',
+        'estimated_time',
         'submission_count',
         'project__id',
         'name'

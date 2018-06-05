@@ -4,6 +4,8 @@ Tests Task viewsets.
 """
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from django.utils import six, timezone
 
 import pytz
@@ -483,18 +485,27 @@ class TestTaskViewSet(TestBase):
         project1 = mommy.make('tasking.Project')
         project2 = mommy.make('tasking.Project')
         task1 = mommy.make(
-            'tasking.Task', name='Milk Production Size', status=Task.DRAFT)
+            'tasking.Task',
+            name='Milk Production Size',
+            status=Task.DRAFT,
+            estimated_time=timedelta(4, 4520))
         project1.tasks.add(task1)
 
         for _ in range(0, 7):
             # create other tasks
             task = mommy.make(
-                'tasking.Task', name='Cow Price', status=Task.DEACTIVATED)
+                'tasking.Task',
+                name='Cow Price',
+                status=Task.DEACTIVATED,
+                estimated_time=timedelta(3, 3250)
+                )
             mommy.make('tasking.Submission', task=task, _quantity=3)
             project1.tasks.add(task)
         task2 = mommy.make(
             'tasking.Task',
-            name='Allocated land for farming', status=Task.ACTIVE)
+            name='Allocated land for farming',
+            status=Task.ACTIVE,
+            estimated_time=timedelta(2, 4520))
         project2.tasks.add(task2)
 
         # Create and add Submissions to Task1 and Task2
@@ -558,6 +569,18 @@ class TestTaskViewSet(TestBase):
             response.data[-1]['name'], task2.name)
         self.assertEqual(response.data[-1]['id'], task2.id)
         self.assertTrue(task1.submissions > task2.submissions)
+
+        # order by Estimated Time descending
+        request = self.factory.get('/tasks', {'ordering': '-estimated_time'})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(
+            response.data[0]['name'], task1.name)
+        self.assertEqual(response.data[0]['id'], task1.id)
+        self.assertEqual(
+            response.data[-1]['name'], task2.name)
+        self.assertEqual(response.data[-1]['id'], task2.id)
+        self.assertTrue(task1.estimated_time > task2.estimated_time)
 
     def test_search_filter_order(self):
         """
