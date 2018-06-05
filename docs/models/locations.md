@@ -20,6 +20,7 @@ django.contrib.gis.db.Model
 ---
   * parent `TreeForeignKey` - A real world place that contains the current one. e.g a town is in a county
   * name `CharField` - _required_ name of the place
+  * description `TextField` - description of location.
   * country `CountryField` - The country that the location is in
   * geopoint `PointField` - Geographical Point of the Location
   * radius `DecimalField` - radius from the geopoint
