@@ -90,6 +90,15 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
         default=DRAFT,
         max_length=1,
         help_text=_('The status of the Task'))
+    estimated_time = models.DurationField(
+        verbose_name=_('Estimated Time'),
+        null=True,
+        blank=True,
+        default=None,
+        help_text=_(
+            'This represents the estimated time it takes to complete'
+            ' a task')
+    )
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods

@@ -31,6 +31,7 @@ It can take additional optional inputs in the content such as:
 - `user_submission_target`: *integer*.
 - `segment_rules`: *list of integers*, is the unique identifier for a segment rule.
 - `locations`: *list of integers*, is the unique identifier for a location.
+- `estimated_time`: *string*, is a [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) *string*.
 
 ### GET /api/v1/tasks
 
@@ -84,10 +85,10 @@ Returns a list of all tasks filtered by time if given `end_time` query parameter
 curl -X GET https://example.com/api/v1/tasks?end_time=21:00
 ```
 
-Returns a list of all tasks ordered by either creation date, task status, number of submissions or name of task if given a `ordering` query parameter. The `ordering` query parameter takes either `created`, `status`, `submission_count`, `project__id` or `name` for ascending order and either `-created`, `-status`, `-submission_count`, `-project_id` or `-name` for descending order.
+Returns a list of all tasks ordered by either creation date, task status, number of submissions or name of task if given a `ordering` query parameter. The `ordering` query parameter takes either `created`, `status`, `submission_count`, `estimated_time`, `project__id` or `name` for ascending order and either `-created`, `-status`, `-submission_count`, `-project_id`, `-estimated_time` or `-name` for descending order.
 
 ```console
-curl -X GET https://example.com/api/v1/tasks?ordering=-created,status,name,submission_count,-project__id
+curl -X GET https://example.com/api/v1/tasks?ordering=-created,status,name,submission_count,-project__id,-submission_count
 ```
 
 ### GET /api/v1/tasks/[pk]
