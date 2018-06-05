@@ -8,6 +8,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
+from datetime import timedelta
 from mptt.models import MPTTModel, TreeForeignKey
 
 from tasking.models.base import GenericFKModel, TimeStampedModel
@@ -90,6 +91,15 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
         default=DRAFT,
         max_length=1,
         help_text=_('The status of the Task'))
+    estimated_time = models.DurationField(
+        verbose_name=_('Estimated Time'),
+        null=True,
+        blank=True,
+        default=timedelta(),
+        help_text=_(
+            'This represents the estimated time it takes to complete'
+            ' a task')
+    )
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
