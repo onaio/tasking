@@ -57,6 +57,11 @@ class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
         blank=True,
         default=None,
         help_text=_('This represents the Shapefile of the Location'))
+    description = models.TextField(
+        _('Description'),
+        blank=True,
+        default='',
+        help_text=_('This represents the description of the Location.'))
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods

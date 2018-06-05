@@ -156,6 +156,7 @@ class LocationSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'country',
+            'description',
             'geopoint',
             'radius',
             'shapefile',

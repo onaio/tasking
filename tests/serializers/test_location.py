@@ -50,6 +50,7 @@ class TestLocationSerializer(TestCase):
             'parent',
             'radius',
             'country',
+            'description',
             'created',
             'geopoint',
             'name',
