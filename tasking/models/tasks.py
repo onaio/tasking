@@ -154,10 +154,10 @@ class Task(BaseTask):
     locations = models.ManyToManyField(
         'tasking.Location',
         through='tasking.TaskLocation',
-        verbose_name=_('Location'),
+        verbose_name=_('Locations'),
         blank=True,
         default=None,
-        help_text=_('This represents the location.'))
+        help_text=_('This represents the locations.'))
 
     # Custom Manager that has submission_count field
     with_submission_count = TaskManager()

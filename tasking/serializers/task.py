@@ -55,12 +55,43 @@ class TaskLocationSerializer(serializers.ModelSerializer):
         return check_timing_rule(value)
 
 
+class TaskLocationCreateSerializer(TaskLocationSerializer):
+    """
+    Serializer model class used when creating a TaskLocation object
+    during Task creation
+    """
+
+    # pylint: disable=too-few-public-methods
+    class Meta(object):
+        """
+        Meta options for TaskLocationSerializer
+        """
+        model = TaskLocation
+        # we dont include the task field as it will be added in TaskSerializer
+        fields = [
+            'created',
+            'modified',
+            'location',
+            'timing_rule',
+            'start',
+            'end'
+        ]
+
+    def to_representation(self, obj):
+        """
+        Use TaskLocationSerializer when reading the object
+        """
+        return TaskLocationSerializer(obj).data
+
+
 class TaskSerializer(GenericForeignKeySerializer):
     """
     Task serializer class
     """
     start = serializers.DateTimeField(required=False)
     submission_count = serializers.SerializerMethodField()
+    locations_input = TaskLocationCreateSerializer(many=True, required=False)
+    task_locations = serializers.SerializerMethodField(read_only=True)
 
     # pylint: disable=too-few-public-methods
     class Meta(object):
@@ -86,8 +117,10 @@ class TaskSerializer(GenericForeignKeySerializer):
             'target_id',
             'segment_rules',
             'locations',
+            'locations_input',
+            'task_locations',
         ]
-
+        read_only_fields = ['locations']
         model = Task
 
     # pylint: disable=no-self-use
@@ -136,3 +169,43 @@ class TaskSerializer(GenericForeignKeySerializer):
             return obj.submission_count
         except AttributeError:
             return obj.submissions
+
+    def get_task_locations(self, obj):
+        queryset = TaskLocation.objects.filter(task=obj)
+        return TaskLocationSerializer(queryset, many=True).data
+
+    def create(self, validated_data):
+        """
+        Custom create method for Tasks
+        """
+        locations_data = validated_data.pop('locations_input', [])
+        task = super(TaskSerializer, self).create(
+            validated_data=validated_data)
+
+        for location_data in locations_data:
+            location_data['task'] = task
+            TaskLocationSerializer.create(
+                TaskLocationSerializer(), validated_data=location_data)
+
+        return task
+
+    def update(self, instance, validated_data):
+        """
+        Custom update method for Tasks
+        """
+        locations_data = validated_data.pop('locations_input', [])
+        task = super(TaskSerializer, self).update(
+            instance=instance, validated_data=validated_data)
+
+        # we assume that this is the one final list of locations to be
+        # linked to this task and that other relationships should be removed
+        # if task_locations is empty it means the user is removing all Task and
+        # Location relationships
+        TaskLocation.objects.filter(task=task).delete()
+
+        for location_data in locations_data:
+            location_data['task'] = task
+            TaskLocationSerializer.create(
+                TaskLocationSerializer(), validated_data=location_data)
+
+        return task
