@@ -315,7 +315,11 @@ class TestTaskViewSet(TestBase):
         arusha = mommy.make('tasking.Location', name='Arusha')
         for _ in range(0, 7):
             task = mommy.make('tasking.Task')
-            task.locations.add(nairobi)
+            mommy.make(
+                'tasking.TaskLocation',
+                task=task,
+                location=nairobi
+            )
 
         view = TaskViewSet.as_view({'get': 'list'})
 
@@ -337,7 +341,11 @@ class TestTaskViewSet(TestBase):
 
         # add one Arusha task and assert that we get it back
         task2 = mommy.make('tasking.Task')
-        task2.locations.add(arusha)
+        mommy.make(
+            'tasking.TaskLocation',
+            task=task2,
+            location=arusha
+        )
         request = self.factory.get('/tasks', {'locations': arusha.id})
         force_authenticate(request, user=user)
         response = view(request=request)
