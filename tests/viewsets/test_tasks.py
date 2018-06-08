@@ -86,6 +86,39 @@ class TestTaskViewSet(TestBase):
         """
         self._create_task()
 
+    def test_task_locations(self):
+        """
+        Test that we can create a task and add task locations
+        """
+        user = mommy.make('auth.User')
+        mocked_target_object = mommy.make('auth.User')
+        location = mommy.make('tasking.Location')
+        data = {
+            'name': 'Cow price',
+            'description': 'Some description',
+            'total_submission_target': 10,
+            'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+            'target_content_type': self.user_type.id,
+            'target_id': mocked_target_object.id,
+            'locations_input': [
+                {
+                    'location': location.id,
+                    'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=7',
+                    'start': '02:00:00',
+                    'end': '09:00:00'
+                }
+            ]
+        }
+        view = TaskViewSet.as_view({'post': 'create'})
+        # import ipdb; ipdb.set_trace()
+        request = self.factory.post('/tasks', data)
+        # Need authenticated user
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 201, response.data)
+        # import ipdb; ipdb.set_trace()
+        self.assertEqual(1, len(response.data['task_locations']))
+
     def test_create_with_bad_data(self):
         """
         Test that we get appropriate errors when trying to create an object
