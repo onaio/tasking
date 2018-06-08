@@ -112,6 +112,34 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
         abstract = True
 
 
+class TaskLocation(TimeStampedModel, models.Model):
+    """
+    Provides extra information on Task-Location relationship
+    """
+    task = models.ForeignKey("tasking.Task", on_delete=models.CASCADE)
+    location = models.ForeignKey("tasking.Location", on_delete=models.CASCADE)
+    timing_rule = models.TextField(
+        verbose_name=_('Timing Rule'),
+        validators=[validate_rrule],
+        help_text=_('This stores the rrule for recurrence.'))
+    start = models.TimeField(_("Start Time"))
+    end = models.TimeField(_("End Time"))
+
+    # pylint: disable=no-self-use
+    # pylint: disable=too-few-public-methods
+    class Meta(object):
+        ordering = ['task', 'location', 'start']
+
+    def __str__(self):
+        """
+        String representation of a TaskLocation object
+
+        e.g. Cow prices - 1
+        """
+        return "{task} at {location}".format(
+            task=self.task.name, location=self.location.name)
+
+
 @python_2_unicode_compatible
 class Task(BaseTask):
     """
@@ -125,6 +153,7 @@ class Task(BaseTask):
     )
     locations = models.ManyToManyField(
         'tasking.Location',
+        through='tasking.TaskLocation',
         verbose_name=_('Location'),
         blank=True,
         default=None,
