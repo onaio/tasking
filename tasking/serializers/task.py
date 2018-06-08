@@ -9,10 +9,50 @@ from rest_framework import serializers
 
 from tasking.common_tags import (INVALID_END_DATE, INVALID_START_DATE,
                                  INVALID_TIMING_RULE)
-from tasking.models import Task
+from tasking.models import Task, TaskLocation
 from tasking.serializers.base import GenericForeignKeySerializer
 from tasking.utils import get_rrule_end, get_rrule_start
 from tasking.validators import validate_rrule
+
+
+def check_timing_rule(value):
+    """
+    Validate timing rule
+    """
+    if validate_rrule(value) is True:
+        return value
+    raise serializers.ValidationError(
+        {'timing_rule': INVALID_TIMING_RULE}
+    )
+
+
+class TaskLocationSerializer(serializers.ModelSerializer):
+    """
+    TaskLocation serialzier class
+    """
+
+    # pylint: disable=too-few-public-methods
+    class Meta(object):
+        """
+        Meta options for TaskLocationSerializer
+        """
+        model = TaskLocation
+        fields = [
+            'task',
+            'created',
+            'modified',
+            'location',
+            'timing_rule',
+            'start',
+            'end'
+        ]
+
+    # pylint: disable=no-self-use
+    def validate_timing_rule(self, value):
+        """
+        Validate timing rule
+        """
+        return check_timing_rule(value)
 
 
 class TaskSerializer(GenericForeignKeySerializer):
@@ -55,11 +95,7 @@ class TaskSerializer(GenericForeignKeySerializer):
         """
         Validate timing rule
         """
-        if validate_rrule(value) is True:
-            return value
-        raise serializers.ValidationError(
-            {'timing_rule': INVALID_TIMING_RULE}
-        )
+        return check_timing_rule(value)
 
     def validate(self, attrs):
         """

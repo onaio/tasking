@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Test for TaskSerializer
+Tests for task serializers
 """
 from __future__ import unicode_literals
 
@@ -13,7 +13,7 @@ from dateutil.rrule import rrulestr
 from model_mommy import mommy
 from tests.base import TestBase
 
-from tasking.serializers import TaskSerializer
+from tasking.serializers import TaskSerializer, TaskLocationSerializer
 from tasking.utils import get_rrule_end, get_rrule_start
 
 
@@ -228,3 +228,50 @@ class TestTaskSerializer(TestBase):
         task = serializer_instance.save()
 
         self.assertEqual(mocked_parent_task, task.parent)
+
+
+class TestTaskLocationSerializer(TestBase):
+    """
+    Test TaskLocationSerializer
+    """
+
+    def setUp(self):
+        """
+        Setup test
+        """
+        self.task = mommy.make('tasking.Task', name='Game Prices')
+        self.location = mommy.make('tasking.Location', name='Village Market')
+
+    def test_create_tasklocation(self):
+        """
+        Test creation of TaskLocation objects
+        """
+        rrule = 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
+
+        data = {
+            'task': self.task.id,
+            'location': self.location.id,
+            'timing_rule': rrule,
+            'start': '14:00:00',
+            'end': '21:00:00'
+        }
+
+        serializer_instance = TaskLocationSerializer(data=data)
+        self.assertTrue(serializer_instance.is_valid())
+        task_location = serializer_instance.save()
+
+        self.assertDictContainsSubset(data, serializer_instance.data)
+        self.assertEqual(self.task, task_location.task)
+        self.assertEqual(self.location, task_location.location)
+
+        expected_fields = [
+            'task',
+            'location',
+            'timing_rule',
+            'created',
+            'modified',
+            'start',
+            'end'
+        ]
+        self.assertEqual(set(expected_fields),
+                         set(list(serializer_instance.data.keys())))
