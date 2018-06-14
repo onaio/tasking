@@ -53,7 +53,7 @@ class ShapeFileField(GeometryField):
                 data_source = DataSource(shp_path)
                 layer = data_source[0]
 
-                # Get the first item of shapefile and turn to a Polygon Object
+                # Get geoms for all Polygons in Datasource
                 polygon_data = layer.get_geoms()
                 polygons = []
 
