@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 import zipfile
 
 from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, MultiPolygon
 
 from backports.tempfile import TemporaryDirectory
 from django_countries import Countries
@@ -29,9 +29,9 @@ class ShapeFileField(GeometryField):
         """
         Custom Conversion for shapefile field
         """
-        shapefile = value
+        multipolygon = value
 
-        if shapefile is not None:
+        if multipolygon is not None:
             try:
                 zip_file = zipfile.ZipFile(value.temporary_file_path())
             except AttributeError:
@@ -53,10 +53,16 @@ class ShapeFileField(GeometryField):
                 data_source = DataSource(shp_path)
                 layer = data_source[0]
 
-                # Get the first item of shapefile and turn to a Polygon Object
-                shapefile = layer[1].geom.geos
+                # Get geoms for all Polygons in Datasource
+                polygon_data = layer.get_geoms()
+                polygons = []
 
-        return shapefile
+                for polygon in polygon_data:
+                    polygons.append(polygon.geos)
+
+                multipolygon = MultiPolygon(polygons)
+
+        return multipolygon
 
     def to_representation(self, value):
         """
