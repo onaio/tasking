@@ -29,9 +29,9 @@ class ShapeFileField(GeometryField):
         """
         Custom Conversion for shapefile field
         """
-        polygon = value
+        multipolygon = value
 
-        if polygon is not None:
+        if multipolygon is not None:
             try:
                 zip_file = zipfile.ZipFile(value.temporary_file_path())
             except AttributeError:
@@ -54,9 +54,13 @@ class ShapeFileField(GeometryField):
                 layer = data_source[0]
 
                 # Get the first item of shapefile and turn to a Polygon Object
-                polygon = layer.get_geoms()
+                polygon_data = layer.get_geoms()
+                polygons = []
 
-                multipolygon = MultiPolygon(polygon)
+                for polygon in polygon_data:
+                    polygons.append(polygon.geos)
+
+                multipolygon = MultiPolygon(polygons)
 
         return multipolygon
 
