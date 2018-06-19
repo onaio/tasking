@@ -165,6 +165,7 @@ class LocationSerializer(serializers.ModelSerializer):
             'description',
             'geopoint',
             'radius',
+            'location_type',
             'shapefile',
             'parent',
             'created',
