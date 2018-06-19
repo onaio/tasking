@@ -25,7 +25,7 @@ class LocationViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         filters.SearchFilter,
         DjangoFilterBackend,
         filters.OrderingFilter]
-    filter_fields = ['parent', 'country']
+    filter_fields = ['parent', 'country', 'location_type']
     search_fields = ['name']
     ordering_fields = ['name', 'created']
     queryset = Location.objects.all()
