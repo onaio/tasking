@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Test for Project Serializers
+Test for LocationType Serializers
 """
 from __future__ import unicode_literals
 
