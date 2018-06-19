@@ -83,6 +83,16 @@ class Location(BaseLocation):
     """
     Location model class
     """
+    location_type = models.ForeignKey(
+        'tasking.LocationType',
+        verbose_name=_('Location Type'),
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        help_text=_('This represents the Location Type.')
+    )
+
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
     class Meta(object):
