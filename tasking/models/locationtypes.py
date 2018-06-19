@@ -1,5 +1,5 @@
 """
-Module for the Project model
+Module for the LocationType model
 """
 
 from __future__ import unicode_literals
@@ -21,12 +21,12 @@ class BaseLocationType(TimeStampedModel, models.Model):
     name = models.CharField(
         _('Name'),
         max_length=255,
-        help_text=_('This is the name of the Project'))
+        help_text=_('This is the name of the Location Type'))
 
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
-        The meta option class for BaseProject
+        The meta option class for BaseLocationType
         """
         abstract = True
 
@@ -39,11 +39,11 @@ class LocationType(BaseLocationType):
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
-        This is the meta options class for the Project model
+        This is the meta options class for the LocationType model
         """
         abstract = False
-        ordering = ['name']
         app_label = 'tasking'
+        ordering = ['name', 'id']
 
     def __str__(self):
         """
