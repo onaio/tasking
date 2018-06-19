@@ -260,6 +260,54 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(
             Location.objects.filter(parent=location1).count(), 1)
 
+    def test_location_type_filter(self):
+        """
+        Test that you can filter by location_type
+        """
+        user = mommy.make('auth.User')
+        locationtype1 = mommy.make('tasking.LocationType', name='Household')
+        locationtype2 = mommy.make('tasking.LocationType', name='Hospital')
+
+        mommy.make(
+            'tasking.Location',
+            name='Market Town', location_type=locationtype1, _quantity=7)
+
+        view = LocationViewSet.as_view({'get': 'list'})
+
+        # assert that there are no locations with locationtype2
+        request = self.factory.get(
+            '/locations?', {'location_type': locationtype2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        self.assertEqual(
+            Location.objects.filter(location_type=locationtype2).count(), 0)
+
+        # assert that there are 7 locations with locationtype1
+        request = self.factory.get(
+            '/locations?', {'location_type': locationtype1.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+        self.assertEqual(
+            Location.objects.filter(location_type=locationtype1).count(), 7)
+
+        # create a new location and make its location_type locationtype2
+        # and assert that it's there
+        mommy.make(
+            'tasking.Location', name='Africa', location_type=locationtype2)
+
+        request = self.factory.get(
+            '/locations?', {'location_type': locationtype2.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            Location.objects.filter(location_type=locationtype2).count(), 1)
+
     def test_country_filter(self):
         """
         Test that you can filter by country
