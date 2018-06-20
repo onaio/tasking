@@ -59,11 +59,11 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
         verbose_name=_('Start'),
         help_text=_('This is the date and time the task starts.'))
     end = models.DateTimeField(
-        verbose_name=_('Start'),
+        verbose_name=_('End'),
         null=True,
         blank=True,
         default=None,
-        help_text=_('This is the date and time the task starts.'))
+        help_text=_('This is the date and time the task ends.'))
     timing_rule = models.TextField(
         verbose_name=_('Timing Rule'),
         validators=[validate_rrule],
