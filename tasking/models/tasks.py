@@ -67,6 +67,9 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
     timing_rule = models.TextField(
         verbose_name=_('Timing Rule'),
         validators=[validate_rrule],
+        null=True,
+        blank=True,
+        default=None,
         help_text=_('This stores the rrule for recurrence.'))
     total_submission_target = models.IntegerField(
         verbose_name=_('Total Submissions Target'),

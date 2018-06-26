@@ -53,6 +53,17 @@ class TestTaskSerializer(TestBase):
 
         self.assertFalse(TaskSerializer(data=bad_content_type).is_valid())
 
+        bad_start_date = OrderedDict(
+            name='Cow Price',
+            description='Some Description',
+            start=timezone.now(),
+            end=timezone.now() - timedelta(1),
+            target_content_type=self.task_type.id,
+            target_id=mocked_target_object.id,
+        )
+
+        self.assertFalse(TaskSerializer(data=bad_start_date).is_valid())
+
     def test_create_task(self):
         """
         Test that the serializer can create Task objects

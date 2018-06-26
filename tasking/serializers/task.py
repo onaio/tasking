@@ -7,7 +7,8 @@ from __future__ import unicode_literals
 from dateutil.rrule import rrulestr
 from rest_framework import serializers
 
-from tasking.common_tags import INVALID_TIMING_RULE
+from tasking.common_tags import (INVALID_END_DATE, INVALID_START_DATE,
+                                 INVALID_TIMING_RULE)
 from tasking.models import Task
 from tasking.serializers.base import GenericForeignKeySerializer
 from tasking.utils import get_rrule_end, get_rrule_start
@@ -77,6 +78,17 @@ class TaskSerializer(GenericForeignKeySerializer):
             # get start and end values from timing_rule
             attrs['start'] = get_rrule_start(rrulestr(timing_rule))
             attrs['end'] = get_rrule_end(rrulestr(timing_rule))
+
+        end_date = attrs.get('end')
+        start_date = attrs.get('start')
+
+        # If end date is present we validate that it is greater than start_date
+        if end_date is not None:
+            # If end date is lesser than the start date raise an error
+            if end_date < start_date:
+                raise serializers.ValidationError(
+                    {'end': INVALID_END_DATE, 'start': INVALID_START_DATE}
+                )
 
         return super(TaskSerializer, self).validate(attrs)
 

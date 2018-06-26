@@ -80,7 +80,10 @@ def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
         return OccurrenceModelClass.objects.none()
 
     # get the max occurrences we can make right now
-    occurrence_count = min(task_rrule.count(), MAX_OCCURRENCES)
+    try:
+        occurrence_count = min(task_rrule.count(), MAX_OCCURRENCES)
+    except ValueError:
+        occurrence_count = MAX_OCCURRENCES
 
     # the start time is always taken from the timing_rule
     start_time = get_rrule_start(task_rrule)
@@ -105,11 +108,12 @@ def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
         # of the day
         this_end_time = time(hour=23, minute=59, second=59, microsecond=999999)
 
-        # for the last occurrence the end time is as set in timing_rule
-        # this is because we believe that the task must end no later than the
-        # timing_rule dictates
-        if len(occurrence_list) + 1 == occurrence_count:
-            this_end_time = end_time
+        # for the last occurrence if the end time is not none we set the end
+        # date for the timing_rule this is because we believe that the task
+        # must end no later than the timing_rule dictates
+        if end_time is not None:
+            if len(occurrence_list) + 1 == occurrence_count:
+                this_end_time = end_time
 
         # do nothing unless start_time != end_time
         # we compare just the hour and minute values because ... well :)

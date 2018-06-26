@@ -19,3 +19,5 @@ UNNECESSARY_FILE = _(
     'Uploaded an unnecessary file. Please make sure only a .shx , .shp and '
     '.dbf file is being uploaded.'
 )
+INVALID_START_DATE = _('The start date cannnot be greater than the end date')
+INVALID_END_DATE = _('The end date cannnot be lesser than the start date.')
