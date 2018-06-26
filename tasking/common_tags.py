@@ -21,4 +21,3 @@ UNNECESSARY_FILE = _(
 )
 INVALID_START_DATE = _('The start date cannnot be greater than the end date')
 INVALID_END_DATE = _('The end date cannnot be lesser than the start date.')
-
