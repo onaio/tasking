@@ -90,6 +90,12 @@ def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
 
     # the end time from the timing_rule
     end_time = get_rrule_end(task_rrule)
+    task_end = task.end
+
+    # If timing_rule has no end but user specified the end
+    # we set end_time to the tasks_end_time
+    if end_time is None and task_end is not None:
+        end_time = task_end.time()
 
     # if creating in bulk we'll use a list to keep track of occurrences
     if BULK_CREATE_OCCURRENCES:
@@ -98,8 +104,10 @@ def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
     # lets loop through all datetimes in the rrule
     for rrule_instance in task_rrule:
 
-        # if we've reached our max count then break the loop
-        if len(occurrence_list) == occurrence_count:
+        # if we've reached our max count or if rrule_instance is
+        # greater than the task_end we then break the loop
+        if len(occurrence_list) == occurrence_count or\
+         (task_end is not None and rrule_instance.date() > task_end.date()):
             break
 
         # the end time for all but the last occurrence is the end of the day
