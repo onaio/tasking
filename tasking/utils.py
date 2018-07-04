@@ -181,6 +181,27 @@ def generate_task_occurrences(
     return OccurrenceModelClass.objects.filter(task=task)
 
 
+def generate_tasklocation_occurrences(task_location):
+    """
+    Generates TaskOccurrence objects using the TaskLocation timing_rule field
+
+    It works this way:
+        - gets the start_time from the timing_rule
+        - only generates a maximum of MAX_OCCURRENCES
+        - occurrences with the same start_time and end_time will not be
+          created, they will be skipped silently
+        - only works for valid rrules
+
+    Returns a Queryset of OccurrenceModel class objects
+    """
+    return generate_task_occurrences(
+        task=task_location.task,
+        timing_rule=task_location.timing_rule,
+        start_time_input=task_location.start,
+        end_time_input=task_location.end,
+        OccurrenceModelClass=TaskOccurrence)
+
+
 def get_rrule_start(rrule_obj):
     """
     Returns the timezone-aware start datetime from rrule
