@@ -69,19 +69,17 @@ class TaskLocationCreateSerializer(TaskLocationSerializer):
         model = TaskLocation
         # we dont include the task field as it will be added in TaskSerializer
         fields = [
-            'created',
-            'modified',
             'location',
             'timing_rule',
             'start',
             'end'
         ]
 
-    def to_representation(self, obj):
+    def to_representation(self, instance):
         """
         Use TaskLocationSerializer when reading the object
         """
-        return TaskLocationSerializer(obj).data
+        return TaskLocationSerializer(instance).data
 
 
 class TaskSerializer(GenericForeignKeySerializer):
@@ -90,7 +88,8 @@ class TaskSerializer(GenericForeignKeySerializer):
     """
     start = serializers.DateTimeField(required=False)
     submission_count = serializers.SerializerMethodField()
-    locations_input = TaskLocationCreateSerializer(many=True, required=False)
+    locations_input = TaskLocationCreateSerializer(
+        many=True, required=False, write_only=True)
     task_locations = serializers.SerializerMethodField(read_only=True)
 
     # pylint: disable=too-few-public-methods
@@ -134,7 +133,6 @@ class TaskSerializer(GenericForeignKeySerializer):
         """
         Object level validation method for TaskSerializer
         """
-
         # if timing_rule is provided, we extract start and end from its value
         if self.instance is not None:
             # we are doing an update
@@ -171,6 +169,10 @@ class TaskSerializer(GenericForeignKeySerializer):
             return obj.submissions
 
     def get_task_locations(self, obj):
+        """
+        Get serialized TaskLocation objects
+        """
+        # pylint: disable=no-member
         queryset = TaskLocation.objects.filter(task=obj)
         return TaskLocationSerializer(queryset, many=True).data
 
@@ -179,6 +181,7 @@ class TaskSerializer(GenericForeignKeySerializer):
         Custom create method for Tasks
         """
         locations_data = validated_data.pop('locations_input', [])
+
         task = super(TaskSerializer, self).create(
             validated_data=validated_data)
 
@@ -201,6 +204,8 @@ class TaskSerializer(GenericForeignKeySerializer):
         # linked to this task and that other relationships should be removed
         # if task_locations is empty it means the user is removing all Task and
         # Location relationships
+
+        # pylint: disable=no-member
         TaskLocation.objects.filter(task=task).delete()
 
         for location_data in locations_data:
