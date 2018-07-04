@@ -6,11 +6,10 @@ from __future__ import unicode_literals
 
 import os
 import zipfile
-from datetime import time, timedelta
+from datetime import time, timedelta, datetime
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.utils import timezone
 
 import pytz
@@ -22,7 +21,8 @@ from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
                                 TargetDoesNotExist, UnnecessaryFiles)
 from tasking.models import Task, TaskOccurrence
 from tasking.utils import (MAX_OCCURRENCES, generate_task_occurrences,
-                           get_allowed_contenttypes, get_rrule_end,
+                           get_allowed_contenttypes, get_occurrence_end_time,
+                           get_occurrence_start_time, get_rrule_end,
                            get_rrule_start, get_shapefile, get_target)
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -228,3 +228,66 @@ class TestUtils(TestCase):
         # one would start at 9pm and end at 9pm
         self.assertEqual(9, generate_task_occurrences(
             task=task, timing_rule=task.timing_rule).count())
+
+    def test_get_occurrence_start_time(self):
+        """
+        Test get_occurrence_start_time
+        """
+        # pylint: disable=line-too-long
+        rule = 'DTSTART:20180501T070000Z RRULE:FREQ=DAILY;INTERVAL=1;COUNT=500;UNTIL=20280521T210000Z'  # noqa
+        the_rrule = rrulestr(rule)
+
+        rule2 = 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
+        the_rrule2 = rrulestr(rule2)
+
+        # when start_time is not input then return start_time from timing_rule
+        self.assertEqual(
+            "07:00:00",
+            get_occurrence_start_time(
+                the_rrule, start_time_input=None).isoformat())
+
+        # if given an input, return that input
+        self.assertEqual(
+            "09:15:00",
+            get_occurrence_start_time(
+                the_rrule, start_time_input=time(9, 15, 0, 0)).isoformat())
+
+        # when timing_rule has no explicit start then we get back is right now
+        now = timezone.now().astimezone(pytz.timezone('Africa/Nairobi')).time()
+        result = get_occurrence_start_time(the_rrule2, start_time_input=None)
+
+        diff = datetime.combine(timezone.now().date(), now) -\
+            datetime.combine(timezone.now().date(), result)
+        # should be within one minutes of each other
+        self.assertTrue(diff.seconds < 60)
+
+    def test_get_occurrence_end_time(self):
+        """
+        Test get_occurrence_end_time
+        """
+        rule = 'RRULE:FREQ=DAILY;INTERVAL=1;COUNT=500;UNTIL=20280521T210000Z'
+        the_rrule = rrulestr(rule)
+        task = mommy.make('tasking.Task', timing_rule=rule)
+
+        rule2 = 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
+        the_rrule2 = rrulestr(rule2)
+
+        # when end_time is not input then return start_time from timing_rule
+        self.assertEqual(
+            "21:00:00",
+            get_occurrence_end_time(
+                task, the_rrule, end_time_input=None).isoformat())
+
+        # when end_time is input then return start_time from timing_rule
+        self.assertEqual(
+            "19:15:00",
+            get_occurrence_end_time(
+                task, the_rrule,
+                end_time_input=time(19, 15, 0, 0)).isoformat())
+
+        # return the end of the day when timing_rule has no end and end_
+        # time is not provided
+        self.assertEqual(
+            "23:59:59.999999",
+            get_occurrence_end_time(
+                task, the_rrule2, end_time_input=None).isoformat())
