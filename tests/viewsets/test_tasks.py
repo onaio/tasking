@@ -9,13 +9,14 @@ from datetime import timedelta
 from django.utils import six, timezone
 
 import pytz
+import json
 from dateutil.parser import parse
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
 
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
-from tasking.models import Task
+from tasking.models import Task, TaskLocation
 from tasking.viewsets import TaskViewSet
 
 
@@ -94,9 +95,9 @@ class TestTaskViewSet(TestBase):
         mocked_target_object = mommy.make('auth.User')
         location = mommy.make('tasking.Location')
         data = {
-            'name': 'Cow price',
-            'description': 'Some description',
-            'total_submission_target': 10,
+            'name': 'Coconut Quest',
+            'description': 'Mission impossible!',
+            'total_submission_target': 1,
             'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             'target_content_type': self.user_type.id,
             'target_id': mocked_target_object.id,
@@ -110,14 +111,25 @@ class TestTaskViewSet(TestBase):
             ]
         }
         view = TaskViewSet.as_view({'post': 'create'})
-        # import ipdb; ipdb.set_trace()
-        request = self.factory.post('/tasks', data)
+
+        # we need to give the inpiut as JSON so that locations_input is
+        # properly set
+        request = self.factory.post(
+            '/tasks', json.dumps(data), content_type='application/json')
+
         # Need authenticated user
         force_authenticate(request, user=user)
         response = view(request=request)
+
         self.assertEqual(response.status_code, 201, response.data)
-        # import ipdb; ipdb.set_trace()
         self.assertEqual(1, len(response.data['task_locations']))
+        task_location = TaskLocation.objects.get(
+            task__id=response.data['id'],
+            location=location)
+        self.assertEqual('RRULE:FREQ=DAILY;INTERVAL=10;COUNT=7',
+                         task_location.timing_rule)
+        self.assertEqual('02:00:00', task_location.start.isoformat())
+        self.assertEqual('09:00:00', task_location.end.isoformat())
 
     def test_create_with_bad_data(self):
         """
