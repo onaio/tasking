@@ -35,8 +35,6 @@ DEFAULT_ALLOWED_CONTENTTYPES = [
 ALLOWED_CONTENTTYPES = getattr(settings, 'TASKING_ALLOWED_CONTENTTYPES',
                                DEFAULT_ALLOWED_CONTENTTYPES)
 MAX_OCCURRENCES = getattr(settings, 'TASKING_MAX_OCCURRENCES', 500)
-BULK_CREATE_OCCURRENCES = getattr(
-    settings, 'TASKING_BULK_CREATE_OCCURRENCES', True)
 
 
 def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
@@ -48,6 +46,39 @@ def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
     if filters:
         return ContentType.objects.filter(reduce(operator.or_, filters))
     return ContentType.objects.none()
+
+
+def get_occurrence_start_time(the_rrule, start_time_input=None):
+    """
+    Get the start time used to create a task occurrence
+    """
+    if start_time_input is None:
+        # the start time is always taken from the timing_rule
+        # if not supplied
+        start_datetime = get_rrule_start(the_rrule)
+        start_time = start_datetime.time()
+    else:
+        start_time = start_time_input
+
+    return start_time
+
+
+def get_occurrence_end_time(task, the_rrule, end_time_input=None):
+    """
+    Get the end time used to create a task occurrence
+    """
+    if end_time_input is None:
+        # get the end time from the timing_rule if not supplied
+        end_datetime = get_rrule_end(the_rrule)
+        if end_datetime is not None:
+            end_time = end_datetime.time()
+        # If we dont have an end_time then we set it to be the task end time
+        if end_time is None and task.end is not None:
+            end_time = task.end.time()
+    else:
+        end_time = end_time_input
+
+    return end_time
 
 
 # pylint: disable=invalid-name
@@ -94,28 +125,13 @@ def generate_task_occurrences(
     # the end datetime for the task
     task_end = task.end
 
-    if start_time_input is None:
-        # the start time is always taken from the timing_rule
-        # if not supplied
-        start_datetime = get_rrule_start(the_rrule)
-        start_time = start_datetime.time()
-    else:
-        start_time = start_time_input
+    start_time = get_occurrence_start_time(
+        the_rrule, start_time_input=start_time_input)
 
-    if end_time_input is None:
-        # get the end time from the timing_rule if not supplied
-        end_datetime = get_rrule_end(the_rrule)
-        if end_datetime is not None:
-            end_time = end_datetime.time()
-        # If we dont have an end_time then we set it to be the task end time
-        if end_time is None and task_end is not None:
-            end_time = task_end.time()
-    else:
-        end_time = end_time_input
+    end_time = get_occurrence_end_time(
+        task, the_rrule, end_time_input=end_time_input)
 
-    # if creating in bulk we'll use a list to keep track of occurrences
-    if BULK_CREATE_OCCURRENCES:
-        occurrence_list = []
+    occurrence_list = []
 
     # lets loop through all datetimes in the rrule
     for rrule_instance in the_rrule:
@@ -155,14 +171,9 @@ def generate_task_occurrences(
                 end_time=this_end_time
             )
 
-            # save it or add it to our bulk creation list
-            if not BULK_CREATE_OCCURRENCES:
-                occurrence_obj.save()
-
             occurrence_list.append(occurrence_obj)
 
-    # bulk create occurrences if that is what we are doing
-    if BULK_CREATE_OCCURRENCES and occurrence_list:
+    if occurrence_list:
         # pylint: disable=no-member
         OccurrenceModelClass.objects.bulk_create(occurrence_list)
 
