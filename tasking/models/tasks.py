@@ -128,13 +128,14 @@ class TaskLocation(TimeStampedModel, models.Model):
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
     class Meta(object):
+        """
+        Meta options for TaskLocation
+        """
         ordering = ['task', 'location', 'start']
 
     def __str__(self):
         """
         String representation of a TaskLocation object
-
-        e.g. Cow prices - 1
         """
         return "{task} at {location}".format(
             task=self.task.name, location=self.location.name)
