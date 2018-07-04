@@ -6,11 +6,10 @@ from __future__ import unicode_literals
 
 import os
 import zipfile
-from datetime import time, timedelta
+from datetime import datetime, time, timedelta
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.utils import timezone
 
 import pytz
@@ -22,7 +21,9 @@ from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
                                 TargetDoesNotExist, UnnecessaryFiles)
 from tasking.models import Task, TaskOccurrence
 from tasking.utils import (MAX_OCCURRENCES, generate_task_occurrences,
-                           get_allowed_contenttypes, get_rrule_end,
+                           generate_tasklocation_occurrences,
+                           get_allowed_contenttypes, get_occurrence_end_time,
+                           get_occurrence_start_time, get_rrule_end,
                            get_rrule_start, get_shapefile, get_target)
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -171,11 +172,13 @@ class TestUtils(TestCase):
         TaskOccurrence.objects.all().delete()
 
         # we should get 5 occurrences
-        occurrences1 = generate_task_occurrences(task1)
+        occurrences1 = generate_task_occurrences(
+            task=task1, timing_rule=task1.timing_rule)
         self.assertEqual(5, occurrences1.count())
 
         # we should get {MAX_OCCURRENCES} occurrences
-        occurrences2 = generate_task_occurrences(task2)
+        occurrences2 = generate_task_occurrences(
+            task=task2, timing_rule=task2.timing_rule)
         self.assertEqual(MAX_OCCURRENCES, occurrences2.count())
 
         # the start times should all be from the timing_rule, whic in this
@@ -193,7 +196,8 @@ class TestUtils(TestCase):
             self.assertEqual(item.end_time, time(23, 59, 59, 999999))
 
         # we should have 30 occurrences
-        occurrences3 = generate_task_occurrences(task3)
+        occurrences3 = generate_task_occurrences(
+            task=task3, timing_rule=task3.timing_rule)
         self.assertEqual(30, occurrences3.count())
 
         # the start times should all be from the timing_rule, whicih in this
@@ -223,64 +227,95 @@ class TestUtils(TestCase):
 
         # we should have 9 instead of 10 occurrences because the very last
         # one would start at 9pm and end at 9pm
-        self.assertEqual(9, generate_task_occurrences(task).count())
+        self.assertEqual(9, generate_task_occurrences(
+            task=task, timing_rule=task.timing_rule).count())
 
-    # pylint: disable=invalid-name
-    @override_settings(TASKING_BULK_CREATE_OCCURRENCES=False)
-    def test_not_bulk_generate_task_occurrences(self):
+    def test_get_occurrence_start_time(self):
         """
-        Test generate_task_occurrences works correctly when not bulk
+        Test get_occurrence_start_time
         """
-        task1 = mommy.make(
-            'tasking.Task',
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
-        )
-        task2 = mommy.make(
-            'tasking.Task',
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5000'
-        )
-
         # pylint: disable=line-too-long
-        rule1 = 'DTSTART:20180501T070000Z RRULE:FREQ=YEARLY;BYDAY=SU;BYSETPOS=1;BYMONTH=1;UNTIL=20480521T210000Z'  # noqa
-        task3 = mommy.make('tasking.Task', timing_rule=rule1)
+        rule = 'DTSTART:20180501T070000Z RRULE:FREQ=DAILY;INTERVAL=1;COUNT=500;UNTIL=20280521T210000Z'  # noqa
+        the_rrule = rrulestr(rule)
 
-        # remove any auto-generated occurrences
+        rule2 = 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
+        the_rrule2 = rrulestr(rule2)
+
+        # when start_time is not input then return start_time from timing_rule
+        self.assertEqual(
+            "07:00:00",
+            get_occurrence_start_time(
+                the_rrule, start_time_input=None).isoformat())
+
+        # if given an input, return that input
+        self.assertEqual(
+            "09:15:00",
+            get_occurrence_start_time(
+                the_rrule, start_time_input=time(9, 15, 0, 0)).isoformat())
+
+        # when timing_rule has no explicit start then we get back is right now
+        now = timezone.now().astimezone(pytz.timezone('Africa/Nairobi')).time()
+        result = get_occurrence_start_time(the_rrule2, start_time_input=None)
+
+        diff = datetime.combine(timezone.now().date(), now) -\
+            datetime.combine(timezone.now().date(), result)
+        # should be within one minutes of each other
+        self.assertTrue(diff.seconds < 60)
+
+    def test_get_occurrence_end_time(self):
+        """
+        Test get_occurrence_end_time
+        """
+        rule = 'RRULE:FREQ=DAILY;INTERVAL=1;COUNT=500;UNTIL=20280521T210000Z'
+        the_rrule = rrulestr(rule)
+        task = mommy.make('tasking.Task', timing_rule=rule)
+
+        rule2 = 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
+        the_rrule2 = rrulestr(rule2)
+
+        # when end_time is not input then return start_time from timing_rule
+        self.assertEqual(
+            "21:00:00",
+            get_occurrence_end_time(
+                task, the_rrule, end_time_input=None).isoformat())
+
+        # when end_time is input then return start_time from timing_rule
+        self.assertEqual(
+            "19:15:00",
+            get_occurrence_end_time(
+                task, the_rrule,
+                end_time_input=time(19, 15, 0, 0)).isoformat())
+
+        # return the end of the day when timing_rule has no end and end_
+        # time is not provided
+        self.assertEqual(
+            "23:59:59.999999",
+            get_occurrence_end_time(
+                task, the_rrule2, end_time_input=None).isoformat())
+
+    def test_generate_tasklocation_occurrences(self):
+        """
+        Test generate_tasklocation_occurrences
+        """
+        task = mommy.make('tasking.Task')
+        location = mommy.make('tasking.Location')
+        task_location = mommy.make(
+            'tasking.TaskLocation',
+            task=task,
+            location=location,
+            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+            start='07:00:00',
+            end='21:00:00'
+        )
+
+        # Delete any autogenerated occurrences
         # pylint: disable=no-member
         TaskOccurrence.objects.all().delete()
 
-        # we should get 5 occurrences
-        occurrences1 = generate_task_occurrences(task1)
-        self.assertEqual(5, occurrences1.count())
+        occurrences = generate_tasklocation_occurrences(task_location)
+        self.assertEqual(5, occurrences.count())
 
-        # we should get {MAX_OCCURRENCES} occurrences
-        occurrences2 = generate_task_occurrences(task2)
-        self.assertEqual(MAX_OCCURRENCES, occurrences2.count())
-
-        # the start times should all be from the timing_rule, whic in this
-        # case is the time the task was created
-        # the end_times should all be 23:59
-        for item in occurrences1:
-            self.assertEqual(
-                item.start_time.hour,
-                task1.start.astimezone(
-                    timezone.get_current_timezone()).time().hour)
-            self.assertEqual(
-                item.start_time.minute,
-                task1.start.astimezone(
-                    timezone.get_current_timezone()).time().minute)
-            self.assertEqual(item.end_time, time(23, 59, 59, 999999))
-
-        # we should have 30 occurrences
-        occurrences3 = generate_task_occurrences(task3)
-        self.assertEqual(30, occurrences3.count())
-
-        # the start times should all be from the timing_rule, whicih in this
-        # case 7am
-        # the end_times should all be 23:59:59 apart from the last one which
-        # should be from the timing rule, which in this case is 9pm
-        for item in occurrences3:
-            self.assertEqual(item.start_time, time(7, 0, 0, 0))
-            if item == occurrences3.last():
-                self.assertEqual(item.end_time, time(21, 0, 0, 0))
-            else:
-                self.assertEqual(item.end_time, time(23, 59, 59, 999999))
+        # check the start and end time
+        for occurrence in occurrences:
+            self.assertEqual('07:00:00', occurrence.start_time.isoformat())
+            self.assertEqual('21:00:00', occurrence.end_time.isoformat())

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Test for TaskSerializer
+Tests for task serializers
 """
 from __future__ import unicode_literals
 
@@ -13,7 +13,8 @@ from dateutil.rrule import rrulestr
 from model_mommy import mommy
 from tests.base import TestBase
 
-from tasking.serializers import TaskSerializer
+from tasking.models import TaskLocation
+from tasking.serializers import TaskSerializer, TaskLocationSerializer
 from tasking.utils import get_rrule_end, get_rrule_start
 
 
@@ -150,6 +151,7 @@ class TestTaskSerializer(TestBase):
             'target_id',
             'segment_rules',
             'locations',
+            'task_locations'
         ]
         self.assertEqual(set(expected_fields),
                          set(list(serializer_instance.data.keys())))
@@ -192,15 +194,93 @@ class TestTaskSerializer(TestBase):
             'target_id': mocked_target_object.id,
         }
         data_with_location = data.copy()
-        data_with_location['locations'] = [location.id]
+        locations_input = [
+            {
+                'location': location.id,
+                'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+                'start': '09:00:00',
+                'end': '15:00:00'
+            }
+        ]
+        data_with_location['locations_input'] = locations_input
 
         serializer_instance = TaskSerializer(data=data_with_location)
 
         self.assertTrue(serializer_instance.is_valid())
-
         task = serializer_instance.save()
 
+        self.assertDictContainsSubset(
+            locations_input[0], serializer_instance.data['task_locations'][0])
+
         self.assertEqual(location, task.locations.get(id=location.id))
+
+    def test_location_link_update(self):
+        """
+        Test the connection of Task and Location
+        """
+        location = mommy.make('tasking.location', name='Nairobi', country='KE')
+        location2 = mommy.make('tasking.Location')
+        mocked_target_object = mommy.make('tasking.Task')
+
+        now = timezone.now()
+
+        data = {
+            'name': 'Cow price',
+            'description': 'Some description',
+            'start': now,
+            'total_submission_target': 10,
+            'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+            'target_content_type': self.task_type.id,
+            'target_id': mocked_target_object.id,
+        }
+        data_with_location = data.copy()
+        locations_input = [
+            {
+                'location': location.id,
+                'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+                'start': '09:00:00',
+                'end': '15:00:00'
+            },
+            {
+                'location': location2.id,
+                'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=7',
+                'start': '12:00:00',
+                'end': '19:00:00'
+            }
+        ]
+        data_with_location['locations_input'] = locations_input
+        serializer_instance = TaskSerializer(data=data_with_location)
+
+        self.assertTrue(serializer_instance.is_valid())
+        task = serializer_instance.save()
+        self.assertEqual(2, TaskLocation.objects.filter(task=task).count())
+
+        # delete all locations
+        data2 = data_with_location.copy()
+        data2['locations_input'] = []
+
+        serializer_instance2 = TaskSerializer(instance=task, data=data2)
+        self.assertTrue(serializer_instance2.is_valid())
+        serializer_instance2.save()
+
+        self.assertEqual(0, TaskLocation.objects.filter(task=task).count())
+
+        # add new location
+        data3 = data_with_location.copy()
+        data3['locations_input'] = [
+            {
+                'location': location.id,
+                'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=7',
+                'start': '02:00:00',
+                'end': '09:00:00'
+            }
+        ]
+        serializer_instance3 = TaskSerializer(instance=task, data=data3)
+
+        self.assertTrue(serializer_instance3.is_valid())
+        serializer_instance3.save()
+
+        self.assertEqual(1, TaskLocation.objects.filter(task=task).count())
 
     def test_task_parent_link(self):
         """
@@ -228,3 +308,50 @@ class TestTaskSerializer(TestBase):
         task = serializer_instance.save()
 
         self.assertEqual(mocked_parent_task, task.parent)
+
+
+class TestTaskLocationSerializer(TestBase):
+    """
+    Test TaskLocationSerializer
+    """
+
+    def setUp(self):
+        """
+        Setup test
+        """
+        self.task = mommy.make('tasking.Task', name='Game Prices')
+        self.location = mommy.make('tasking.Location', name='Village Market')
+
+    def test_create_tasklocation(self):
+        """
+        Test creation of TaskLocation objects
+        """
+        rrule = 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
+
+        data = {
+            'task': self.task.id,
+            'location': self.location.id,
+            'timing_rule': rrule,
+            'start': '14:00:00',
+            'end': '21:00:00'
+        }
+
+        serializer_instance = TaskLocationSerializer(data=data)
+        self.assertTrue(serializer_instance.is_valid())
+        task_location = serializer_instance.save()
+
+        self.assertDictContainsSubset(data, serializer_instance.data)
+        self.assertEqual(self.task, task_location.task)
+        self.assertEqual(self.location, task_location.location)
+
+        expected_fields = [
+            'task',
+            'location',
+            'timing_rule',
+            'created',
+            'modified',
+            'start',
+            'end'
+        ]
+        self.assertEqual(set(expected_fields),
+                         set(list(serializer_instance.data.keys())))

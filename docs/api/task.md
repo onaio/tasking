@@ -30,8 +30,21 @@ It can take additional optional inputs in the content such as:
 - `total_submission_target`: *integer*.
 - `user_submission_target`: *integer*.
 - `segment_rules`: *list of integers*, is the unique identifier for a segment rule.
-- `locations`: *list of integers*, is the unique identifier for a location.
+- `locations`: *list of integers*, list of location ids.
+- `locations_input`: *list of dictionaries*, the list of TaskLocation objects for the task.
 - `estimated_time`: *string*, is a [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) *string*.
+
+> an example of locations_input is as follows:
+> ```python
+> locations_input = [
+>             {
+>                 'location': 14,
+>                 'timing_rule': 'RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
+>                 'start': '09:00:00',
+>                 'end': '15:00:00'
+>             }
+>         ]
+> ```
 
 ### GET /api/v1/tasks
 
