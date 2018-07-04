@@ -51,7 +51,12 @@ def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
 
 
 # pylint: disable=invalid-name
-def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
+def generate_task_occurrences(
+        task,
+        timing_rule,
+        start_time_input=None,
+        end_time_input=None,
+        OccurrenceModelClass=TaskOccurrence):
     """
     Generates TaskOccurrence objects using the Task timing_rule field
 
@@ -67,9 +72,10 @@ def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
 
     Returns a Queryset of OccurrenceModel class objects
     """
+
     # get the rrule
     try:
-        task_rrule = rrulestr(task.timing_rule)
+        the_rrule = rrulestr(timing_rule)
     except ValueError:
         # not valid rrule string
         # pylint: disable=no-member
@@ -81,28 +87,38 @@ def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
 
     # get the max occurrences we can make right now
     try:
-        occurrence_count = min(task_rrule.count(), MAX_OCCURRENCES)
+        occurrence_count = min(the_rrule.count(), MAX_OCCURRENCES)
     except ValueError:
         occurrence_count = MAX_OCCURRENCES
 
-    # the start time is always taken from the timing_rule
-    start_time = get_rrule_start(task_rrule)
-
-    # the end time from the timing_rule
-    end_time = get_rrule_end(task_rrule)
+    # the end datetime for the task
     task_end = task.end
 
-    # If timing_rule has no end but user specified the end
-    # we set end_time to the tasks_end_time
-    if end_time is None and task_end is not None:
-        end_time = task_end.time()
+    if start_time_input is None:
+        # the start time is always taken from the timing_rule
+        # if not supplied
+        start_datetime = get_rrule_start(the_rrule)
+        start_time = start_datetime.time()
+    else:
+        start_time = start_time_input
+
+    if end_time_input is None:
+        # get the end time from the timing_rule if not supplied
+        end_datetime = get_rrule_end(the_rrule)
+        if end_datetime is not None:
+            end_time = end_datetime.time()
+        # If we dont have an end_time then we set it to be the task end time
+        if end_time is None and task_end is not None:
+            end_time = task_end.time()
+    else:
+        end_time = end_time_input
 
     # if creating in bulk we'll use a list to keep track of occurrences
     if BULK_CREATE_OCCURRENCES:
         occurrence_list = []
 
     # lets loop through all datetimes in the rrule
-    for rrule_instance in task_rrule:
+    for rrule_instance in the_rrule:
 
         # if we've reached our max count or if rrule_instance is
         # greater than the task_end we then break the loop
@@ -110,23 +126,27 @@ def generate_task_occurrences(task, OccurrenceModelClass=TaskOccurrence):
          (task_end is not None and rrule_instance.date() > task_end.date()):
             break
 
-        # the end time for all but the last occurrence is the end of the day
-        # this is because we have no information about what time the task
-        # should run to on a particular day, we therefore set it to the end
-        # of the day
-        this_end_time = time(hour=23, minute=59, second=59, microsecond=999999)
+        # if end time is provided as in input use it as the_end_time
+        if end_time_input:
+            this_end_time = end_time_input
+        else:
+            # the end time for all but the last occurrence is the end of the
+            # day this is because we have no information about what time the
+            # task should run to on a particular day, we therefore set it to
+            # the end of the day
+            this_end_time = time(
+                hour=23, minute=59, second=59, microsecond=999999)
 
-        # for the last occurrence if the end time is not none we set the end
-        # date for the timing_rule this is because we believe that the task
-        # must end no later than the timing_rule dictates
-        if end_time is not None:
-            if len(occurrence_list) + 1 == occurrence_count:
-                this_end_time = end_time
+            # for the last occurrence if the end time is not none we set the
+            # end date for the timing_rule this is because we believe that
+            # the task must end no later than the timing_rule dictates
+            if end_time is not None:
+                if len(occurrence_list) + 1 == occurrence_count:
+                    this_end_time = end_time
 
-        # do nothing unless start_time != end_time
+        # do nothing unless this_end_time > start_time
         # we compare just the hour and minute values because ... well :)
-        if (start_time.hour, start_time.minute) !=\
-                (this_end_time.hour, this_end_time.minute):
+        if this_end_time > start_time:
             # define the OccurrenceModelClass object
             occurrence_obj = OccurrenceModelClass(
                 task=task,

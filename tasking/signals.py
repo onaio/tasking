@@ -19,4 +19,5 @@ def create_occurrences(sender, instance, created, **kwargs):
         # delete any existing occurrences
         instance.taskoccurrence_set.all().delete()
         # generate new occurrences
-        generate_task_occurrences(instance)
+        generate_task_occurrences(
+            task=instance, timing_rule=instance.timing_rule)

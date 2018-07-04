@@ -171,11 +171,13 @@ class TestUtils(TestCase):
         TaskOccurrence.objects.all().delete()
 
         # we should get 5 occurrences
-        occurrences1 = generate_task_occurrences(task1)
+        occurrences1 = generate_task_occurrences(
+            task=task1, timing_rule=task1.timing_rule)
         self.assertEqual(5, occurrences1.count())
 
         # we should get {MAX_OCCURRENCES} occurrences
-        occurrences2 = generate_task_occurrences(task2)
+        occurrences2 = generate_task_occurrences(
+            task=task2, timing_rule=task2.timing_rule)
         self.assertEqual(MAX_OCCURRENCES, occurrences2.count())
 
         # the start times should all be from the timing_rule, whic in this
@@ -193,7 +195,8 @@ class TestUtils(TestCase):
             self.assertEqual(item.end_time, time(23, 59, 59, 999999))
 
         # we should have 30 occurrences
-        occurrences3 = generate_task_occurrences(task3)
+        occurrences3 = generate_task_occurrences(
+            task=task3, timing_rule=task3.timing_rule)
         self.assertEqual(30, occurrences3.count())
 
         # the start times should all be from the timing_rule, whicih in this
@@ -223,7 +226,8 @@ class TestUtils(TestCase):
 
         # we should have 9 instead of 10 occurrences because the very last
         # one would start at 9pm and end at 9pm
-        self.assertEqual(9, generate_task_occurrences(task).count())
+        self.assertEqual(9, generate_task_occurrences(
+            task=task, timing_rule=task.timing_rule).count())
 
     # pylint: disable=invalid-name
     @override_settings(TASKING_BULK_CREATE_OCCURRENCES=False)
@@ -249,11 +253,13 @@ class TestUtils(TestCase):
         TaskOccurrence.objects.all().delete()
 
         # we should get 5 occurrences
-        occurrences1 = generate_task_occurrences(task1)
+        occurrences1 = generate_task_occurrences(
+            task=task1, timing_rule=task1.timing_rule)
         self.assertEqual(5, occurrences1.count())
 
         # we should get {MAX_OCCURRENCES} occurrences
-        occurrences2 = generate_task_occurrences(task2)
+        occurrences2 = generate_task_occurrences(
+            task=task2, timing_rule=task2.timing_rule)
         self.assertEqual(MAX_OCCURRENCES, occurrences2.count())
 
         # the start times should all be from the timing_rule, whic in this
@@ -271,7 +277,8 @@ class TestUtils(TestCase):
             self.assertEqual(item.end_time, time(23, 59, 59, 999999))
 
         # we should have 30 occurrences
-        occurrences3 = generate_task_occurrences(task3)
+        occurrences3 = generate_task_occurrences(
+            task=task3, timing_rule=task3.timing_rule)
         self.assertEqual(30, occurrences3.count())
 
         # the start times should all be from the timing_rule, whicih in this
