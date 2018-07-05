@@ -112,12 +112,10 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
         abstract = True
 
 
-class TaskLocation(TimeStampedModel, models.Model):
+class BaseTaskLocation(TimeStampedModel, models.Model):
     """
-    Provides extra information on Task-Location relationship
+    BaseTaskLocation abstract model class
     """
-    task = models.ForeignKey("tasking.Task", on_delete=models.CASCADE)
-    location = models.ForeignKey("tasking.Location", on_delete=models.CASCADE)
     timing_rule = models.TextField(
         verbose_name=_('Timing Rule'),
         validators=[validate_rrule],
@@ -129,8 +127,27 @@ class TaskLocation(TimeStampedModel, models.Model):
     # pylint: disable=too-few-public-methods
     class Meta(object):
         """
+        Meta options for BaseTaskLocation
+        """
+        abstract = True
+
+
+@python_2_unicode_compatible
+class TaskLocation(BaseTaskLocation):
+    """
+    Provides extra information on Task-Location relationship
+    """
+    task = models.ForeignKey("tasking.Task", on_delete=models.CASCADE)
+    location = models.ForeignKey("tasking.Location", on_delete=models.CASCADE)
+
+    # pylint: disable=no-self-use
+    # pylint: disable=too-few-public-methods
+    class Meta(object):
+        """
         Meta options for TaskLocation
         """
+        abstract = False
+        app_label = 'tasking'
         ordering = ['task', 'location', 'start']
 
     def __str__(self):
