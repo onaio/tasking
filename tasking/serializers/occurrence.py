@@ -25,6 +25,7 @@ class TaskOccurrenceSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'task',
+            'location',
             'created',
             'modified',
             'date',
