@@ -123,6 +123,33 @@ class TestTaskOccurrenceViewSet(TestBase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], occurrence.id)
 
+    def test_location_filter(self):
+        """
+        Test that you can filter by location
+        """
+        user = mommy.make('auth.User')
+        location = mommy.make('tasking.Location')
+
+        # make a bunch of occurrences
+        mommy.make('tasking.TaskOccurrence', _quantity=7)
+
+        # make one occurrence using the location
+        occurrence = mommy.make('tasking.TaskOccurrence', location=location)
+
+        # check that we have 8 occurrences
+        # pylint: disable=no-member
+        self.assertEqual(TaskOccurrence.objects.all().count(), 8)
+
+        view = TaskOccurrenceViewSet.as_view({'get': 'list'})
+
+        # test that we get occurrences for our location
+        request = self.factory.get('/occurrences', {'location': location.id})
+        force_authenticate(request, user=user)
+        response = view(request=request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], occurrence.id)
+
     def test_date_filter(self):
         """
         Test that you can filter by date

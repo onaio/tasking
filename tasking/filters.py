@@ -29,6 +29,7 @@ class TaskOccurrenceFilterSet(filters.FilterSet):
         model = TaskOccurrence
         fields = {
             'task': ['exact'],
+            'location': ['exact'],
             'date': DATETIME_LOOKUPS,
             'start_time': TIME_LOOKUPS,
             'end_time': TIME_LOOKUPS

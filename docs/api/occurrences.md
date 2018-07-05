@@ -9,6 +9,7 @@ A read only endpoint that gives **when** a task is taking place.
 
 You can filter by fields:
  - task
+ - location
  - date
  - start_time
  - end_time
@@ -52,8 +53,9 @@ This request returns a response containing a specific task occurrence.
 
 ```json
 {
-    "id": 24,
-    "task": 1,
+    "id": 247,
+    "task": 24,
+    "location": 12,
     "date": "2018-05-23T14:48:42.169151+03:00",
     "start_time": "2018-05-24T07:00:00.169151+03:00",
     "end_time": "2018-05-23T14:30:00.169151+03:00",
@@ -75,6 +77,7 @@ curl https://example.com/api/v1/occurrences?start_time__gte=17:00:00
     {
         "id": 24,
         "task": 1,
+        "location": 7,
         "date": "2018-05-23T14:48:42.169151+03:00",
         "start_time": "2018-05-24T17:00:00.169151+03:00",
         "end_time": "2018-05-23T23:30:00.169151+03:00",
@@ -85,6 +88,7 @@ curl https://example.com/api/v1/occurrences?start_time__gte=17:00:00
     {
         "id": 24,
         "task": 1,
+        "location": 7,
         "date": "2018-05-23T14:48:42.169151+03:00",
         "start_time": "2018-05-24T19:00:00.169151+03:00",
         "end_time": "2018-05-23T19:30:00.169151+03:00",
@@ -95,6 +99,7 @@ curl https://example.com/api/v1/occurrences?start_time__gte=17:00:00
     {
         "id": 24,
         "task": 1,
+        "location": 7,
         "date": "2018-05-23T14:48:42.169151+03:00",
         "start_time": "2018-05-24T20:00:00.169151+03:00",
         "end_time": "2018-05-23T23:30:00.169151+03:00",
@@ -117,6 +122,7 @@ curl https://example.com/api/v1/occurrences?date__year__gte=2017
     {
         "id": 24,
         "task": 1,
+        "location": 7,
         "date": "2018-05-23T14:48:42.169151+03:00",
         "start_time": "2018-05-24T07:00:00.169151+03:00",
         "end_time": "2017-05-23T14:30:00.169151+03:00",
@@ -127,6 +133,7 @@ curl https://example.com/api/v1/occurrences?date__year__gte=2017
     {
         "id": 25,
         "task": 1,
+        "location": 7,
         "date": "2018-05-23T14:48:42.169151+03:00",
         "start_time": "2018-05-24T07:00:00.169151+03:00",
         "end_time": "2017-05-23T14:30:00.169151+03:00",
@@ -137,6 +144,7 @@ curl https://example.com/api/v1/occurrences?date__year__gte=2017
     {
         "id": 27,
         "task": 1,
+        "location": 7,
         "date": "2018-05-23T14:48:42.169151+03:00",
         "start_time": "2018-05-24T07:00:00.169151+03:00",
         "end_time": "2018-05-23T14:30:00.169151+03:00",
