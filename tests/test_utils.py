@@ -266,7 +266,8 @@ class TestUtils(TestCase):
         """
         Test get_occurrence_end_time
         """
-        rule = 'RRULE:FREQ=DAILY;INTERVAL=1;COUNT=500;UNTIL=20280521T210000Z'
+        # pylint: disable=line-too-long
+        rule = 'DTSTART:20180501T070000Z RRULE:FREQ=DAILY;INTERVAL=1;COUNT=500;UNTIL=20280521T210000Z'  # noqa
         the_rrule = rrulestr(rule)
         task = mommy.make('tasking.Task', timing_rule=rule)
 
