@@ -21,13 +21,27 @@ class TestOccurrence(TestCase):
         """
         Test __str__ method of TaskOccurrence model
         """
+        # without location
         item = mommy.make(
             'tasking.TaskOccurrence',
             date=datetime.date(2018, 5, 24),
             start_time=datetime.time(7, 0, tzinfo=pytz.utc),
             end_time=datetime.time(14, 30, tzinfo=pytz.utc)
         )
-        expected = '{} - 24th May 2018, 7 a.m. to 2:30 p.m.'.format(item.task)
+        expected = '{} - 24th May 2018, 7 a.m. to 2:30 p.m.'.format(
+            item.task.name)
+        self.assertEqual(expected, item.__str__())
+
+        # with location
+        item = mommy.make(
+            'tasking.TaskOccurrence',
+            location=mommy.make('tasking.Location'),
+            date=datetime.date(2018, 5, 24),
+            start_time=datetime.time(7, 0, tzinfo=pytz.utc),
+            end_time=datetime.time(14, 30, tzinfo=pytz.utc)
+        )
+        expected = '{} at {} - 24th May 2018, 7 a.m. to 2:30 p.m.'.format(
+            item.task.name, item.location.name)
         self.assertEqual(expected, item.__str__())
 
     def test_task_occurrence_timestring(self):
