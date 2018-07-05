@@ -131,6 +131,7 @@ class TaskLocation(TimeStampedModel, models.Model):
         """
         Meta options for TaskLocation
         """
+        app_label = 'tasking'
         ordering = ['task', 'location', 'start']
 
     def __str__(self):
