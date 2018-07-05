@@ -41,7 +41,15 @@ class TaskOccurrence(BaseOccurrence):
     """
     task = models.ForeignKey(
         'tasking.Task',
-        verbose_name=_('Task Occurrence'),
+        verbose_name=_('Task'),
+        on_delete=models.CASCADE
+    )
+    location = models.ForeignKey(
+        'tasking.Location',
+        verbose_name=_('Location'),
+        null=True,
+        default=None,
+        blank=True,
         on_delete=models.CASCADE
     )
 
@@ -52,13 +60,16 @@ class TaskOccurrence(BaseOccurrence):
         """
         abstract = False
         app_label = 'tasking'
-        ordering = ['task', 'date', 'start_time']
+        ordering = ['task', 'location', 'date', 'start_time']
 
     def __str__(self):
         """
         Returns string representation of the object
         """
-        return '{} - {}'.format(self.task, self.get_timestring())
+        if self.location:
+            return _('{} at {} - {}'.format(
+                self.task.name, self.location.name, self.get_timestring()))
+        return '{} - {}'.format(self.task.name, self.get_timestring())
 
     def get_timestring(self):
         """
