@@ -181,7 +181,8 @@ def generate_task_occurrences(
     return OccurrenceModelClass.objects.filter(task=task)
 
 
-def generate_tasklocation_occurrences(task_location):
+def generate_tasklocation_occurrences(
+        task_location, OccurrenceModelClass=TaskOccurrence):
     """
     Generates TaskOccurrence objects using the TaskLocation timing_rule field
 
@@ -199,7 +200,7 @@ def generate_tasklocation_occurrences(task_location):
         timing_rule=task_location.timing_rule,
         start_time_input=task_location.start,
         end_time_input=task_location.end,
-        OccurrenceModelClass=TaskOccurrence)
+        OccurrenceModelClass=OccurrenceModelClass)
 
 
 def get_rrule_start(rrule_obj):
