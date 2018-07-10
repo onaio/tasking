@@ -67,6 +67,7 @@ def get_occurrence_end_time(task, the_rrule, end_time_input=None):
     """
     Get the end time used to create a task occurrence
     """
+    end_time = None
     if end_time_input is None:
         # get the end time from the timing_rule if not supplied
         end_datetime = get_rrule_end(the_rrule)
