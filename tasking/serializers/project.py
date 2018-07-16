@@ -15,7 +15,7 @@ class ProjectSerializer(GenericForeignKeySerializer):
     Project serializer class
     """
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for ProjectSerializer
         """

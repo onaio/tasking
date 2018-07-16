@@ -24,7 +24,7 @@ class BaseProject(GenericFKModel, TimeStampedModel, models.Model):
         help_text=_('This is the name of the Project'))
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         The meta option class for BaseProject
         """
@@ -44,7 +44,7 @@ class Project(BaseProject):
         help_text=_('This represents the Task.'))
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         This is the meta options class for the Project model
         """

@@ -22,7 +22,7 @@ class TaskOccurrenceFilterSet(filters.FilterSet):
     """
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskOccurrenceFilterSet
         """
@@ -57,7 +57,7 @@ class TaskFilterSet(filters.FilterSet):
     )
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskFilterSet
         """

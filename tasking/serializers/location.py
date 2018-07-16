@@ -7,7 +7,8 @@ from __future__ import unicode_literals
 import zipfile
 
 from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.geos import Point, MultiPolygon
+from django.contrib.gis.geos import MultiPolygon, Point
+from django.utils import six
 
 from backports.tempfile import TemporaryDirectory
 from django_countries import Countries
@@ -84,11 +85,20 @@ class GeopointField(GeometryField):
         """
         geopoint = value
         if geopoint is not None:
-            geopoint_split = geopoint.split(',')
-            lon = int(geopoint_split[0])
-            lat = int(geopoint_split[1])
+            if isinstance(geopoint, six.text_type):
+                geopoint_split = geopoint.split(',')
+                lon = float(geopoint_split[0])
+                lat = float(geopoint_split[1])
 
-        return Point(lon, lat)
+                return Point(lon, lat)
+
+            if isinstance(geopoint, list):
+                lon = float(geopoint[0])
+                lat = float(geopoint[1])
+
+                return Point(lon, lat)
+
+        return super(GeopointField, self).to_internal_value(value)
 
     def to_representation(self, value):
         """
@@ -127,9 +137,14 @@ class LocationSerializer(serializers.ModelSerializer):
         """
         Custom Validation for Location Serializer
         """
-        geopoint = attrs.get('geopoint')
-        radius = attrs.get('radius')
-        shapefile = attrs.get('shapefile')
+        if self.instance:
+            geopoint = attrs.get('geopoint', self.instance.geopoint)
+            radius = attrs.get('radius', self.instance.radius)
+            shapefile = attrs.get('shapefile', self.instance.shapefile)
+        else:
+            geopoint = attrs.get('geopoint')
+            radius = attrs.get('radius')
+            shapefile = attrs.get('shapefile')
 
         if geopoint is not None:
             if shapefile is not None:
@@ -153,7 +168,7 @@ class LocationSerializer(serializers.ModelSerializer):
         return super(LocationSerializer, self).validate(attrs)
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for LocationSerializer
         """

@@ -58,7 +58,7 @@ class BaseSegmentRule(TimeStampedModel, models.Model):
     active = models.BooleanField()
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for BaseSegmentRule
         """
@@ -72,7 +72,7 @@ class SegmentRule(BaseSegmentRule):
     """
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for SegmentRule
         """

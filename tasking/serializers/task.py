@@ -8,7 +8,7 @@ from dateutil.rrule import rrulestr
 from rest_framework import serializers
 
 from tasking.common_tags import (INVALID_END_DATE, INVALID_START_DATE,
-                                 INVALID_TIMING_RULE)
+                                 INVALID_TIMING_RULE, MISSING_START_DATE)
 from tasking.models import Task, TaskLocation
 from tasking.serializers.base import GenericForeignKeySerializer
 from tasking.utils import get_rrule_end, get_rrule_start
@@ -21,9 +21,7 @@ def check_timing_rule(value):
     """
     if validate_rrule(value) is True:
         return value
-    raise serializers.ValidationError(
-        {'timing_rule': INVALID_TIMING_RULE}
-    )
+    raise serializers.ValidationError(INVALID_TIMING_RULE)
 
 
 class TaskLocationSerializer(serializers.ModelSerializer):
@@ -32,7 +30,7 @@ class TaskLocationSerializer(serializers.ModelSerializer):
     """
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskLocationSerializer
         """
@@ -62,7 +60,7 @@ class TaskLocationCreateSerializer(TaskLocationSerializer):
     """
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskLocationSerializer
         """
@@ -93,7 +91,7 @@ class TaskSerializer(GenericForeignKeySerializer):
     task_locations = serializers.SerializerMethodField(read_only=True)
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskSerializer
         """
@@ -133,29 +131,68 @@ class TaskSerializer(GenericForeignKeySerializer):
         """
         Object level validation method for TaskSerializer
         """
-        # if timing_rule is provided, we extract start and end from its value
-        if self.instance is not None:
-            # we are doing an update
-            timing_rule = attrs.get('timing_rule', self.instance.timing_rule)
-        else:
-            # we are creating a new object
+        if not self.instance:
+            # this is a new object
+
+            # get start from input
+            start_from_input = attrs.get('start')
+
+            # get timing rules from task locations
+            tasklocation_timing_rules = []
+            for location_input in attrs.get('locations_input', []):
+                tasklocation_timing_rules.append(location_input['timing_rule'])
+
+            # get start and end from timing rules
             timing_rule = attrs.get('timing_rule')
+            if timing_rule is not None:
+                timing_rule_start = get_rrule_start(rrulestr(timing_rule))
+                timing_rule_end = get_rrule_end(rrulestr(timing_rule))
+            else:
+                timing_rule_start = None
+                timing_rule_end = None
 
-        if timing_rule is not None:
-            # get start and end values from timing_rule
-            attrs['start'] = get_rrule_start(rrulestr(timing_rule))
-            attrs['end'] = get_rrule_end(rrulestr(timing_rule))
+            if not start_from_input:
+                # start was not input by user, we try and generate it from
+                # timing rules
+                if not timing_rule_start:
+                    # we cannot determine a start time
+                    raise serializers.ValidationError(
+                        {
+                            'timing_rule': MISSING_START_DATE,
+                            'start': MISSING_START_DATE
+                        }
+                    )
 
-        end_date = attrs.get('end')
-        start_date = attrs.get('start')
+                attrs['start'] = timing_rule_start
+
+            # get end
+            attrs['end'] = attrs.get('end', timing_rule_end)
 
         # If end date is present we validate that it is greater than start_date
-        if end_date is not None:
+        if attrs.get('end') is not None:
             # If end date is lesser than the start date raise an error
-            if end_date < start_date:
+            the_start = attrs.get('start')
+            if the_start is None and self.instance is not None:
+                the_start = self.instance.start
+
+            if not the_start:
                 raise serializers.ValidationError(
-                    {'end': INVALID_END_DATE, 'start': INVALID_START_DATE}
+                    {'start': INVALID_START_DATE}
                 )
+
+            if attrs['end'] < the_start:
+                raise serializers.ValidationError(
+                    {'end': INVALID_END_DATE}
+                )
+
+        # If start date is present and this is an existing object, we validate
+        # that the start date is not greater than the existing end date
+        if attrs.get('start') is not None and self.instance is not None\
+                and self.instance.end is not None and attrs.get('start') >\
+                self.instance.end:
+            raise serializers.ValidationError(
+                {'start': INVALID_START_DATE}
+            )
 
         return super(TaskSerializer, self).validate(attrs)
 

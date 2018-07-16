@@ -21,7 +21,7 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
     """
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for SegmentRuleSerializer
         """
