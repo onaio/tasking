@@ -105,7 +105,7 @@ class BaseTask(MPTTModel, GenericFKModel, TimeStampedModel, models.Model):
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         This is the meta options class for BaseTask
         """
@@ -125,7 +125,7 @@ class BaseTaskLocation(TimeStampedModel, models.Model):
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for BaseTaskLocation
         """
@@ -142,7 +142,7 @@ class TaskLocation(BaseTaskLocation):
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskLocation
         """
@@ -182,7 +182,7 @@ class Task(BaseTask):
 
     # pylint: disable=no-self-use
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         This is the meta options class for the Task model
         """

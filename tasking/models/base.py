@@ -23,7 +23,7 @@ class GeoTimeStampedModel(geomodels.Model):
         auto_now=True)
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for GeoTimeStampedModel
         """
@@ -42,7 +42,7 @@ class TimeStampedModel(models.Model):
         auto_now=True)
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TimeStampedModel
         """
@@ -70,7 +70,7 @@ class GenericFKModel(models.Model):
         'target_content_type', 'target_object_id')
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for GenericFKModel
         """

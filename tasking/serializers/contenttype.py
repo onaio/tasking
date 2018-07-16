@@ -15,7 +15,7 @@ class ContentTypeSerializer(serializers.ModelSerializer):
     """
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta Options for ContentTypeSerializer
         """

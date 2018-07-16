@@ -30,7 +30,7 @@ class TaskLocationSerializer(serializers.ModelSerializer):
     """
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskLocationSerializer
         """
@@ -60,7 +60,7 @@ class TaskLocationCreateSerializer(TaskLocationSerializer):
     """
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskLocationSerializer
         """
@@ -91,7 +91,7 @@ class TaskSerializer(GenericForeignKeySerializer):
     task_locations = serializers.SerializerMethodField(read_only=True)
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for TaskSerializer
         """

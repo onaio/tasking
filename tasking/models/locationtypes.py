@@ -24,7 +24,7 @@ class BaseLocationType(TimeStampedModel, models.Model):
         help_text=_('This is the name of the Location Type'))
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         The meta option class for BaseLocationType
         """
@@ -37,7 +37,7 @@ class LocationType(BaseLocationType):
     LocationType model class
     """
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         This is the meta options class for the LocationType model
         """

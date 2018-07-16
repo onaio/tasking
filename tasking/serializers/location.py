@@ -168,7 +168,7 @@ class LocationSerializer(serializers.ModelSerializer):
         return super(LocationSerializer, self).validate(attrs)
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta options for LocationSerializer
         """

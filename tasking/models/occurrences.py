@@ -27,7 +27,7 @@ class BaseOccurrence(TimeStampedModel, models.Model):
     )
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta for BaseOccurrence
         """
@@ -54,7 +54,7 @@ class TaskOccurrence(BaseOccurrence):
     )
 
     # pylint: disable=too-few-public-methods
-    class Meta(object):
+    class Meta:
         """
         Meta for TaskOccurrence
         """
