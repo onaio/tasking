@@ -18,7 +18,7 @@ setup(
         'python-dateutil',
         'djangorestframework',  # Adds Serializers and API support
         'markdown',  # adds markdown support for browsable REST API
-        'django-filter',  # for filtering in the API
+        'django-filter < 2',  # for filtering in the API
         'djangorestframework-gis',  # for location model
         'django_countries',  # for location model
         'django-mptt',  # For MPTT
