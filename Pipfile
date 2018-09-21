@@ -20,3 +20,4 @@ tblib = "*"
 
 [packages]
 "e1839a8" = {editable = true, path = "."}
+future = "*"

@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 import zipfile
 
+from builtins import bytes  # pylint: disable=redefined-builtin
+from io import BytesIO
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
 from django.utils import six
@@ -30,9 +32,17 @@ class ShapeFileField(GeometryField):
         """
         Custom Conversion for shapefile field
         """
+        if isinstance(value, dict):
+            # if given a raw binary data buffer i.e an ArrayBuffer,
+            # store the binary data in value
+            # The values dict should be an ordered dict
+            value = BytesIO(bytes(value.values()))
+
         multipolygon = value
 
         if multipolygon is not None:
+            # open zipfile given : path to a file (a string),
+            # a file-like object or a path-like object
             try:
                 zip_file = zipfile.ZipFile(value.temporary_file_path())
             except AttributeError:
