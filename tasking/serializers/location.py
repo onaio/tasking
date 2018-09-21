@@ -5,7 +5,6 @@ Location Serializers
 from __future__ import unicode_literals
 
 import zipfile
-import six
 
 from builtins import bytes
 from io import BytesIO

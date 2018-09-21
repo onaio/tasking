@@ -326,7 +326,7 @@ class TestLocationSerializer(TestCase):
         shapefile_keys_list = shapefile.keys()
         sorted_key_list = ['{}'.format(y) for y in
                            sorted([int(x) for x in shapefile_keys_list])]
-        shapefile_tuples_list= [(x, shapefile[x]) for x in sorted_key_list]
+        shapefile_tuples_list = [(x, shapefile[x]) for x in sorted_key_list]
         shapefile_ordered_dict = OrderedDict(shapefile_tuples_list)
 
         data = OrderedDict(
