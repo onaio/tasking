@@ -14,7 +14,7 @@ setup(
     url='https://github.com/onaio/tasking',
     packages=find_packages(exclude=['docs', 'tests']),
     install_requires=[
-        'Django >= 1.11',
+        'Django >= 1.11, < 2.1',
         'python-dateutil',
         'djangorestframework',  # Adds Serializers and API support
         'markdown',  # adds markdown support for browsable REST API
