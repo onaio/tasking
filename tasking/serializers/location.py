@@ -5,6 +5,7 @@ Location Serializers
 from __future__ import unicode_literals
 
 import zipfile
+import six
 
 from builtins import bytes
 from io import BytesIO
@@ -35,6 +36,7 @@ class ShapeFileField(GeometryField):
         if isinstance(value, dict):
             # if given a raw binary data buffer i.e an ArrayBuffer,
             # store the binary data in value
+            # The values dict should be an ordered dict
             value = BytesIO(bytes(value.values()))
 
         multipolygon = value

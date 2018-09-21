@@ -322,10 +322,17 @@ class TestLocationSerializer(TestCase):
                      '680': 3, '681': 0, '682': 3, '683': 0, '684': 8,
                      '685': 1, '686': 0, '687': 0, '688': 152, '689': 1,
                      '690': 0, '691': 0, '692': 0, '693': 0}
+
+        shapefile_keys_list = shapefile.keys()
+        sorted_key_list = ['{}'.format(y) for y in
+                           sorted([int(x) for x in shapefile_keys_list])]
+        shapefile_tuples_list= [(x, shapefile[x]) for x in sorted_key_list]
+        shapefile_ordered_dict = OrderedDict(shapefile_tuples_list)
+
         data = OrderedDict(
                 name='Nairobi',
                 country='KE',
-                shapefile=shapefile
+                shapefile=shapefile_ordered_dict
             )
         serializer_instance = LocationSerializer(data=data)
         self.assertTrue(serializer_instance.is_valid())
