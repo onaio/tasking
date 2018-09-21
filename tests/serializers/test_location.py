@@ -329,9 +329,9 @@ class TestLocationSerializer(TestCase):
             )
         serializer_instance = LocationSerializer(data=data)
         self.assertTrue(serializer_instance.is_valid())
-        self.assertEqual(
-            type(serializer_instance.data['shapefile']), GeoJsonDict)
         location = serializer_instance.save()
         self.assertEqual('Nairobi', location.name)
         self.assertEqual('KE', location.country)
         self.assertEqual('Kenya - Nairobi', six.text_type(location))
+        self.assertEqual(
+            type(serializer_instance.data['shapefile']), GeoJsonDict)
