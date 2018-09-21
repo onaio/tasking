@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 import zipfile
 
-from builtins import bytes
+from builtins import bytes  # pylint: disable=redefined-builtin
 from io import BytesIO
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
