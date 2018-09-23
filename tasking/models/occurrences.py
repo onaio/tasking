@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
 """
 Occurrence models module
 """
-from __future__ import unicode_literals
-
 from django.db import models
 from django.utils.dateformat import DateFormat
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
 from tasking.models.base import TimeStampedModel
@@ -34,7 +30,6 @@ class BaseOccurrence(TimeStampedModel, models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class TaskOccurrence(BaseOccurrence):
     """
     TaskOccurrence model class
@@ -67,9 +62,9 @@ class TaskOccurrence(BaseOccurrence):
         Returns string representation of the object
         """
         if self.location:
-            return _('{} at {} - {}'.format(
-                self.task.name, self.location.name, self.get_timestring()))
-        return '{} - {}'.format(self.task.name, self.get_timestring())
+            return _(f'{self.task.name} at {self.location.name} '
+                     f'- {self.get_timestring()}')
+        return f'{self.task.name} - {self.get_timestring()}'
 
     def get_timestring(self):
         """
@@ -78,12 +73,8 @@ class TaskOccurrence(BaseOccurrence):
 
         e.g. 24th May 2018, 7 a.m. to 2:30 p.m.
         """
-        date_format_obj = DateFormat(self.date)
-        start_format_obj = DateFormat(self.start_time)
-        end_format_obj = DateFormat(self.end_time)
+        date = DateFormat(self.date).format('jS F Y')
+        start = DateFormat(self.start_time).format('P')
+        end = DateFormat(self.end_time).format('P')
 
-        return '{date}, {start} to {end}'.format(
-            date=date_format_obj.format('jS F Y'),
-            start=start_format_obj.format('P'),
-            end=end_format_obj.format('P')
-        )
+        return f'{date}, {start} to {end}'

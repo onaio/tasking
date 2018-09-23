@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Test for ContentTypeSerializer
 """
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
@@ -32,6 +29,7 @@ class TestContentTypeSerializer(TestCase):
 
         self.assertEqual(set(expected_fields),
                          set(list(serializer_data.keys())))
-        self.assertEqual(mocked_contenttype.app_label, serializer_data['app_label'])
+        self.assertEqual(
+            mocked_contenttype.app_label, serializer_data['app_label'])
         self.assertEqual(mocked_contenttype.model, serializer_data['model'])
         self.assertEqual(mocked_contenttype.id, serializer_data['id'])

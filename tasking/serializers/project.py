@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Project Serializers
 """
-
-from __future__ import unicode_literals
-
 from tasking.models import Project
 
 from tasking.serializers.base import GenericForeignKeySerializer

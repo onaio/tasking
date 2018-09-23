@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 Module for the Location model(s)
 """
-from __future__ import unicode_literals
-
 from django_countries.fields import CountryField
 from mptt.models import MPTTModel, TreeForeignKey
 
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext as _
-from django.utils.encoding import python_2_unicode_compatible
 from tasking.models.base import GeoTimeStampedModel
 
 
@@ -78,7 +74,6 @@ class BaseLocation(MPTTModel, GeoTimeStampedModel, models.Model):
         order_insertion_by = ['id']
 
 
-@python_2_unicode_compatible
 class Location(BaseLocation):
     """
     Location model class
@@ -111,9 +106,6 @@ class Location(BaseLocation):
         e.g. Kenya - Nairobi
         """
         if self.country.name != '':
-            return "{country} - {name}".format(
-                country=self.country.name,
-                name=self.name)
+            return f'{self.country.name} - {self.name}'
         else:
-            return "{name}".format(
-                name=self.name)
+            return f'{self.name}'

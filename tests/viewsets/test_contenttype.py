@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tests ContentType viewsets.
 """
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.models import ContentType
 
 from model_mommy import mommy
@@ -35,6 +32,7 @@ class TestContentTypeViewSet(TestBase):
         response = view(request=request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), get_allowed_contenttypes().count())
+        self.assertEqual(
+            len(response.data), get_allowed_contenttypes().count())
         self.assertTrue(
             ContentType.objects.filter(pk=response.data[1]['id']).exists())

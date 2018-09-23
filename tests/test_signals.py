@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tests for tasking signals
 """
-from __future__ import unicode_literals
-
 from django.db.models.signals import post_save
 from django.test import TestCase
 

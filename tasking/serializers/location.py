@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
 """
 Location Serializers
 """
-from __future__ import unicode_literals
-
 import zipfile
 from io import BytesIO
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
-from django.utils import six
 
-from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 from django_countries import Countries
 from future.builtins import bytes  # pylint: disable=redefined-builtin
 from rest_framework import serializers
@@ -58,6 +54,7 @@ class ShapeFileField(GeometryField):
                 raise serializers.ValidationError(exp.message)
 
             # Setup a Temporary Directory to store Shapefiles
+            # TODO: Remove TemporaryDirectory : If not need in Python3
             with TemporaryDirectory() as temp_dir:
                 tpath = temp_dir
 
@@ -65,7 +62,7 @@ class ShapeFileField(GeometryField):
                 zip_file.extractall(tpath)
 
                 # concatenate Shapefile path
-                shp_path = "{tpath}/{shp}".format(tpath=tpath, shp=shpfile)
+                shp_path = f'{tpath}/{shpfile}'
 
                 # Make the shapefile a DataSource
                 data_source = DataSource(shp_path)
@@ -102,7 +99,7 @@ class GeopointField(GeometryField):
         """
         geopoint = value
         if geopoint is not None:
-            if isinstance(geopoint, six.text_type):
+            if isinstance(geopoint, str):
                 geopoint_split = geopoint.split(',')
                 lon = float(geopoint_split[0])
                 lat = float(geopoint_split[1])

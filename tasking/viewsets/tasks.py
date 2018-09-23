@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Task viewsets
 """
-from __future__ import unicode_literals
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.permissions import IsAuthenticated

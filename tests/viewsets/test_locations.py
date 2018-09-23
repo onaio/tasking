@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
 """
 Tests Location viewsets.
 """
-from __future__ import unicode_literals
-
 import os
-
-from django.utils import six
 
 import pytz
 from model_mommy import mommy
@@ -104,7 +99,7 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('radius', response.data.keys())
         self.assertEqual(RADIUS_MISSING,
-                         six.text_type(response.data['radius'][0]))
+                         str(response.data['radius'][0]))
 
         data_missing_geopoint = {
             'name': 'Montreal',
@@ -120,7 +115,7 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(response1.status_code, 400)
         self.assertIn('geopoint', response1.data.keys())
         self.assertEqual(GEOPOINT_MISSING,
-                         six.text_type(response1.data['geopoint'][0]))
+                         str(response1.data['geopoint'][0]))
 
         path = os.path.join(
             BASE_DIR, 'fixtures', 'test_shapefile.zip')
@@ -142,7 +137,7 @@ class TestLocationViewSet(TestBase):
             self.assertEqual(response2.status_code, 400)
             self.assertIn('shapefile', response2.data.keys())
             self.assertEqual(GEODETAILS_ONLY,
-                             six.text_type(response2.data['shapefile'][0]))
+                             str(response2.data['shapefile'][0]))
 
     def test_delete_location(self):
         """
@@ -155,7 +150,7 @@ class TestLocationViewSet(TestBase):
         self.assertTrue(Location.objects.filter(pk=location.id).exists())
         # delete location
         view = LocationViewSet.as_view({'delete': 'destroy'})
-        request = self.factory.delete('/locations/{id}'.format(id=location.id))
+        request = self.factory.delete(f'/locations/{location.id}')
         force_authenticate(request, user=user)
         response = view(request=request, pk=location.id)
         # assert that location was deleted
@@ -168,12 +163,12 @@ class TestLocationViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         location_data = self._create_location()
+        location_id = location_data['id']
 
         view = LocationViewSet.as_view({'get': 'retrieve'})
-        request = self.factory.get(
-            '/locations/{id}'.format(id=location_data['id']))
+        request = self.factory.get(f'/locations/{location_id}')
         force_authenticate(request, user=user)
-        response = view(request=request, pk=location_data['id'])
+        response = view(request=request, pk=location_id)
 
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.data, location_data)
@@ -200,6 +195,7 @@ class TestLocationViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         location_data = self._create_location()
+        location_id = location_data['id']
 
         data = {
             'name': 'Arusha',
@@ -208,9 +204,9 @@ class TestLocationViewSet(TestBase):
 
         view = LocationViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/locations/{id}'.format(id=location_data['id']), data=data)
+            f'/locations/{location_id}', data=data)
         force_authenticate(request, user=user)
-        response = view(request=request, pk=location_data['id'])
+        response = view(request=request, pk=location_id)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual('Arusha', response.data['name'])
@@ -408,7 +404,9 @@ class TestLocationViewSet(TestBase):
         Test that authentication is required for all viewset actions
         """
         location_data = self._create_location()
+        location_id = location_data['id']
         location1_data = self._create_location()
+        location1_id = location1_data['id']
         location = mommy.make('tasking.Location')
 
         # test that you need authentication for creating a location
@@ -424,18 +422,17 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response.data['detail']))
+            str(response.data['detail']))
 
         # test that you need authentication for retrieving a location
         view1 = LocationViewSet.as_view({'get': 'retrieve'})
-        request1 = self.factory.get(
-            '/locations/{id}'.format(id=location_data['id']))
-        response1 = view1(request=request1, pk=location_data['id'])
+        request1 = self.factory.get(f'/locations/{location_id}')
+        response1 = view1(request=request1, pk=location_id)
 
         self.assertEqual(response1.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response1.data['detail']))
+            str(response1.data['detail']))
 
         # test that you need authentication for listing a task
         view2 = LocationViewSet.as_view({'get': 'list'})
@@ -445,21 +442,20 @@ class TestLocationViewSet(TestBase):
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response2.data['detail']))
+            str(response2.data['detail']))
 
         # test that you need authentication for deleting a task
         # assert that location exists
         self.assertTrue(Location.objects.filter(pk=location.id).exists())
 
         view3 = LocationViewSet.as_view({'delete': 'destroy'})
-        request3 = self.factory.delete(
-            '/locations/{id}'.format(id=location.id))
+        request3 = self.factory.delete(f'/locations/{location.id}')
         response3 = view3(request=request3, pk=location.id)
 
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response3.data['detail']))
+            str(response3.data['detail']))
 
         # test that you need authentication for updating a task
         data2 = {
@@ -469,10 +465,10 @@ class TestLocationViewSet(TestBase):
 
         view4 = LocationViewSet.as_view({'patch': 'partial_update'})
         request4 = self.factory.patch(
-            '/locations/{id}'.format(id=location1_data['id']), data=data2)
-        response4 = view4(request=request4, pk=location1_data['id'])
+            f'/locations/{location1_id}', data=data2)
+        response4 = view4(request=request4, pk=location1_id)
 
         self.assertEqual(response4.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response4.data['detail']))
+            str(response4.data['detail']))

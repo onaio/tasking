@@ -2,8 +2,6 @@
 """
 Utility functions for tasking
 """
-from __future__ import unicode_literals
-
 import operator
 from datetime import time
 from functools import reduce

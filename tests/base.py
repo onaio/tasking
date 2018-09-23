@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Base Tasking test classes
 """
-from __future__ import unicode_literals
 
 from django.test import TestCase
 

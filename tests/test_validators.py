@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tests for tasking validators
 """
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
 from tasking.validators import validate_rrule

@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
 """
 Tests Task viewsets.
 """
-from __future__ import unicode_literals
-
 from datetime import timedelta
 
-from django.utils import six, timezone
+from django.utils import timezone
 
-import pytz
 import json
+import pytz
 from dateutil.parser import parse
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -160,7 +157,7 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(response1.status_code, 400)
         self.assertIn('target_id', response1.data.keys())
         self.assertEqual(TARGET_DOES_NOT_EXIST,
-                         six.text_type(response1.data['target_id'][0]))
+                         str(response1.data['target_id'][0]))
 
         # test bad content type validation
         bad_content_type = dict(
@@ -184,7 +181,7 @@ class TestTaskViewSet(TestBase):
         self.assertIn('target_content_type', response2.data.keys())
         self.assertEqual(
             'Invalid pk "999" - object does not exist.',
-            six.text_type(response2.data['target_content_type'][0]))
+            str(response2.data['target_content_type'][0]))
 
     def test_delete_task(self):
         """
@@ -197,7 +194,7 @@ class TestTaskViewSet(TestBase):
         self.assertTrue(Task.objects.filter(pk=task.id).exists())
         # delete task
         view = TaskViewSet.as_view({'delete': 'destroy'})
-        request = self.factory.delete('/tasks/{id}'.format(id=task.id))
+        request = self.factory.delete(f'/tasks/{task.id}')
         force_authenticate(request, user=user)
         response = view(request=request, pk=task.id)
         # assert that task was deleted
@@ -210,10 +207,12 @@ class TestTaskViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         task_data = self._create_task()
+        task_id = task_data['id']
+
         view = TaskViewSet.as_view({'get': 'retrieve'})
-        request = self.factory.get('/tasks/{id}'.format(id=task_data['id']))
+        request = self.factory.get(f'/tasks/{task_id}')
         force_authenticate(request, user=user)
-        response = view(request=request, pk=task_data['id'])
+        response = view(request=request, pk=task_id)
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.data, task_data)
 
@@ -238,7 +237,9 @@ class TestTaskViewSet(TestBase):
         user = mommy.make('auth.User')
         user2 = mommy.make('auth.User')
         task_data = self._create_task()
+        task_id = task_data['id']
         task_data2 = self._create_task()
+        task2_id = task_data2['id']
 
         data = {
             'name': "Milk Price",
@@ -248,9 +249,9 @@ class TestTaskViewSet(TestBase):
 
         view = TaskViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/tasks/{id}'.format(id=task_data['id']), data=data)
+            f'/tasks/{task_id}', data=data)
         force_authenticate(request, user=user)
-        response = view(request=request, pk=task_data['id'])
+        response = view(request=request, pk=task_id)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual('Milk Price', response.data['name'])
@@ -266,9 +267,9 @@ class TestTaskViewSet(TestBase):
 
         view2 = TaskViewSet.as_view({'patch': 'partial_update'})
         request2 = self.factory.patch(
-            '/tasks/{id}'.format(id=task_data2['id']), data=data2)
+            f'/tasks/{task2_id}', data=data2)
         force_authenticate(request2, user=user2)
-        response2 = view2(request=request2, pk=task_data2['id'])
+        response2 = view2(request=request2, pk=task2_id)
 
         self.assertEqual(response2.status_code, 200)
         self.assertEqual('Cattle Price', response2.data['name'])
@@ -283,6 +284,7 @@ class TestTaskViewSet(TestBase):
         """
         mocked_target_object = mommy.make('tasking.Task')
         task_data = self._create_task()
+        task_id = task_data['id']
         task = mommy.make('tasking.Task')
         user = mommy.make('auth.User')
 
@@ -302,16 +304,16 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response.data['detail']))
+            str(response.data['detail']))
 
         # test that you need authentication for retrieving a task
         view2 = TaskViewSet.as_view({'get': 'retrieve'})
-        request2 = self.factory.get('/tasks/{id}'.format(id=task_data['id']))
-        response2 = view2(request=request2, pk=task_data['id'])
+        request2 = self.factory.get(f'/tasks/{task_id}')
+        response2 = view2(request=request2, pk=task_id)
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response2.data['detail']))
+            str(response2.data['detail']))
 
         # test that you need authentication for listing a task
         view3 = TaskViewSet.as_view({'get': 'list'})
@@ -320,19 +322,19 @@ class TestTaskViewSet(TestBase):
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response3.data['detail']))
+            str(response3.data['detail']))
 
         # test that you need authentication for deleting a task
         self.assertTrue(Task.objects.filter(pk=task.id).exists())
 
         view4 = TaskViewSet.as_view({'delete': 'destroy'})
-        request4 = self.factory.delete('/tasks/{id}'.format(id=task.id))
+        request4 = self.factory.delete(f'/tasks/{task.id}')
         response4 = view4(request=request4, pk=task.id)
 
         self.assertEqual(response4.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response4.data['detail']))
+            str(response4.data['detail']))
 
         # test that you need authentication for updating a task
         data = {
@@ -343,13 +345,13 @@ class TestTaskViewSet(TestBase):
 
         view5 = TaskViewSet.as_view({'patch': 'partial_update'})
         request5 = self.factory.patch(
-            '/tasks/{id}'.format(id=task_data['id']), data=data)
-        response5 = view5(request=request5, pk=task_data['id'])
+            f'/tasks/{task_id}', data=data)
+        response5 = view5(request=request5, pk=task_id)
 
         self.assertEqual(response5.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response5.data['detail']))
+            str(response5.data['detail']))
 
     def test_location_filter(self):
         """
@@ -640,23 +642,23 @@ class TestTaskViewSet(TestBase):
         Test that you can search filter and order at the same time
         """
         user = mommy.make('auth.User')
+        name = 'Cattle Price'
 
         task = mommy.make(
-            'tasking.Task', name='Cattle Price', status=Task.ACTIVE)
+            'tasking.Task', name=name, status=Task.ACTIVE)
         task2 = mommy.make(
-            'tasking.Task', name='Cattle Price', status=Task.ACTIVE)
+            'tasking.Task', name=name, status=Task.ACTIVE)
 
-        mommy.make('tasking.Task', name='Cattle Price', status=Task.DRAFT)
+        mommy.make('tasking.Task', name=name, status=Task.DRAFT)
 
         for _ in range(0, 4):
             mommy.make(
-                'tasking.Task', name='Cattle Price', status=Task.DEACTIVATED)
+                'tasking.Task', name=name, status=Task.DEACTIVATED)
 
         view = TaskViewSet.as_view({'get': 'list'})
 
         request = self.factory.get(
-            '/tasks?search={name}&status={status}&ordering={order}'.format(
-                name='Cattle Price', status=Task.ACTIVE, order='created'))
+            f'/tasks?search={name}&status={Task.ACTIVE}&ordering=created')
         force_authenticate(request, user=user)
 
         response = view(request=request)

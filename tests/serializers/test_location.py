@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 Tests for LocationSerializer
 """
-from __future__ import unicode_literals
-
 import os
 
 from collections import OrderedDict
 
 from django.test import TestCase
-from django.utils import six
 
 from rest_framework.exceptions import ValidationError
 from rest_framework_gis.fields import GeoJsonDict
@@ -46,7 +42,7 @@ class TestLocationSerializer(TestCase):
 
         self.assertEqual('Nairobi', location.name)
         self.assertEqual('KE', location.country)
-        self.assertEqual('Kenya - Nairobi', six.text_type(location))
+        self.assertEqual('Kenya - Nairobi', str(location))
 
         expected_fields = [
             'id',
@@ -106,19 +102,19 @@ class TestLocationSerializer(TestCase):
             LocationSerializer().validate(missing_radius)
 
         radius_error_detail = missing_radius_cm.exception.detail['radius']
-        self.assertEqual(RADIUS_MISSING, six.text_type(radius_error_detail))
+        self.assertEqual(RADIUS_MISSING, str(radius_error_detail))
 
         with self.assertRaises(ValidationError) as missing_geopoint_cm:
             LocationSerializer().validate(missing_geopoint)
 
         geopnt_error_detail = missing_geopoint_cm.exception.detail['geopoint']
-        self.assertEqual(GEOPOINT_MISSING, six.text_type(geopnt_error_detail))
+        self.assertEqual(GEOPOINT_MISSING, str(geopnt_error_detail))
 
         with self.assertRaises(ValidationError) as shapefile_radius_cm:
             LocationSerializer().validate(shapefile_radius)
 
         shape_error_detail = shapefile_radius_cm.exception.detail['shapefile']
-        self.assertEqual(GEODETAILS_ONLY, six.text_type(shape_error_detail))
+        self.assertEqual(GEODETAILS_ONLY, str(shape_error_detail))
 
     def test_location_serializer_validate_shapefile(self):
         """
