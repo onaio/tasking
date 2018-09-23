@@ -6,7 +6,7 @@ name = "pypi"
 [dev-packages]
 "flake8" = "*"
 pylint = "*"
-pycodestyle = "*"
+pycodestyle = "==2.3.1"
 coverage = "*"
 tox = "*"
 yapf = "*"
@@ -20,6 +20,4 @@ tblib = "*"
 mock = "*"
 
 [packages]
-e1839a8 = {editable = true,path = "."}
-future = "*"
-ona-tasking = {editable = true,path = "."}
+"e1839a8" = {editable = true, path = "."}

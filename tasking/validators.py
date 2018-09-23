@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tasking validators
 """
-from __future__ import unicode_literals
-
 from dateutil.rrule import rrulestr
 
 

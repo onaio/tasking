@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
-Main init file for tasking app
+Module containing the Filters for tasking app
 """
-from __future__ import unicode_literals
-
 from django_filters import rest_framework as filters
 
 from tasking.models import Task, TaskOccurrence

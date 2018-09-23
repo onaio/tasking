@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
 """
 Test for SegmentRuleSerializer
 """
-from __future__ import unicode_literals
-
 from collections import OrderedDict
-
-from django.utils import six
 
 from tests.base import TestBase
 
@@ -92,5 +87,5 @@ class TestSegmentRuleSerializer(TestBase):
         self.assertFalse(instance.is_valid())
         self.assertEqual(
             "Task has no field named 'invalid_field'",
-            six.text_type(instance.errors['target_field'][0])
+            str(instance.errors['target_field'][0])
         )

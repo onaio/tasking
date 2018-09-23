@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Test for Occurrence model
 """
-from __future__ import unicode_literals
-
 import datetime
 
 from django.test import TestCase
@@ -28,8 +25,7 @@ class TestOccurrence(TestCase):
             start_time=datetime.time(7, 0, tzinfo=pytz.utc),
             end_time=datetime.time(14, 30, tzinfo=pytz.utc)
         )
-        expected = '{} - 24th May 2018, 7 a.m. to 2:30 p.m.'.format(
-            item.task.name)
+        expected = f'{item.task.name} - 24th May 2018, 7 a.m. to 2:30 p.m.'
         self.assertEqual(expected, item.__str__())
 
         # with location
@@ -40,8 +36,8 @@ class TestOccurrence(TestCase):
             start_time=datetime.time(7, 0, tzinfo=pytz.utc),
             end_time=datetime.time(14, 30, tzinfo=pytz.utc)
         )
-        expected = '{} at {} - 24th May 2018, 7 a.m. to 2:30 p.m.'.format(
-            item.task.name, item.location.name)
+        expected = f'{item.task.name} at {item.location.name}'\
+                   ' - 24th May 2018, 7 a.m. to 2:30 p.m.'
         self.assertEqual(expected, item.__str__())
 
     def test_task_occurrence_timestring(self):

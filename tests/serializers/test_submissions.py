@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Test for SubmissionSerializer
 """
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 
 from django.contrib.auth import get_user_model
@@ -13,8 +10,8 @@ import pytz
 from model_mommy import mommy
 from tests.base import TestBase
 
-from tasking.serializers import SubmissionSerializer
 from tasking.models import Submission
+from tasking.serializers import SubmissionSerializer
 
 USER = get_user_model()
 

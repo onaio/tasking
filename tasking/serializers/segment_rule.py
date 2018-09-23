@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
 """
 SegmentRule Serializers
 """
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
-from django.utils import six
 
 from rest_framework.serializers import ValidationError
 
@@ -66,7 +62,7 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
             target_model._meta.get_field(target_field)
         except FieldDoesNotExist as exception:
             raise ValidationError({
-                'target_field': six.text_type(exception)
+                'target_field': str(exception)
             })
 
         return super(SegmentRuleSerializer, self).validate(attrs)

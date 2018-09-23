@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Settings for tests
 """
-from __future__ import unicode_literals
-
 
 INSTALLED_APPS = (
     # core django apps

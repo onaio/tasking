@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Signals for tasking
 
 These signals are not connected by default, you will have to connect them
 'manually' in your own code
 """
-from __future__ import unicode_literals
-
 from tasking.utils import generate_task_occurrences
 
 

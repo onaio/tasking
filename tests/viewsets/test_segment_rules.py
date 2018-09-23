@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tests SegmentRule viewsets.
 """
-from __future__ import unicode_literals
-
-from django.utils import six
-
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
@@ -82,7 +77,7 @@ class TestSegmentRuleViewSet(TestBase):
         self.assertIn('target_content_type', response.data.keys())
         self.assertEqual(
             'Invalid pk "999" - object does not exist.',
-            six.text_type(response.data['target_content_type'][0]))
+            str(response.data['target_content_type'][0]))
 
     def test_delete_segment_rule(self):
         """
@@ -98,7 +93,7 @@ class TestSegmentRuleViewSet(TestBase):
         # delete segment rule
         view = SegmentRuleViewSet.as_view({'delete': 'destroy'})
         request = self.factory.delete(
-            '/segment-rules/{id}'.format(id=segment_rule.id))
+            f'/segment-rules/{segment_rule.id}')
         force_authenticate(request, user=user)
         response = view(request=request, pk=segment_rule.id)
         # assert that segment rule was deleted
@@ -112,11 +107,13 @@ class TestSegmentRuleViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         segment_rule_data = self._create_segment_rule()
+        segment_rule_id = segment_rule_data['id']
+
         view = SegmentRuleViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get(
-            '/segment-rules/{id}'.format(id=segment_rule_data['id']))
+            f'/segment-rules/{segment_rule_id}')
         force_authenticate(request, user=user)
-        response = view(request=request, pk=segment_rule_data['id'])
+        response = view(request=request, pk=segment_rule_id)
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.data, segment_rule_data)
 
@@ -140,6 +137,7 @@ class TestSegmentRuleViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         segment_rule_data = self._create_segment_rule()
+        segment_rule_id = segment_rule_data['id']
 
         data = {
             'name': 'Rule One',
@@ -152,9 +150,9 @@ class TestSegmentRuleViewSet(TestBase):
 
         view = SegmentRuleViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/segment-rules/{id}'.format(id=segment_rule_data['id']), data=data)
+            f'/segment-rules/{segment_rule_id}', data=data)
         force_authenticate(request, user=user)
-        response = view(request=request, pk=segment_rule_data['id'])
+        response = view(request=request, pk=segment_rule_id)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual('Rule One', response.data['name'])
@@ -171,6 +169,7 @@ class TestSegmentRuleViewSet(TestBase):
         Test that authentication is required for all viewset actions
         """
         segment_rule_data = self._create_segment_rule()
+        segment_rule_id = segment_rule_data['id']
         segment_rule = mommy.make('tasking.SegmentRule')
 
         # test that you need authentication for creating a segment rule
@@ -188,17 +187,17 @@ class TestSegmentRuleViewSet(TestBase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response.data['detail']))
+            str(response.data['detail']))
 
         # test that you need authentication for retrieving a segment rule
         view2 = SegmentRuleViewSet.as_view({'get': 'retrieve'})
         request2 = self.factory.get(
-            '/segment-rules/{id}'.format(id=segment_rule_data['id']))
-        response2 = view2(request=request2, pk=segment_rule_data['id'])
+            f'/segment-rules/{segment_rule_id}')
+        response2 = view2(request=request2, pk=segment_rule_id)
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response2.data['detail']))
+            str(response2.data['detail']))
 
         # test that you need authentication for listing a segment rule
         view3 = SegmentRuleViewSet.as_view({'get': 'list'})
@@ -207,7 +206,7 @@ class TestSegmentRuleViewSet(TestBase):
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response3.data['detail']))
+            str(response3.data['detail']))
 
         # test that you need authentication for deleting a segment rule
         # pylint: disable=no-member
@@ -216,13 +215,13 @@ class TestSegmentRuleViewSet(TestBase):
 
         view4 = SegmentRuleViewSet.as_view({'delete': 'destroy'})
         request4 = self.factory.delete(
-            '/segment-rules/{id}'.format(id=segment_rule.id))
+            f'/segment-rules/{segment_rule.id}')
         response4 = view4(request=request4, pk=segment_rule.id)
 
         self.assertEqual(response4.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response4.data['detail']))
+            str(response4.data['detail']))
 
         # test that you need authentication for updating a segment rule
         data = {
@@ -230,10 +229,10 @@ class TestSegmentRuleViewSet(TestBase):
         }
         view5 = SegmentRuleViewSet.as_view({'patch': 'partial_update'})
         request5 = self.factory.patch(
-            '/segment-rules/{id}'.format(id=segment_rule_data['id']), data=data)
-        response5 = view5(request=request5, pk=segment_rule_data['id'])
+            f'/segment-rules/{segment_rule_id}', data=data)
+        response5 = view5(request=request5, pk=segment_rule_id)
 
         self.assertEqual(response5.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response5.data['detail']))
+            str(response5.data['detail']))

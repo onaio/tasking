@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Test for ContentTypeSerializer
 """
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 

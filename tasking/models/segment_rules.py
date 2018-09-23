@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
 """
 Module for SegmentRule model(s)
 """
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
 from tasking.models.base import TimeStampedModel
@@ -65,7 +61,6 @@ class BaseSegmentRule(TimeStampedModel, models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class SegmentRule(BaseSegmentRule):
     """
     SegmentRule model class
