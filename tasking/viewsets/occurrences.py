@@ -18,7 +18,7 @@ class TaskOccurrenceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TaskOccurrenceSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
-    filter_class = TaskOccurrenceFilterSet
+    filterset_class = TaskOccurrenceFilterSet
     ordering_fields = [
         'created',
         'date',

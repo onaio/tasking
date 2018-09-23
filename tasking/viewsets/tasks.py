@@ -23,7 +23,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         DjangoFilterBackend,
         filters.OrderingFilter,
         filters.SearchFilter]
-    filter_class = TaskFilterSet
+    filterset_class = TaskFilterSet
     search_fields = ['name', ]
     ordering_fields = [
         'created',

@@ -22,7 +22,7 @@ class ProjectViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         DjangoFilterBackend,
         filters.SearchFilter,
         filters.OrderingFilter]
-    filter_fields = ['tasks']
+    filterset_fields = ['tasks']
     search_fields = ['name', ]
     ordering_fields = ['name', 'created']
     queryset = Project.objects.all()  # pylint: disable=no-member

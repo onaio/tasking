@@ -20,7 +20,7 @@ class SubmissionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter, filters.SearchFilter,
                        DjangoFilterBackend]
-    filter_fields = [
+    filterset_fields = [
         'location',
         'task',
         'valid',
