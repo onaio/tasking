@@ -54,7 +54,6 @@ class ShapeFileField(GeometryField):
                 raise serializers.ValidationError(exp.message)
 
             # Setup a Temporary Directory to store Shapefiles
-            # TODO: Remove TemporaryDirectory : If not need in Python3
             with TemporaryDirectory() as temp_dir:
                 tpath = temp_dir
 
