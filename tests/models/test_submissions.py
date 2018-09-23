@@ -21,7 +21,7 @@ class TestSubmission(TestCase):
         submission = mommy.make(
             'tasking.Submission',
             task=cattle,
-            _fill_optional=['user', 'comment', 'submission_time'])
+            _fill_optional=['user', 'comments', 'submission_time'])
         expected = f'Cattle Price - {submission.task.id}'\
                    f' submission {submission.id}'
         self.assertEqual(expected, str(submission))

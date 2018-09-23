@@ -290,7 +290,7 @@ def get_shapefile(geofile):
 
     if settings.TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR:
         # Check if zipfile has more than 3 files
-        if len(name_list) > 3:
+        if len(name_list) > 3:  # pylint: disable=no-else-raise
             # Raise UnnecessaryFiles Exception if files exceed 3
             raise UnnecessaryFiles()
         # Check if zipfile has less than the 3 required files

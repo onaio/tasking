@@ -695,8 +695,9 @@ class TestTaskViewSet(TestBase):
         view = TaskViewSet.as_view({'get': 'list'})
 
         # test that we get the task with our unique date
-        request = self.factory.get('/tasks',
-                                   {'date': '2017-09-09'})
+        request = self.factory.get(
+            '/tasks',
+            {'date__exact': '2017-09-09'})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
@@ -711,8 +712,9 @@ class TestTaskViewSet(TestBase):
             date='2018-11-11')
 
         # test that we can get tasks before or after a certain date
-        request2 = self.factory.get('/tasks',
-                                    {'date__gt': '2018-07-13', 'xxx': 23})
+        request2 = self.factory.get(
+            '/tasks',
+            {'date__gt': '2018-07-13', 'xxx': 23})
         force_authenticate(request2, user=user)
         response2 = view(request=request2)
         self.assertEqual(response2.status_code, 200)

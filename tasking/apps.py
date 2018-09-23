@@ -18,6 +18,7 @@ class TaskingConfig(AppConfig):
         Do stuff when the app is ready
         """
         # set up app settings
+        # pylint: disable=import-outside-toplevel
         from django.conf import settings
         import tasking.settings as defaults
         for name in dir(defaults):
