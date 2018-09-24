@@ -695,8 +695,9 @@ class TestTaskViewSet(TestBase):
         view = TaskViewSet.as_view({'get': 'list'})
 
         # test that we get the task with our unique date
-        request = self.factory.get('/tasks',
-                                   {'date': '2017-09-09'})
+        request = self.factory.get(
+            '/tasks',
+            {'date': '2017-09-09', 'date_lookup': 'exact'})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
@@ -711,8 +712,9 @@ class TestTaskViewSet(TestBase):
             date='2018-11-11')
 
         # test that we can get tasks before or after a certain date
-        request2 = self.factory.get('/tasks',
-                                    {'date__gt': '2018-07-13', 'xxx': 23})
+        request2 = self.factory.get(
+            '/tasks',
+            {'date': '2018-07-13', 'xxx': 23, 'date_lookup': 'gt'})
         force_authenticate(request2, user=user)
         response2 = view(request=request2)
         self.assertEqual(response2.status_code, 200)
@@ -745,7 +747,7 @@ class TestTaskViewSet(TestBase):
 
         # test that we can get tasks before or after a certain time
         request2 = self.factory.get(
-            '/tasks', {'start_time__gte': '09:15'})
+            '/tasks', {'start_time': '09:15', 'start_time_lookup': 'gte'})
         force_authenticate(request2, user=user)
         response2 = view(request=request2)
         self.assertEqual(response2.status_code, 200)
@@ -754,7 +756,7 @@ class TestTaskViewSet(TestBase):
 
         # check that we can get tasks before a certain time
         request3 = self.factory.get(
-            '/tasks', {'start_time__lt': '09:15'})
+            '/tasks', {'start_time': '09:15', 'start_time_lookup': 'lt'})
         force_authenticate(request3, user=user)
         response3 = view(request=request3)
         self.assertEqual(response3.status_code, 200)
@@ -781,7 +783,7 @@ class TestTaskViewSet(TestBase):
 
         # test that we can get tasks before or after a certain time
         request2 = self.factory.get(
-            '/tasks', {'end_time__gte': '21:15'})
+            '/tasks', {'end_time': '21:15', 'end_time_lookup': 'gte'})
         force_authenticate(request2, user=user)
         response2 = view(request=request2)
         self.assertEqual(response2.status_code, 200)
@@ -790,7 +792,7 @@ class TestTaskViewSet(TestBase):
 
         # check that we can get tasks before a certain time
         request3 = self.factory.get(
-            '/tasks', {'end_time__lt': '21:15'})
+            '/tasks', {'end_time': '21:15', 'end_time_lookup': 'lt'})
         force_authenticate(request3, user=user)
         response3 = view(request=request3)
         self.assertEqual(response3.status_code, 200)

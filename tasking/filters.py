@@ -1,6 +1,8 @@
 """
 Module containing the Filters for tasking app
 """
+from django import forms
+
 from django_filters import rest_framework as filters
 
 from tasking.models import Task, TaskOccurrence
@@ -37,21 +39,21 @@ class TaskFilterSet(filters.FilterSet):
     """
     Filterset for Task
     """
-    date = filters.DateFilter(
-        name='date',
-        lookup_expr=DATETIME_LOOKUPS,
-        method='filter_timing'
-    )
-    start_time = filters.TimeFilter(
-        name='start_time',
-        lookup_expr=TIME_LOOKUPS,
-        method='filter_timing'
-    )
-    end_time = filters.TimeFilter(
-        name='end_time',
-        lookup_expr=TIME_LOOKUPS,
-        method='filter_timing'
-    )
+    date = filters.LookupChoiceFilter(
+        field_name='date',
+        field_class=forms.DateField,
+        lookup_choices=DATETIME_LOOKUPS,
+        method='filter_timing')
+    start_time = filters.LookupChoiceFilter(
+        field_name='start_time',
+        field_class=forms.TimeField,
+        lookup_choices=TIME_LOOKUPS,
+        method='filter_timing')
+    end_time = filters.LookupChoiceFilter(
+        field_name='end_time',
+        field_class=forms.TimeField,
+        lookup_choices=TIME_LOOKUPS,
+        method='filter_timing')
 
     # pylint: disable=too-few-public-methods
     class Meta:
@@ -60,12 +62,7 @@ class TaskFilterSet(filters.FilterSet):
         """
         model = Task
         fields = [
-            'locations',
-            'status',
-            'project',
-            'parent',
-            'date',
-            'start_time',
+            'locations', 'status', 'project', 'parent', 'date', 'start_time',
             'end_time'
         ]
 
@@ -75,27 +72,10 @@ class TaskFilterSet(filters.FilterSet):
         Method to filter against task timing using TaskOccurrences
         """
 
-        # get the filter
-        try:
-            the_filter = self.get_filters()[name]
-        except KeyError:
-            # this name isn't a valid filter
-            return queryset
-
         # first try the exact name
         data = self.data.get(name)
-        if data is not None:
-            query_name = name
-        else:
-            # get the lookups
-            lookups = the_filter.lookup_expr
-            # loop through lookups to find which one is being used
-            if lookups:
-                for lookup in lookups:
-                    query_name = self.get_filter_name(name, lookup)
-                    data = self.data.get(query_name)
-                    if data is not None:
-                        break
+        lookup = self.data.get(f'{name}_lookup')
+        query_name = f'{name}__{lookup}'
 
         if data is None:
             # no data was found
@@ -104,6 +84,6 @@ class TaskFilterSet(filters.FilterSet):
         filter_args = {query_name: data}
         # get task ids
         # pylint: disable=no-member
-        task_ids = TaskOccurrence.objects.filter(
-            **filter_args).values_list('task_id', flat=True).distinct()
+        task_ids = TaskOccurrence.objects.filter(**filter_args).values_list(
+            'task_id', flat=True).distinct()
         return queryset.filter(id__in=task_ids)
