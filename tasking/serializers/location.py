@@ -51,6 +51,7 @@ class ShapeFileField(GeometryField):
             # Call get_shapefile method to get the .shp files name
             try:
                 shpfile = get_shapefile(zip_file)
+            # pylint: disable=no-member
             except Exception as e:
                 raise serializers.ValidationError(e.message)
 
