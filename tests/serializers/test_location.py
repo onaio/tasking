@@ -18,6 +18,10 @@ from model_mommy import mommy
 from tasking.serializers import LocationSerializer
 from tasking.common_tags import RADIUS_MISSING, GEOPOINT_MISSING
 from tasking.common_tags import GEODETAILS_ONLY
+from tasking.exceptions import (MissingFiles,
+                                ShapeFileNotFound,
+                                UnnecessaryFiles)
+from rest_framework.exceptions import ErrorDetail
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -342,3 +346,64 @@ class TestLocationSerializer(TestCase):
         self.assertEqual('Kenya - Nairobi', six.text_type(location))
         self.assertEqual(
             type(serializer_instance.data['shapefile']), GeoJsonDict)
+
+    def test_bad_shapefile_data(self):
+        """
+        Test upload of a bad shapefile returns an error message
+        - missing files
+        - shapefile not found
+        - unnecessary files
+        """
+        # test missing files
+        missing_files_path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_missing_files.zip')
+
+        with open(missing_files_path, 'r+b') as shapefile:
+            data = OrderedDict(
+                name='Nairobi',
+                country='KE',
+                shapefile=shapefile
+            )
+            serializer_instance = LocationSerializer(data=data)
+
+            self.assertFalse(serializer_instance.is_valid())
+            self.assertEqual(
+                serializer_instance.errors,
+                {"shapefile": [ErrorDetail(string=MissingFiles().message,
+                                           code="invalid")]})
+
+        # test shapefile not found
+        shapefile_not_found_files_path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_shapefile_not_found.zip')
+
+        with open(shapefile_not_found_files_path, 'r+b') as shapefile:
+            data = OrderedDict(
+                name='Nairobi',
+                country='KE',
+                shapefile=shapefile
+            )
+            serializer_instance = LocationSerializer(data=data)
+
+            self.assertFalse(serializer_instance.is_valid())
+            self.assertEqual(
+                serializer_instance.errors,
+                {"shapefile": [ErrorDetail(string=ShapeFileNotFound().message,
+                                           code="invalid")]})
+
+        # test unnecessary files
+        unnecessary_files_path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_unnecessary_files.zip')
+
+        with open(unnecessary_files_path, 'r+b') as shapefile:
+            data = OrderedDict(
+                name='Nairobi',
+                country='KE',
+                shapefile=shapefile
+            )
+            serializer_instance = LocationSerializer(data=data)
+
+            self.assertFalse(serializer_instance.is_valid())
+            self.assertEqual(
+                serializer_instance.errors,
+                {"shapefile": [ErrorDetail(string=UnnecessaryFiles().message,
+                                           code="invalid")]})
