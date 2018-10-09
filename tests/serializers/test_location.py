@@ -349,7 +349,7 @@ class TestLocationSerializer(TestCase):
 
     def test_bad_shapefile_data(self):
         """
-        Test upload of a bad shapefile returns an error message
+        Test upload of a bad shapefile returns relevant error message
         - missing files
         - shapefile not found
         - unnecessary files
