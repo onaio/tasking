@@ -47,8 +47,12 @@ class ShapeFileField(GeometryField):
                 zip_file = zipfile.ZipFile(value.temporary_file_path())
             except AttributeError:
                 zip_file = zipfile.ZipFile(value)
+
             # Call get_shapefile method to get the .shp files name
-            shpfile = get_shapefile(zip_file)
+            try:
+                shpfile = get_shapefile(zip_file)
+            except Exception as e:
+                raise serializers.ValidationError(e.message)
 
             # Setup a Temporary Directory to store Shapefiles
             with TemporaryDirectory() as temp_dir:
