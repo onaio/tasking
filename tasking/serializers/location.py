@@ -19,6 +19,8 @@ from rest_framework_gis.serializers import GeometryField
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
                                  RADIUS_MISSING)
+from tasking.exceptions import (UnnecessaryFiles, MissingFiles,
+                                ShapeFileNotFound)
 from tasking.models import Location
 from tasking.utils import get_shapefile
 
@@ -51,9 +53,9 @@ class ShapeFileField(GeometryField):
             # Call get_shapefile method to get the .shp files name
             try:
                 shpfile = get_shapefile(zip_file)
-            except Exception as exception:
+            except (ShapeFileNotFound, MissingFiles, UnnecessaryFiles) as exp:
                 # pylint: disable=no-member
-                raise serializers.ValidationError(exception.message)
+                raise serializers.ValidationError(exp.message)
 
             # Setup a Temporary Directory to store Shapefiles
             with TemporaryDirectory() as temp_dir:
