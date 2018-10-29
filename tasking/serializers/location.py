@@ -5,22 +5,22 @@ Location Serializers
 from __future__ import unicode_literals
 
 import zipfile
-
-from builtins import bytes  # pylint: disable=redefined-builtin
 from io import BytesIO
+
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
 from django.utils import six
 
 from backports.tempfile import TemporaryDirectory
 from django_countries import Countries
+from future.builtins import bytes  # pylint: disable=redefined-builtin
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometryField
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
                                  RADIUS_MISSING)
-from tasking.exceptions import (UnnecessaryFiles, MissingFiles,
-                                ShapeFileNotFound)
+from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
+                                UnnecessaryFiles)
 from tasking.models import Location
 from tasking.utils import get_shapefile
 
