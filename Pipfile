@@ -14,8 +14,6 @@ isort = "*"
 ipdb = "*"
 model-mommy = "*"
 "psycopg2-binary" = "*"
-"pep8" = "*"
-"autopep8" = "*"
 tblib = "*"
 
 [packages]
