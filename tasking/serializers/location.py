@@ -9,7 +9,6 @@ from django.contrib.gis.geos import MultiPolygon, Point
 
 from tempfile import TemporaryDirectory
 from django_countries import Countries
-from future.builtins import bytes  # pylint: disable=redefined-builtin
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometryField
 
