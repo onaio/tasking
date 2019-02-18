@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import zipfile
 from io import BytesIO
+from os import path
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
@@ -65,7 +66,7 @@ class ShapeFileField(GeometryField):
                 zip_file.extractall(tpath)
 
                 # concatenate Shapefile path
-                shp_path = "{tpath}/{shp}".format(tpath=tpath, shp=shpfile)
+                shp_path = path.join(tpath, shpfile)
 
                 # Make the shapefile a DataSource
                 data_source = DataSource(shp_path)
