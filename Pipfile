@@ -17,6 +17,7 @@ model-mommy = "*"
 "pep8" = "*"
 "autopep8" = "*"
 tblib = "*"
+mock = "*"
 
 [packages]
 "e1839a8" = {path = ".", editable = true}
