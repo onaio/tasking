@@ -27,7 +27,7 @@ from tasking.models import Location
 from tasking.utils import get_shapefile
 
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class ShapeFileField(GeometryField):
@@ -35,7 +35,7 @@ class ShapeFileField(GeometryField):
     Custom Field for Shapefile
     """
 
-    def to_internal_value(self, value):
+    def to_internal_value(self, value):  # pylint: disable=too-many-locals
         """
         Custom Conversion for shapefile field
         """
@@ -85,9 +85,9 @@ class ShapeFileField(GeometryField):
 
                 try:
                     multipolygon = MultiPolygon(polygons)
-                except TypeError as e:
+                except TypeError as exc:
                     # this shapefile is just not valid for some reason
-                    logger.exception(e)
+                    LOGGER.exception(exc)
                     raise serializers.ValidationError(INVALID_SHAPEFILE)
 
         return multipolygon
