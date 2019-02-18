@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import zipfile
 from io import BytesIO
 from os import path
+import logging
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
@@ -19,11 +20,14 @@ from rest_framework import serializers
 from rest_framework_gis.serializers import GeometryField
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
-                                 RADIUS_MISSING)
+                                 RADIUS_MISSING, INVALID_SHAPEFILE)
 from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
                                 UnnecessaryFiles)
 from tasking.models import Location
 from tasking.utils import get_shapefile
+
+
+logger = logging.getLogger(__name__)
 
 
 class ShapeFileField(GeometryField):
@@ -79,7 +83,12 @@ class ShapeFileField(GeometryField):
                 for polygon in polygon_data:
                     polygons.append(polygon.geos)
 
-                multipolygon = MultiPolygon(polygons)
+                try:
+                    multipolygon = MultiPolygon(polygons)
+                except TypeError as e:
+                    # this shapefile is just not valid for some reason
+                    logger.exception(e)
+                    raise serializers.ValidationError(INVALID_SHAPEFILE)
 
         return multipolygon
 
