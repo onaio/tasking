@@ -14,7 +14,7 @@ setup(
     url='https://github.com/onaio/tasking',
     packages=find_packages(exclude=['docs', 'tests']),
     install_requires=[
-        'Django >= 1.11, < 2.1',
+        'Django >= 1.11.19, < 2.1',
         'python-dateutil',
         'markdown',  # adds markdown support for browsable REST API
         'django-filter < 2',  # for filtering in the API

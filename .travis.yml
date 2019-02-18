@@ -13,12 +13,10 @@ matrix:
           env: TOXENV=flake8
         - python: 3.6
           env: TOXENV=pylint
-        - python: 3.6
-          env: TOXENV=coverage
 services:
     - postgresql
 addons:
-    postgresql: 9.6
+    postgresql: "9.6"
     apt:
         packages:
             - postgresql-9.6-postgis-2.3
@@ -30,5 +28,4 @@ install:
     - pip install tox
 script: tox
 notifications:
-    slack:
-        - onaio:snkNXgprD498qQv4DgRREKJF
+    slack: onaio:snkNXgprD498qQv4DgRREKJF

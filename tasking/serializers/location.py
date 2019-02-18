@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 import zipfile
 from io import BytesIO
+from os import path
+import logging
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
@@ -18,11 +20,14 @@ from rest_framework import serializers
 from rest_framework_gis.serializers import GeometryField
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
-                                 RADIUS_MISSING)
+                                 RADIUS_MISSING, INVALID_SHAPEFILE)
 from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
                                 UnnecessaryFiles)
 from tasking.models import Location
 from tasking.utils import get_shapefile
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class ShapeFileField(GeometryField):
@@ -30,7 +35,7 @@ class ShapeFileField(GeometryField):
     Custom Field for Shapefile
     """
 
-    def to_internal_value(self, value):
+    def to_internal_value(self, value):  # pylint: disable=too-many-locals
         """
         Custom Conversion for shapefile field
         """
@@ -65,7 +70,7 @@ class ShapeFileField(GeometryField):
                 zip_file.extractall(tpath)
 
                 # concatenate Shapefile path
-                shp_path = "{tpath}/{shp}".format(tpath=tpath, shp=shpfile)
+                shp_path = path.join(tpath, shpfile)
 
                 # Make the shapefile a DataSource
                 data_source = DataSource(shp_path)
@@ -78,7 +83,12 @@ class ShapeFileField(GeometryField):
                 for polygon in polygon_data:
                     polygons.append(polygon.geos)
 
-                multipolygon = MultiPolygon(polygons)
+                try:
+                    multipolygon = MultiPolygon(polygons)
+                except TypeError as exc:
+                    # this shapefile is just not valid for some reason
+                    LOGGER.exception(exc)
+                    raise serializers.ValidationError(INVALID_SHAPEFILE)
 
         return multipolygon
 

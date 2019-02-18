@@ -5,23 +5,25 @@ Tests for LocationSerializer
 from __future__ import unicode_literals
 
 import os
-
 from collections import OrderedDict
 
 from django.test import TestCase
 from django.utils import six
-
-from rest_framework.exceptions import ValidationError
-from rest_framework_gis.fields import GeoJsonDict
 from model_mommy import mommy
+from rest_framework.exceptions import ErrorDetail, ValidationError
+from rest_framework_gis.fields import GeoJsonDict
 
+from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
+                                 RADIUS_MISSING)
+from tasking.exceptions import (InvalidShapeFile, MissingFiles,
+                                ShapeFileNotFound, UnnecessaryFiles)
 from tasking.serializers import LocationSerializer
-from tasking.common_tags import RADIUS_MISSING, GEOPOINT_MISSING
-from tasking.common_tags import GEODETAILS_ONLY
-from tasking.exceptions import (MissingFiles,
-                                ShapeFileNotFound,
-                                UnnecessaryFiles)
-from rest_framework.exceptions import ErrorDetail
+
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -406,4 +408,29 @@ class TestLocationSerializer(TestCase):
             self.assertEqual(
                 serializer_instance.errors,
                 {"shapefile": [ErrorDetail(string=UnnecessaryFiles().message,
+                                           code="invalid")]})
+
+    @patch('tasking.serializers.location.MultiPolygon')
+    def test_invalid_shapefile(self, mock):
+        """
+        Test invalid shapefile
+        The appropriate exception is raised when we encounter an invalid
+        shapefile    
+        """
+        mock.side_effect = TypeError
+
+        path = os.path.join(
+            BASE_DIR, 'fixtures', 'test_shapefile.zip')
+
+        with open(path, 'r+b') as shapefile:
+            data = OrderedDict(
+                name='Nairobi',
+                country='KE',
+                shapefile=shapefile
+            )
+            serializer_instance = LocationSerializer(data=data)
+            self.assertFalse(serializer_instance.is_valid())
+            self.assertEqual(
+                serializer_instance.errors,
+                {"shapefile": [ErrorDetail(string=InvalidShapeFile().message,
                                            code="invalid")]})
