@@ -20,5 +20,6 @@ tblib = "*"
 mock = "*"
 
 [packages]
-"e1839a8" = {path = ".", editable = true}
+e1839a8 = {editable = true,path = "."}
 future = "*"
+ona-tasking = {editable = true,path = "."}
