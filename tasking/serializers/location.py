@@ -9,8 +9,7 @@ import zipfile
 from io import BytesIO
 from os import path
 
-from django.conf import settings
-from django.contrib.gis.gdal import DataSource, geometries
+from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
 from django.utils import six
 
@@ -26,7 +25,7 @@ from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
 from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
                                 UnnecessaryFiles)
 from tasking.models import Location
-from tasking.utils import get_shapefile
+from tasking.utils import get_polygons, get_shapefile
 
 LOGGER = logging.getLogger(__name__)
 
@@ -79,16 +78,7 @@ class ShapeFileField(GeometryField):
 
                 # Get geoms for all Polygons in Datasource
                 polygon_data = layer.get_geoms()
-                polygons = []
-
-                for polygon in polygon_data:
-                    if settings.TASKING_SHAPEFILE_IGNORE_INVALID_TYPES:
-                        # if the geom is not a Polygon just ignore it
-                        if not isinstance(polygon, geometries.Polygon):
-                            import ipdb; ipdb.set_trace()
-                            continue
-
-                    polygons.append(polygon.geos)
+                polygons = get_polygons(polygon_data)
 
                 if not polygons:
                     LOGGER.exception(NO_VALID_POLYGONS)
