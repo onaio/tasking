@@ -117,8 +117,22 @@ class TestUtils(TestCase):
                             'test_unnecessary_files.zip')
         zip_file3 = zipfile.ZipFile(path)
 
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'kenya.zip')
+        zip_file4 = zipfile.ZipFile(path)
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'dotted_names.zip')
+        zip_file5 = zipfile.ZipFile(path)
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'SamburuCentralPolygon.zip')
+        zip_file6 = zipfile.ZipFile(path)
+
         # test that we can get valid shapefile
         self.assertEqual(get_shapefile(zip_file), 'test_shapefile.shp')
+        self.assertEqual(get_shapefile(zip_file4), 'KEN/KEN.Divisions.shp')
+        self.assertEqual(get_shapefile(zip_file5), 'example.test.shp')
+        self.assertEqual(get_shapefile(zip_file6),
+                         'SamburuCentralPolygon/mytestfile.shp')
 
         # test that we get ShapeFileNotFound when shapefile cant be located
         with self.assertRaises(ShapeFileNotFound):
