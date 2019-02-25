@@ -67,10 +67,6 @@ ALLOWED_CONTENTTYPES = getattr(settings, 'TASKING_ALLOWED_CONTENTTYPES',
                                DEFAULT_ALLOWED_CONTENTTYPES)
 MAX_OCCURRENCES = getattr(settings, 'TASKING_MAX_OCCURRENCES', 500)
 
-VALID_GEOM_TYPES = [geometries.Polygon]
-if settings.TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS:
-    VALID_GEOM_TYPES = [geometries.Polygon, geometries.MultiPolygon]
-
 
 def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
     """
@@ -337,7 +333,7 @@ def get_polygons(geom_object_list):
         Process multipolygon object
         """
         if settings.TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS:
-            nested_items = get_polygons((x for x in item))
+            nested_items = get_polygons((x for x in multipolygon_obj))
             results = results + nested_items
         else:
             if ignore_invalid:
