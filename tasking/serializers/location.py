@@ -85,6 +85,7 @@ class ShapeFileField(GeometryField):
                     if settings.TASKING_SHAPEFILE_IGNORE_INVALID_TYPES:
                         # if the geom is not a Polygon just ignore it
                         if not isinstance(polygon, geometries.Polygon):
+                            import ipdb; ipdb.set_trace()
                             continue
 
                     polygons.append(polygon.geos)
