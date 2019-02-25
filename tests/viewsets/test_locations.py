@@ -103,7 +103,7 @@ class TestLocationViewSet(TestBase):
     def test_create_location_with_shapefile_ignore_invalid(self):
         """
         Test that we can create a Location Object with a shapefile
-        that includes invalid types when SHAPEFILE_IGNORE_INVALID_TYPES = True
+        that includes invalid types when TASKING_SHAPEFILE_IGNORE_INVALID_TYPES = True
         """
         user = mommy.make('auth.User')
         path = os.path.join(BASE_DIR, 'fixtures', 'kenya.zip')
@@ -120,7 +120,7 @@ class TestLocationViewSet(TestBase):
             force_authenticate(request, user=user)
 
             # should not work
-            with self.settings(SHAPEFILE_IGNORE_INVALID_TYPES=False):
+            with self.settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=False):
                 response = view(request=request)
                 self.assertEqual(response.status_code, 400)
                 self.assertIn('shapefile', response.data.keys())
@@ -129,7 +129,7 @@ class TestLocationViewSet(TestBase):
                     six.text_type(response.data['shapefile'][0]))
 
             # should work
-            with self.settings(SHAPEFILE_IGNORE_INVALID_TYPES=True):
+            with self.settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=True):
                 response = view(request=request)
                 self.assertEqual(response.status_code, 201, response.data)
                 self.assertEqual('Kenya', response.data['name'])

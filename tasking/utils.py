@@ -259,7 +259,7 @@ def get_shapefile(geofile):
     # Takes the inputted geofile(zipfile) and lists all items in it
     name_list = geofile.namelist()
 
-    if settings.CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR:
+    if settings.TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR:
         # Check if zipfile has more than 3 files
         if len(name_list) > 3:
             # Raise UnnecessaryFiles Exception if files exceed 3

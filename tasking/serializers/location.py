@@ -82,7 +82,7 @@ class ShapeFileField(GeometryField):
                 polygons = []
 
                 for polygon in polygon_data:
-                    if settings.SHAPEFILE_IGNORE_INVALID_TYPES:
+                    if settings.TASKING_SHAPEFILE_IGNORE_INVALID_TYPES:
                         # if the geom is not a Polygon just ignore it
                         if type(polygon) != geometries.Polygon:
                             continue

@@ -141,7 +141,7 @@ class TestUtils(TestCase):
         with self.assertRaises(MissingFiles):
             get_shapefile(zip_file2)
         # test that we get UnnecessaryFiles when zipfile exceeds needed files
-        with self.settings(CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True):
+        with self.settings(TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True):
             with self.assertRaises(UnnecessaryFiles):
                 get_shapefile(zip_file3)
 

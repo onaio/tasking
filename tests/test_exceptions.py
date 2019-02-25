@@ -71,7 +71,7 @@ class TestExceptions(TestCase):
         the_exception = context.exception
         self.assertEqual(MISSING_FILE, the_exception.message)
 
-    @override_settings(CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True)
+    @override_settings(TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True)
     def test_missing_files(self):
         """
         Test MissingFiles error message is what we expect
@@ -85,7 +85,7 @@ class TestExceptions(TestCase):
         the_exception = context.exception
         self.assertEqual(MISSING_FILE, the_exception.message)
 
-    @override_settings(CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True)
+    @override_settings(TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True)
     def test_unnecessary_files(self):
         """
         Test UnnecessaryFiles error message is what we expect
