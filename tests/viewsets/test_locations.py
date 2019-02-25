@@ -65,6 +65,8 @@ class TestLocationViewSet(TestBase):
         user = mommy.make('auth.User')
         path = os.path.join(
             BASE_DIR, 'fixtures', 'test_shapefile.zip')
+        path2 = os.path.join(
+            BASE_DIR, 'fixtures', 'SamburuCentralPolygon.zip')
 
         with open(path, 'r+b') as shapefile:
             data = {
@@ -80,6 +82,22 @@ class TestLocationViewSet(TestBase):
 
             self.assertEqual(response.status_code, 201, response.data)
             self.assertEqual('Nairobi', response.data['name'])
+            self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+
+        with open(path2, 'r+b') as shapefile2:
+            data = {
+                'name': 'Samburu',
+                'country': 'KE',
+                'shapefile': shapefile2
+            }
+            view = LocationViewSet.as_view({'post': 'create'})
+            request = self.factory.post('/locations', data)
+            # Need authenticated user
+            force_authenticate(request, user=user)
+            response = view(request=request)
+
+            self.assertEqual(response.status_code, 201, response.data)
+            self.assertEqual('Samburu', response.data['name'])
             self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
 
     def test_create_with_bad_data(self):
