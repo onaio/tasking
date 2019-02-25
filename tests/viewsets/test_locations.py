@@ -82,6 +82,8 @@ class TestLocationViewSet(TestBase):
             self.assertEqual(response.status_code, 201, response.data)
             self.assertEqual('Nairobi', response.data['name'])
             self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+            location = Location.objects.get(pk=response.data['id'])
+            self.assertEqual(1, len([_ for _ in location.shapefile]))
 
         with open(path2, 'r+b') as shapefile2:
             data = {
@@ -98,6 +100,8 @@ class TestLocationViewSet(TestBase):
             self.assertEqual(response.status_code, 201, response.data)
             self.assertEqual('Samburu', response.data['name'])
             self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+            location = Location.objects.get(pk=response.data['id'])
+            self.assertEqual(1, len([_ for _ in location.shapefile]))
 
     @override_settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=False)
     def test_create_location_with_shapefile_nested_multipolygons(self):
@@ -136,6 +140,8 @@ class TestLocationViewSet(TestBase):
                 self.assertEqual(response.status_code, 201, response.data)
                 self.assertEqual('Kenya', response.data['name'])
                 self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+                location = Location.objects.get(pk=response.data['id'])
+                self.assertEqual(431, len([_ for _ in location.shapefile]))
 
     def test_create_location_with_shapefile_ignore_invalid(self):
         """
@@ -172,6 +178,8 @@ class TestLocationViewSet(TestBase):
                 self.assertEqual(response.status_code, 201, response.data)
                 self.assertEqual('Kenya', response.data['name'])
                 self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+                location = Location.objects.get(pk=response.data['id'])
+                self.assertEqual(379, len([_ for _ in location.shapefile]))
 
     def test_create_with_bad_data(self):
         """
