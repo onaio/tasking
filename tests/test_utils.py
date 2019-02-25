@@ -102,20 +102,19 @@ class TestUtils(TestCase):
         """
         Test get_shapefile
         """
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_shapefile.zip')
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'test_shapefile.zip')
         zip_file = zipfile.ZipFile(path)
 
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_shapefile_not_found.zip')
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures', 'missing_shp.zip')
         zip_file1 = zipfile.ZipFile(path)
 
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_missing_files.zip')
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'test_missing_files.zip')
         zip_file2 = zipfile.ZipFile(path)
 
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_unnecessary_files.zip')
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'test_unnecessary_files.zip')
         zip_file3 = zipfile.ZipFile(path)
 
         # test that we can get valid shapefile
@@ -128,20 +127,25 @@ class TestUtils(TestCase):
         with self.assertRaises(MissingFiles):
             get_shapefile(zip_file2)
         # test that we get UnnecessaryFiles when zipfile exceeds needed files
-        with self.assertRaises(UnnecessaryFiles):
-            get_shapefile(zip_file3)
+        with self.settings(CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True):
+            with self.assertRaises(UnnecessaryFiles):
+                get_shapefile(zip_file3)
 
     def test_get_allowed_contenttypes(self):
         """
         Test get_allowed_contenttypes
         """
-        input_expected = [
-            {'app_label': 'tasking', 'model': 'task'},
-            {'app_label': 'tasking', 'model': 'segmentrule'}]
+        input_expected = [{
+            'app_label': 'tasking',
+            'model': 'task'
+        }, {
+            'app_label': 'tasking',
+            'model': 'segmentrule'
+        }]
 
         task_type = ContentType.objects.get(app_label='tasking', model='task')
-        rule_type = ContentType.objects.get(app_label='tasking',
-                                            model='segmentrule')
+        rule_type = ContentType.objects.get(
+            app_label='tasking', model='segmentrule')
 
         allowed = get_allowed_contenttypes(
             allowed_content_types=input_expected)
@@ -155,13 +159,10 @@ class TestUtils(TestCase):
         Test generate_task_occurrences works correctly
         """
         task1 = mommy.make(
-            'tasking.Task',
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
-        )
+            'tasking.Task', timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5')
         task2 = mommy.make(
             'tasking.Task',
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5000'
-        )
+            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5000')
 
         # pylint: disable=line-too-long
         rule1 = 'DTSTART:20180501T070000Z RRULE:FREQ=YEARLY;BYDAY=SU;BYSETPOS=1;BYMONTH=1;UNTIL=20480521T210000Z'  # noqa
@@ -227,8 +228,10 @@ class TestUtils(TestCase):
 
         # we should have 9 instead of 10 occurrences because the very last
         # one would start at 9pm and end at 9pm
-        self.assertEqual(9, generate_task_occurrences(
-            task=task, timing_rule=task.timing_rule).count())
+        self.assertEqual(
+            9,
+            generate_task_occurrences(task=task,
+                                      timing_rule=task.timing_rule).count())
 
     def test_get_occurrence_start_time(self):
         """
@@ -244,8 +247,8 @@ class TestUtils(TestCase):
         # when start_time is not input then return start_time from timing_rule
         self.assertEqual(
             "07:00:00",
-            get_occurrence_start_time(
-                the_rrule, start_time_input=None).isoformat())
+            get_occurrence_start_time(the_rrule,
+                                      start_time_input=None).isoformat())
 
         # if given an input, return that input
         self.assertEqual(
@@ -277,22 +280,22 @@ class TestUtils(TestCase):
         # when end_time is not input then return start_time from timing_rule
         self.assertEqual(
             "21:00:00",
-            get_occurrence_end_time(
-                task, the_rrule, end_time_input=None).isoformat())
+            get_occurrence_end_time(task, the_rrule,
+                                    end_time_input=None).isoformat())
 
         # when end_time is input then return start_time from timing_rule
         self.assertEqual(
             "19:15:00",
             get_occurrence_end_time(
-                task, the_rrule,
-                end_time_input=time(19, 15, 0, 0)).isoformat())
+                task, the_rrule, end_time_input=time(19, 15, 0,
+                                                     0)).isoformat())
 
         # return the end of the day when timing_rule has no end and end_
         # time is not provided
         self.assertEqual(
             "23:59:59.999999",
-            get_occurrence_end_time(
-                task, the_rrule2, end_time_input=None).isoformat())
+            get_occurrence_end_time(task, the_rrule2,
+                                    end_time_input=None).isoformat())
 
     def test_generate_tasklocation_occurrences(self):
         """
@@ -306,8 +309,7 @@ class TestUtils(TestCase):
             location=location,
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             start='07:00:00',
-            end='21:00:00'
-        )
+            end='21:00:00')
 
         # Delete any autogenerated occurrences
         # pylint: disable=no-member
