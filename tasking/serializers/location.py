@@ -4,12 +4,13 @@ Location Serializers
 """
 from __future__ import unicode_literals
 
+import logging
 import zipfile
 from io import BytesIO
 from os import path
-import logging
 
-from django.contrib.gis.gdal import DataSource
+from django.conf import settings
+from django.contrib.gis.gdal import DataSource, geometries
 from django.contrib.gis.geos import MultiPolygon, Point
 from django.utils import six
 
@@ -20,12 +21,12 @@ from rest_framework import serializers
 from rest_framework_gis.serializers import GeometryField
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
-                                 RADIUS_MISSING, INVALID_SHAPEFILE)
+                                 INVALID_SHAPEFILE, NO_VALID_POLYGONS,
+                                 RADIUS_MISSING)
 from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
                                 UnnecessaryFiles)
 from tasking.models import Location
 from tasking.utils import get_shapefile
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -81,7 +82,16 @@ class ShapeFileField(GeometryField):
                 polygons = []
 
                 for polygon in polygon_data:
+                    if settings.SHAPEFILE_IGNORE_INVALID_TYPES:
+                        # if the geom is not a Polygon just ignore it
+                        if type(polygon) != geometries.Polygon:
+                            continue
+
                     polygons.append(polygon.geos)
+
+                if not polygons:
+                    LOGGER.exception(NO_VALID_POLYGONS)
+                    raise serializers.ValidationError(NO_VALID_POLYGONS)
 
                 try:
                     multipolygon = MultiPolygon(polygons)

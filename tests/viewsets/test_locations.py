@@ -15,7 +15,7 @@ from rest_framework_gis.fields import GeoJsonDict
 from tests.base import TestBase
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
-                                 RADIUS_MISSING)
+                                 INVALID_SHAPEFILE, RADIUS_MISSING)
 from tasking.models import Location
 from tasking.viewsets import LocationViewSet
 
@@ -99,6 +99,41 @@ class TestLocationViewSet(TestBase):
             self.assertEqual(response.status_code, 201, response.data)
             self.assertEqual('Samburu', response.data['name'])
             self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+
+    def test_create_location_with_shapefile_ignore_invalid(self):
+        """
+        Test that we can create a Location Object with a shapefile
+        that includes invalid types when SHAPEFILE_IGNORE_INVALID_TYPES = True
+        """
+        user = mommy.make('auth.User')
+        path = os.path.join(BASE_DIR, 'fixtures', 'kenya.zip')
+
+        with open(path, 'r+b') as shapefile:
+            data = {
+                'name': 'Kenya',
+                'country': 'KE',
+                'shapefile': shapefile
+            }
+            view = LocationViewSet.as_view({'post': 'create'})
+            request = self.factory.post('/locations', data)
+            # Need authenticated user
+            force_authenticate(request, user=user)
+
+            # should not work
+            with self.settings(SHAPEFILE_IGNORE_INVALID_TYPES=False):
+                response = view(request=request)
+                self.assertEqual(response.status_code, 400)
+                self.assertIn('shapefile', response.data.keys())
+                self.assertEqual(
+                    INVALID_SHAPEFILE,
+                    six.text_type(response.data['shapefile'][0]))
+
+            # should work
+            with self.settings(SHAPEFILE_IGNORE_INVALID_TYPES=True):
+                response = view(request=request)
+                self.assertEqual(response.status_code, 201, response.data)
+                self.assertEqual('Kenya', response.data['name'])
+                self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
 
     def test_create_with_bad_data(self):
         """
