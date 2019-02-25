@@ -9,6 +9,7 @@ from collections import OrderedDict
 
 from django.test import TestCase
 from django.utils import six
+
 from model_mommy import mommy
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework_gis.fields import GeoJsonDict
@@ -925,7 +926,8 @@ class TestLocationSerializer(TestCase):
                 })
 
         # test unnecessary files
-        with self.settings(TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True):
+        with self.settings(
+                TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True):
             unnecessary_files_path = os.path.join(
                 BASE_DIR, 'fixtures', 'test_unnecessary_files.zip')
 
