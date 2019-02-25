@@ -84,7 +84,7 @@ class ShapeFileField(GeometryField):
                 for polygon in polygon_data:
                     if settings.TASKING_SHAPEFILE_IGNORE_INVALID_TYPES:
                         # if the geom is not a Polygon just ignore it
-                        if type(polygon) != geometries.Polygon:
+                        if not isinstance(polygon, geometries.Polygon):
                             continue
 
                     polygons.append(polygon.geos)
