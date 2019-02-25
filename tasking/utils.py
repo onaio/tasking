@@ -336,9 +336,7 @@ def get_polygons(geom_object_list):
             nested_items = get_polygons((x for x in multipolygon_obj))
             results = results + nested_items
         else:
-            if ignore_invalid:
-                pass
-            else:
+            if not ignore_invalid:
                 results.append(multipolygon_obj)
 
         return results
