@@ -9,10 +9,13 @@ import zipfile
 from datetime import datetime, time, timedelta
 
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.contrib.gis.gdal import DataSource, geometries
+from django.contrib.gis.geos import Polygon
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 import pytz
+from backports.tempfile import TemporaryDirectory
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 from model_mommy import mommy
@@ -23,8 +26,9 @@ from tasking.models import Task, TaskOccurrence
 from tasking.utils import (MAX_OCCURRENCES, generate_task_occurrences,
                            generate_tasklocation_occurrences,
                            get_allowed_contenttypes, get_occurrence_end_time,
-                           get_occurrence_start_time, get_rrule_end,
-                           get_rrule_start, get_shapefile, get_target)
+                           get_occurrence_start_time, get_polygons,
+                           get_rrule_end, get_rrule_start, get_shapefile,
+                           get_target)
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -141,7 +145,8 @@ class TestUtils(TestCase):
         with self.assertRaises(MissingFiles):
             get_shapefile(zip_file2)
         # test that we get UnnecessaryFiles when zipfile exceeds needed files
-        with self.settings(TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True):
+        with self.settings(
+                TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True):
             with self.assertRaises(UnnecessaryFiles):
                 get_shapefile(zip_file3)
 
@@ -336,3 +341,104 @@ class TestUtils(TestCase):
         for occurrence in occurrences:
             self.assertEqual('07:00:00', occurrence.start_time.isoformat())
             self.assertEqual('21:00:00', occurrence.end_time.isoformat())
+
+    def test_get_polygons(self):
+        """
+        Test get_polygons
+        """
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'SamburuCentralPolygon.zip')
+        zip_file = zipfile.ZipFile(path)
+        shapefile = get_shapefile(zip_file)
+
+        with TemporaryDirectory() as temp_dir:
+            tpath = temp_dir
+            # Extract all files to Temporary Directory
+            zip_file.extractall(tpath)
+            # concatenate Shapefile path
+            shp_path = os.path.join(tpath, shapefile)
+            # Make the shapefile a DataSource
+            data_source = DataSource(shp_path)
+            layer = data_source[0]
+            # Get geoms for all Polygons in Datasource
+            geom_object_list = layer.get_geoms()
+            polygons = get_polygons(geom_object_list)
+
+            self.assertEqual(1, len(polygons))
+
+            for item in polygons:
+                self.assertTrue(isinstance(item, Polygon))
+
+    @override_settings(TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=True)
+    def test_get_polygons_nested(self):
+        """
+        Test get_polygons with nested polygons
+        """
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures', 'kenya.zip')
+        zip_file = zipfile.ZipFile(path)
+        shapefile = get_shapefile(zip_file)
+
+        with TemporaryDirectory() as temp_dir:
+            tpath = temp_dir
+            # Extract all files to Temporary Directory
+            zip_file.extractall(tpath)
+            # concatenate Shapefile path
+            shp_path = os.path.join(tpath, shapefile)
+            # Make the shapefile a DataSource
+            data_source = DataSource(shp_path)
+            layer = data_source[0]
+            # Get geoms for all Polygons in Datasource
+            geom_object_list = layer.get_geoms()
+            polygons = get_polygons(geom_object_list)
+
+            # check that we get the expected number of Polygons
+            self.assertEqual(431, len(polygons))
+
+            for item in polygons:
+                self.assertTrue(isinstance(item, Polygon))
+
+            # lets check get_polygons from the nested multipolygons
+            multipolygon_list = [
+                _ for _ in geom_object_list
+                if isinstance(_, geometries.MultiPolygon)]
+
+            self.assertEqual(12, len(multipolygon_list))
+            other_polygons = get_polygons(multipolygon_list)
+            # check that we get the expected number of Polygons
+            self.assertEqual(52, len(other_polygons))
+            for item in other_polygons:
+                self.assertTrue(isinstance(item, Polygon))
+            # if we add all polygons, do we get the expected number?
+            # 379 is the number of poolygons excluding nested multipolygons
+            # see the `test_get_polygons_ignore_invalid` test below
+            self.assertEqual(431, 379 + len(other_polygons))
+
+    @override_settings(
+        TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=True
+    )
+    def test_get_polygons_ignore_invalid(self):
+        """
+        Test get_polygons when ignoring invalid
+        """
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures', 'kenya.zip')
+        zip_file = zipfile.ZipFile(path)
+        shapefile = get_shapefile(zip_file)
+
+        with TemporaryDirectory() as temp_dir:
+            tpath = temp_dir
+            # Extract all files to Temporary Directory
+            zip_file.extractall(tpath)
+            # concatenate Shapefile path
+            shp_path = os.path.join(tpath, shapefile)
+            # Make the shapefile a DataSource
+            data_source = DataSource(shp_path)
+            layer = data_source[0]
+            # Get geoms for all Polygons in Datasource
+            geom_object_list = layer.get_geoms()
+            polygons = get_polygons(geom_object_list)
+
+            # check that we get the expected number of Polygons
+            self.assertEqual(379, len(polygons))
+
+            for item in polygons:
+                self.assertTrue(isinstance(item, Polygon))
