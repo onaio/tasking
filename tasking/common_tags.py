@@ -24,3 +24,4 @@ INVALID_END_DATE = _('The end date cannnot be lesser than the start date.')
 MISSING_START_DATE = _('Cannot determine the start date.  Please provide '
                        'either the start date or timing rule(s)')
 INVALID_SHAPEFILE = _("Invalid shapefile")
+NO_VALID_POLYGONS = _("No valid polygons in shapefile")
