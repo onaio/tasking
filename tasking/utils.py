@@ -10,6 +10,7 @@ from functools import reduce
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.gdal import geometries
 from django.db.models import Q
 from django.utils import timezone
 
@@ -20,16 +21,46 @@ from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
 from tasking.models import TaskOccurrence
 
 DEFAULT_ALLOWED_CONTENTTYPES = [
-    {'app_label': 'tasking', 'model': 'task'},
-    {'app_label': 'tasking', 'model': 'location'},
-    {'app_label': 'tasking', 'model': 'project'},
-    {'app_label': 'tasking', 'model': 'segmentrule'},
-    {'app_label': 'tasking', 'model': 'submission'},
-    {'app_label': 'auth', 'model': 'user'},
-    {'app_label': 'auth', 'model': 'group'},
-    {'app_label': 'logger', 'model': 'xform'},
-    {'app_label': 'logger', 'model': 'instance'},
-    {'app_label': 'logger', 'model': 'project'}
+    {
+        'app_label': 'tasking',
+        'model': 'task'
+    },
+    {
+        'app_label': 'tasking',
+        'model': 'location'
+    },
+    {
+        'app_label': 'tasking',
+        'model': 'project'
+    },
+    {
+        'app_label': 'tasking',
+        'model': 'segmentrule'
+    },
+    {
+        'app_label': 'tasking',
+        'model': 'submission'
+    },
+    {
+        'app_label': 'auth',
+        'model': 'user'
+    },
+    {
+        'app_label': 'auth',
+        'model': 'group'
+    },
+    {
+        'app_label': 'logger',
+        'model': 'xform'
+    },
+    {
+        'app_label': 'logger',
+        'model': 'instance'
+    },
+    {
+        'app_label': 'logger',
+        'model': 'project'
+    }
 ]
 
 ALLOWED_CONTENTTYPES = getattr(settings, 'TASKING_ALLOWED_CONTENTTYPES',
@@ -41,8 +72,10 @@ def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
     """
     Returns a queryset of allowed content_types
     """
-    filters = [Q(app_label=item['app_label'], model=item['model']) for item in
-               allowed_content_types]
+    filters = [
+        Q(app_label=item['app_label'], model=item['model'])
+        for item in allowed_content_types
+    ]
     if filters:
         return ContentType.objects.filter(reduce(operator.or_, filters))
     return ContentType.objects.none()
@@ -83,12 +116,11 @@ def get_occurrence_end_time(task, the_rrule, end_time_input=None):
 
 
 # pylint: disable=invalid-name
-def generate_task_occurrences(
-        task,
-        timing_rule,
-        start_time_input=None,
-        end_time_input=None,
-        OccurrenceModelClass=TaskOccurrence):
+def generate_task_occurrences(task,
+                              timing_rule,
+                              start_time_input=None,
+                              end_time_input=None,
+                              OccurrenceModelClass=TaskOccurrence):
     """
     Generates TaskOccurrence objects using the Task timing_rule field
 
@@ -169,8 +201,7 @@ def generate_task_occurrences(
                 task=task,
                 date=rrule_instance.date(),
                 start_time=start_time,
-                end_time=this_end_time
-            )
+                end_time=this_end_time)
 
             occurrence_list.append(occurrence_obj)
 
@@ -182,8 +213,8 @@ def generate_task_occurrences(
     return OccurrenceModelClass.objects.filter(task=task)
 
 
-def generate_tasklocation_occurrences(
-        task_location, OccurrenceModelClass=TaskOccurrence):
+def generate_tasklocation_occurrences(task_location,
+                                      OccurrenceModelClass=TaskOccurrence):
     """
     Generates TaskOccurrence objects using the TaskLocation timing_rule field
 
@@ -258,32 +289,79 @@ def get_shapefile(geofile):
     """
     # Takes the inputted geofile(zipfile) and lists all items in it
     name_list = geofile.namelist()
-    # Initializes name variable
-    name = None
 
-    # Check if zipfile has more than 3 files
-    if len(name_list) > 3:
-        # Raise UnnecessaryFiles Exception if files exceed 3
-        raise UnnecessaryFiles()
-    # Check if zipfile has less than the 3 required files
-    elif len(name_list) < 3:
-        # Raise MissingFiles Exeption if it has less than the required files
+    if settings.TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR:
+        # Check if zipfile has more than 3 files
+        if len(name_list) > 3:
+            # Raise UnnecessaryFiles Exception if files exceed 3
+            raise UnnecessaryFiles()
+        # Check if zipfile has less than the 3 required files
+        elif len(name_list) < 3:
+            # Raise MissingFiles Exception
+            raise MissingFiles()
+
+    needed_files = {}
+
+    for item in name_list:
+        if item.endswith('shp'):
+            needed_files['shp'] = item
+        elif item.endswith('dbf'):
+            needed_files['dbf'] = item
+        elif item.endswith('shx'):
+            needed_files['shx'] = item
+
+    if not needed_files.get('dbf') or not needed_files.get('shx'):
         raise MissingFiles()
-    # Check if zipfile has 3 files only
-    elif len(name_list) == 3:
-        # Iterate through the names of items to find the .shp file
-        for item in name_list:
-            # Split the elements of the name_list in order to have an array
-            # Of filename and extension name
-            arr = item.split('.')
-            # Check if the extension of the file is .shp
-            if arr[1] == 'shp':
-                # Set name to the name of the .shp file
-                name = '.'.join(arr)
-    # Check if name has changed from its initial value
-    if name is None:
-        # Raise ShapeFileNotFound exception if name hasn't changed from initial
+
+    if not needed_files.get('shp'):
         raise ShapeFileNotFound()
-    else:
-        # Return name
-        return name
+
+    return needed_files['shp']
+
+
+def get_polygons(geom_object_list):
+    """
+    Takes a geom object list and returns polygons, runs recursively
+
+    :param geom_object_list: list of geom objects
+
+    :return: list of Polygon objects
+    """
+
+    def _process_multipolygon(multipolygon_obj, results, ignore_invalid):
+        """
+        Process multipolygon object
+        """
+        if settings.TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS:
+            nested_items = get_polygons((x for x in multipolygon_obj))
+            results = results + nested_items
+        else:
+            if not ignore_invalid:
+                results.append(multipolygon_obj)
+
+        return results
+
+    result = []
+    for item in geom_object_list:
+        if settings.TASKING_SHAPEFILE_IGNORE_INVALID_TYPES:
+            if isinstance(item, geometries.Polygon):
+                result.append(item.geos)
+            elif isinstance(item, geometries.MultiPolygon):
+                result = _process_multipolygon(
+                    multipolygon_obj=item,
+                    results=result,
+                    ignore_invalid=settings.
+                    TASKING_SHAPEFILE_IGNORE_INVALID_TYPES)
+            else:
+                continue
+        else:
+            if isinstance(item, geometries.MultiPolygon):
+                result = _process_multipolygon(
+                    multipolygon_obj=item,
+                    results=result,
+                    ignore_invalid=settings.
+                    TASKING_SHAPEFILE_IGNORE_INVALID_TYPES)
+            else:
+                result.append(item.geos)
+
+    return result

@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 import os
 import zipfile
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from tasking.common_tags import TARGET_DOES_NOT_EXIST, NO_SHAPEFILE
 from tasking.common_tags import UNNECESSARY_FILE, MISSING_FILE
@@ -37,7 +37,7 @@ class TestExceptions(TestCase):
         Test ShapeFileNotFound error message is what we expect
         """
         path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_shapefile_not_found.zip')
+            BASE_DIR, 'tests', 'fixtures', 'missing_shp.zip')
         zip_file = zipfile.ZipFile(path)
 
         with self.assertRaises(ShapeFileNotFound) as context:
@@ -45,6 +45,33 @@ class TestExceptions(TestCase):
         the_exception = context.exception
         self.assertEqual(NO_SHAPEFILE, the_exception.message)
 
+    def test_missing_dbf(self):
+        """
+        Test missing .dbf file
+        """
+        path = os.path.join(
+            BASE_DIR, 'tests', 'fixtures', 'missing_dbf.zip')
+        zip_file = zipfile.ZipFile(path)
+
+        with self.assertRaises(MissingFiles) as context:
+            get_shapefile(zip_file)
+        the_exception = context.exception
+        self.assertEqual(MISSING_FILE, the_exception.message)
+
+    def test_missing_shx(self):
+        """
+        Test missing .shx file
+        """
+        path = os.path.join(
+            BASE_DIR, 'tests', 'fixtures', 'missing_shx.zip')
+        zip_file = zipfile.ZipFile(path)
+
+        with self.assertRaises(MissingFiles) as context:
+            get_shapefile(zip_file)
+        the_exception = context.exception
+        self.assertEqual(MISSING_FILE, the_exception.message)
+
+    @override_settings(TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True)
     def test_missing_files(self):
         """
         Test MissingFiles error message is what we expect
@@ -58,6 +85,7 @@ class TestExceptions(TestCase):
         the_exception = context.exception
         self.assertEqual(MISSING_FILE, the_exception.message)
 
+    @override_settings(TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True)
     def test_unnecessary_files(self):
         """
         Test UnnecessaryFiles error message is what we expect

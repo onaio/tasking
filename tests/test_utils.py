@@ -9,10 +9,13 @@ import zipfile
 from datetime import datetime, time, timedelta
 
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.contrib.gis.gdal import DataSource, geometries
+from django.contrib.gis.geos import Polygon
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 import pytz
+from backports.tempfile import TemporaryDirectory
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 from model_mommy import mommy
@@ -23,8 +26,9 @@ from tasking.models import Task, TaskOccurrence
 from tasking.utils import (MAX_OCCURRENCES, generate_task_occurrences,
                            generate_tasklocation_occurrences,
                            get_allowed_contenttypes, get_occurrence_end_time,
-                           get_occurrence_start_time, get_rrule_end,
-                           get_rrule_start, get_shapefile, get_target)
+                           get_occurrence_start_time, get_polygons,
+                           get_rrule_end, get_rrule_start, get_shapefile,
+                           get_target)
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -102,24 +106,37 @@ class TestUtils(TestCase):
         """
         Test get_shapefile
         """
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_shapefile.zip')
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'test_shapefile.zip')
         zip_file = zipfile.ZipFile(path)
 
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_shapefile_not_found.zip')
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures', 'missing_shp.zip')
         zip_file1 = zipfile.ZipFile(path)
 
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_missing_files.zip')
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'test_missing_files.zip')
         zip_file2 = zipfile.ZipFile(path)
 
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_unnecessary_files.zip')
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'test_unnecessary_files.zip')
         zip_file3 = zipfile.ZipFile(path)
+
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'kenya.zip')
+        zip_file4 = zipfile.ZipFile(path)
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'dotted_names.zip')
+        zip_file5 = zipfile.ZipFile(path)
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'SamburuCentralPolygon.zip')
+        zip_file6 = zipfile.ZipFile(path)
 
         # test that we can get valid shapefile
         self.assertEqual(get_shapefile(zip_file), 'test_shapefile.shp')
+        self.assertEqual(get_shapefile(zip_file4), 'KEN/KEN.Divisions.shp')
+        self.assertEqual(get_shapefile(zip_file5), 'example.test.shp')
+        self.assertEqual(get_shapefile(zip_file6),
+                         'SamburuCentralPolygon/mytestfile.shp')
 
         # test that we get ShapeFileNotFound when shapefile cant be located
         with self.assertRaises(ShapeFileNotFound):
@@ -128,20 +145,26 @@ class TestUtils(TestCase):
         with self.assertRaises(MissingFiles):
             get_shapefile(zip_file2)
         # test that we get UnnecessaryFiles when zipfile exceeds needed files
-        with self.assertRaises(UnnecessaryFiles):
-            get_shapefile(zip_file3)
+        with self.settings(
+                TASKING_CHECK_NUMBER_OF_FILES_IN_SHAPEFILES_DIR=True):
+            with self.assertRaises(UnnecessaryFiles):
+                get_shapefile(zip_file3)
 
     def test_get_allowed_contenttypes(self):
         """
         Test get_allowed_contenttypes
         """
-        input_expected = [
-            {'app_label': 'tasking', 'model': 'task'},
-            {'app_label': 'tasking', 'model': 'segmentrule'}]
+        input_expected = [{
+            'app_label': 'tasking',
+            'model': 'task'
+        }, {
+            'app_label': 'tasking',
+            'model': 'segmentrule'
+        }]
 
         task_type = ContentType.objects.get(app_label='tasking', model='task')
-        rule_type = ContentType.objects.get(app_label='tasking',
-                                            model='segmentrule')
+        rule_type = ContentType.objects.get(
+            app_label='tasking', model='segmentrule')
 
         allowed = get_allowed_contenttypes(
             allowed_content_types=input_expected)
@@ -155,13 +178,10 @@ class TestUtils(TestCase):
         Test generate_task_occurrences works correctly
         """
         task1 = mommy.make(
-            'tasking.Task',
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5'
-        )
+            'tasking.Task', timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5')
         task2 = mommy.make(
             'tasking.Task',
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5000'
-        )
+            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5000')
 
         # pylint: disable=line-too-long
         rule1 = 'DTSTART:20180501T070000Z RRULE:FREQ=YEARLY;BYDAY=SU;BYSETPOS=1;BYMONTH=1;UNTIL=20480521T210000Z'  # noqa
@@ -227,8 +247,10 @@ class TestUtils(TestCase):
 
         # we should have 9 instead of 10 occurrences because the very last
         # one would start at 9pm and end at 9pm
-        self.assertEqual(9, generate_task_occurrences(
-            task=task, timing_rule=task.timing_rule).count())
+        self.assertEqual(
+            9,
+            generate_task_occurrences(task=task,
+                                      timing_rule=task.timing_rule).count())
 
     def test_get_occurrence_start_time(self):
         """
@@ -244,8 +266,8 @@ class TestUtils(TestCase):
         # when start_time is not input then return start_time from timing_rule
         self.assertEqual(
             "07:00:00",
-            get_occurrence_start_time(
-                the_rrule, start_time_input=None).isoformat())
+            get_occurrence_start_time(the_rrule,
+                                      start_time_input=None).isoformat())
 
         # if given an input, return that input
         self.assertEqual(
@@ -277,22 +299,22 @@ class TestUtils(TestCase):
         # when end_time is not input then return start_time from timing_rule
         self.assertEqual(
             "21:00:00",
-            get_occurrence_end_time(
-                task, the_rrule, end_time_input=None).isoformat())
+            get_occurrence_end_time(task, the_rrule,
+                                    end_time_input=None).isoformat())
 
         # when end_time is input then return start_time from timing_rule
         self.assertEqual(
             "19:15:00",
             get_occurrence_end_time(
-                task, the_rrule,
-                end_time_input=time(19, 15, 0, 0)).isoformat())
+                task, the_rrule, end_time_input=time(19, 15, 0,
+                                                     0)).isoformat())
 
         # return the end of the day when timing_rule has no end and end_
         # time is not provided
         self.assertEqual(
             "23:59:59.999999",
-            get_occurrence_end_time(
-                task, the_rrule2, end_time_input=None).isoformat())
+            get_occurrence_end_time(task, the_rrule2,
+                                    end_time_input=None).isoformat())
 
     def test_generate_tasklocation_occurrences(self):
         """
@@ -306,8 +328,7 @@ class TestUtils(TestCase):
             location=location,
             timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5',
             start='07:00:00',
-            end='21:00:00'
-        )
+            end='21:00:00')
 
         # Delete any autogenerated occurrences
         # pylint: disable=no-member
@@ -320,3 +341,104 @@ class TestUtils(TestCase):
         for occurrence in occurrences:
             self.assertEqual('07:00:00', occurrence.start_time.isoformat())
             self.assertEqual('21:00:00', occurrence.end_time.isoformat())
+
+    def test_get_polygons(self):
+        """
+        Test get_polygons
+        """
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures',
+                            'SamburuCentralPolygon.zip')
+        zip_file = zipfile.ZipFile(path)
+        shapefile = get_shapefile(zip_file)
+
+        with TemporaryDirectory() as temp_dir:
+            tpath = temp_dir
+            # Extract all files to Temporary Directory
+            zip_file.extractall(tpath)
+            # concatenate Shapefile path
+            shp_path = os.path.join(tpath, shapefile)
+            # Make the shapefile a DataSource
+            data_source = DataSource(shp_path)
+            layer = data_source[0]
+            # Get geoms for all Polygons in Datasource
+            geom_object_list = layer.get_geoms()
+            polygons = get_polygons(geom_object_list)
+
+            self.assertEqual(1, len(polygons))
+
+            for item in polygons:
+                self.assertTrue(isinstance(item, Polygon))
+
+    @override_settings(TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=True)
+    def test_get_polygons_nested(self):
+        """
+        Test get_polygons with nested polygons
+        """
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures', 'kenya.zip')
+        zip_file = zipfile.ZipFile(path)
+        shapefile = get_shapefile(zip_file)
+
+        with TemporaryDirectory() as temp_dir:
+            tpath = temp_dir
+            # Extract all files to Temporary Directory
+            zip_file.extractall(tpath)
+            # concatenate Shapefile path
+            shp_path = os.path.join(tpath, shapefile)
+            # Make the shapefile a DataSource
+            data_source = DataSource(shp_path)
+            layer = data_source[0]
+            # Get geoms for all Polygons in Datasource
+            geom_object_list = layer.get_geoms()
+            polygons = get_polygons(geom_object_list)
+
+            # check that we get the expected number of Polygons
+            self.assertEqual(431, len(polygons))
+
+            for item in polygons:
+                self.assertTrue(isinstance(item, Polygon))
+
+            # lets check get_polygons from the nested multipolygons
+            multipolygon_list = [
+                _ for _ in geom_object_list
+                if isinstance(_, geometries.MultiPolygon)]
+
+            self.assertEqual(12, len(multipolygon_list))
+            other_polygons = get_polygons(multipolygon_list)
+            # check that we get the expected number of Polygons
+            self.assertEqual(52, len(other_polygons))
+            for item in other_polygons:
+                self.assertTrue(isinstance(item, Polygon))
+            # if we add all polygons, do we get the expected number?
+            # 379 is the number of poolygons excluding nested multipolygons
+            # see the `test_get_polygons_ignore_invalid` test below
+            self.assertEqual(431, 379 + len(other_polygons))
+
+    @override_settings(
+        TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=True
+    )
+    def test_get_polygons_ignore_invalid(self):
+        """
+        Test get_polygons when ignoring invalid
+        """
+        path = os.path.join(BASE_DIR, 'tests', 'fixtures', 'kenya.zip')
+        zip_file = zipfile.ZipFile(path)
+        shapefile = get_shapefile(zip_file)
+
+        with TemporaryDirectory() as temp_dir:
+            tpath = temp_dir
+            # Extract all files to Temporary Directory
+            zip_file.extractall(tpath)
+            # concatenate Shapefile path
+            shp_path = os.path.join(tpath, shapefile)
+            # Make the shapefile a DataSource
+            data_source = DataSource(shp_path)
+            layer = data_source[0]
+            # Get geoms for all Polygons in Datasource
+            geom_object_list = layer.get_geoms()
+            polygons = get_polygons(geom_object_list)
+
+            # check that we get the expected number of Polygons
+            self.assertEqual(379, len(polygons))
+
+            for item in polygons:
+                self.assertTrue(isinstance(item, Polygon))

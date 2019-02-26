@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import os
 
+from django.test import override_settings
 from django.utils import six
 
 import pytz
@@ -15,7 +16,7 @@ from rest_framework_gis.fields import GeoJsonDict
 from tests.base import TestBase
 
 from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
-                                 RADIUS_MISSING)
+                                 INVALID_SHAPEFILE, RADIUS_MISSING)
 from tasking.models import Location
 from tasking.viewsets import LocationViewSet
 
@@ -63,8 +64,8 @@ class TestLocationViewSet(TestBase):
         Test that we can create a Location Object with a shapefile
         """
         user = mommy.make('auth.User')
-        path = os.path.join(
-            BASE_DIR, 'fixtures', 'test_shapefile.zip')
+        path = os.path.join(BASE_DIR, 'fixtures', 'test_shapefile.zip')
+        path2 = os.path.join(BASE_DIR, 'fixtures', 'SamburuCentralPolygon.zip')
 
         with open(path, 'r+b') as shapefile:
             data = {
@@ -81,6 +82,104 @@ class TestLocationViewSet(TestBase):
             self.assertEqual(response.status_code, 201, response.data)
             self.assertEqual('Nairobi', response.data['name'])
             self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+            location = Location.objects.get(pk=response.data['id'])
+            self.assertEqual(1, len([_ for _ in location.shapefile]))
+
+        with open(path2, 'r+b') as shapefile2:
+            data = {
+                'name': 'Samburu',
+                'country': 'KE',
+                'shapefile': shapefile2
+            }
+            view = LocationViewSet.as_view({'post': 'create'})
+            request = self.factory.post('/locations', data)
+            # Need authenticated user
+            force_authenticate(request, user=user)
+            response = view(request=request)
+
+            self.assertEqual(response.status_code, 201, response.data)
+            self.assertEqual('Samburu', response.data['name'])
+            self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+            location = Location.objects.get(pk=response.data['id'])
+            self.assertEqual(1, len([_ for _ in location.shapefile]))
+
+    @override_settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=False)
+    def test_create_location_with_shapefile_nested_multipolygons(self):
+        """
+        Test that we can create a Location Object with a shapefile that has
+        nested multipolygons
+        """
+        user = mommy.make('auth.User')
+        path = os.path.join(BASE_DIR, 'fixtures', 'kenya.zip')
+
+        with open(path, 'r+b') as shapefile:
+            data = {
+                'name': 'Kenya',
+                'country': 'KE',
+                'shapefile': shapefile
+            }
+            view = LocationViewSet.as_view({'post': 'create'})
+            request = self.factory.post('/locations', data)
+            # Need authenticated user
+            force_authenticate(request, user=user)
+
+            # should not work
+            with self.settings(
+                    TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=False):
+                response = view(request=request)
+                self.assertEqual(response.status_code, 400)
+                self.assertIn('shapefile', response.data.keys())
+                self.assertEqual(
+                    INVALID_SHAPEFILE,
+                    six.text_type(response.data['shapefile'][0]))
+
+            # should work
+            with self.settings(
+                    TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=True):
+                response = view(request=request)
+                self.assertEqual(response.status_code, 201, response.data)
+                self.assertEqual('Kenya', response.data['name'])
+                self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+                location = Location.objects.get(pk=response.data['id'])
+                self.assertEqual(431, len([_ for _ in location.shapefile]))
+
+    def test_create_location_with_shapefile_ignore_invalid(self):
+        """
+        Test that we can create a Location Object with a shapefile
+        that includes invalid types when
+        TASKING_SHAPEFILE_IGNORE_INVALID_TYPES = True
+        """
+        user = mommy.make('auth.User')
+        path = os.path.join(BASE_DIR, 'fixtures', 'kenya.zip')
+
+        with open(path, 'r+b') as shapefile:
+            data = {
+                'name': 'Kenya',
+                'country': 'KE',
+                'shapefile': shapefile
+            }
+            view = LocationViewSet.as_view({'post': 'create'})
+            request = self.factory.post('/locations', data)
+            # Need authenticated user
+            force_authenticate(request, user=user)
+
+            # should not work
+            with self.settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=False):
+                response = view(request=request)
+                self.assertEqual(response.status_code, 400)
+                self.assertIn('shapefile', response.data.keys())
+                self.assertEqual(
+                    INVALID_SHAPEFILE,
+                    six.text_type(response.data['shapefile'][0]))
+
+            # should work
+            with self.settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=True):
+                response = view(request=request)
+                self.assertEqual(response.status_code, 201, response.data)
+                self.assertEqual('Kenya', response.data['name'])
+                self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
+                location = Location.objects.get(pk=response.data['id'])
+                self.assertEqual(379, len([_ for _ in location.shapefile]))
 
     def test_create_with_bad_data(self):
         """
