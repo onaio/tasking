@@ -19,6 +19,7 @@ model-mommy = "*"
 tblib = "*"
 mock = "*"
 pre-commit = "*"
+black = "==19.10b0"
 
 [packages]
 e1839a8 = {editable = true,path = "."}
