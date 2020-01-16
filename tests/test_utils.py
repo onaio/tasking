@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tests for tasking utils
 """
-from __future__ import unicode_literals
-
 import os
 import zipfile
 from datetime import datetime, time, timedelta
@@ -15,7 +12,7 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 
 import pytz
-from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 from model_mommy import mommy

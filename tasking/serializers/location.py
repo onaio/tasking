@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Location Serializers
 """
-from __future__ import unicode_literals
-
 import logging
 import zipfile
 from io import BytesIO
@@ -11,11 +8,9 @@ from os import path
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
-from django.utils import six
 
-from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 from django_countries import Countries
-from future.builtins import bytes  # pylint: disable=redefined-builtin
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometryField
 
@@ -113,7 +108,7 @@ class GeopointField(GeometryField):
         """
         geopoint = value
         if geopoint is not None:
-            if isinstance(geopoint, six.text_type):
+            if isinstance(geopoint, str):
                 geopoint_split = geopoint.split(',')
                 lon = float(geopoint_split[0])
                 lat = float(geopoint_split[1])

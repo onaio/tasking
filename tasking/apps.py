@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Apps module for tasking app
 """
-from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.apps import AppConfig
 
@@ -20,6 +18,7 @@ class TaskingConfig(AppConfig):
         Do stuff when the app is ready
         """
         # set up app settings
+        # pylint: disable=import-outside-toplevel
         from django.conf import settings
         import tasking.settings as defaults
         for name in dir(defaults):

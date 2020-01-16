@@ -17,16 +17,13 @@ setup(
         'Django >= 1.11.19, < 2.1',
         'python-dateutil',
         'markdown',  # adds markdown support for browsable REST API
-        'django-filter < 2',  # for filtering in the API
+        'django-filter',  # for filtering in the API
         'djangorestframework-gis',  # for location model
         'django_countries',  # for location model
         'django-mptt',  # For MPTT
-        'backports.tempfile',  # TemporaryDirectory support in py27
     ],
     classifiers=[
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Framework :: Django',
         'Framework :: Django :: 1.11',

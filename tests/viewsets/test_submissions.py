@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Tests Submission viewsets.
 """
-from __future__ import unicode_literals
-
 from datetime import timedelta
 
-from django.utils import six, timezone
+from django.utils import timezone
 
 import pytz
 from model_mommy import mommy
@@ -108,7 +105,7 @@ class TestSubmissionViewSet(TestBase):
 
         self.assertIn('target_id', response1.data.keys())
         self.assertEqual(TARGET_DOES_NOT_EXIST,
-                         six.text_type(response1.data['target_id'][0]))
+                         str(response1.data['target_id'][0]))
 
         bad_content_type = dict(
             task=mocked_task.id,
@@ -133,7 +130,7 @@ class TestSubmissionViewSet(TestBase):
         self.assertIn('target_content_type', response2.data.keys())
         self.assertEqual(
             'Invalid pk "999" - object does not exist.',
-            six.text_type(response2.data['target_content_type'][0]))
+            str(response2.data['target_content_type'][0]))
 
     def test_delete_submissions(self):
         """
@@ -148,7 +145,7 @@ class TestSubmissionViewSet(TestBase):
         # delete submission
         view = SubmissionViewSet.as_view({'delete': 'destroy'})
         request = self.factory.delete(
-            '/submissions/{id}'.format(id=submission.id))
+            f'/submissions/{submission.id}')
         force_authenticate(request, user=user)
         response = view(request=request, pk=submission.id)
         # assert that submission was deleted
@@ -161,13 +158,15 @@ class TestSubmissionViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         submission_data = self._create_submission()
+        submission_id = submission_data['id']
+
         view = SubmissionViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get(
-            '/submissions/{id}'.format(id=submission_data['id']))
+            f'/submissions/{submission_id}')
 
         force_authenticate(request, user=user)
 
-        response = view(request=request, pk=submission_data['id'])
+        response = view(request=request, pk=submission_id)
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.data, submission_data)
 
@@ -194,8 +193,11 @@ class TestSubmissionViewSet(TestBase):
         user3 = mommy.make('auth.User')
         task = mommy.make('tasking.Task')
         submission_data = self._create_submission()
+        submission_id = submission_data['id']
         submission_data2 = self._create_submission()
+        submission2_id = submission_data2['id']
         submission_data3 = self._create_submission()
+        submission3_id = submission_data3['id']
 
         data = {
             'target_content_type': self.user_type.id,
@@ -204,9 +206,9 @@ class TestSubmissionViewSet(TestBase):
         # test that target_content_type and target_id can be changed
         view = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/submissions/{id}'.format(id=submission_data['id']), data=data)
+            f'/submissions/{submission_id}', data=data)
         force_authenticate(request, user=user)
-        response = view(request=request, pk=submission_data['id'])
+        response = view(request=request, pk=submission_id)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -221,9 +223,9 @@ class TestSubmissionViewSet(TestBase):
 
         view2 = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request2 = self.factory.patch(
-            '/submissions/{id}'.format(id=submission_data2['id']), data=data2)
+            f'/submissions/{submission2_id}', data=data2)
         force_authenticate(request2, user=user2)
-        response2 = view2(request=request2, pk=submission_data2['id'])
+        response2 = view2(request=request2, pk=submission2_id)
 
         self.assertEqual(response2.status_code, 200)
         self.assertTrue(response2.data['valid'])
@@ -237,14 +239,14 @@ class TestSubmissionViewSet(TestBase):
         # test an error is raised when trying to change task
         view3 = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request3 = self.factory.patch(
-            '/submissions/{id}'.format(id=submission_data3['id']), data=data3)
+            f'/submissions/{submission3_id}', data=data3)
         force_authenticate(request3, user=user3)
-        response3 = view3(request=request3, pk=submission_data3['id'])
+        response3 = view3(request=request3, pk=submission3_id)
 
         self.assertEqual(response3.status_code, 400)
         self.assertIn('task', response3.data.keys())
         self.assertEqual(CANT_EDIT_TASK,
-                         six.text_type(response3.data['task'][0]))
+                         str(response3.data['task'][0]))
 
     def test_authentication_required(self):
         """
@@ -277,17 +279,17 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response.data['detail']))
+            str(response.data['detail']))
 
         # test that you need authentication for retrieving a submission
         view2 = SubmissionViewSet.as_view({'get': 'retrieve'})
         request2 = self.factory.get(
-            '/submissions/{id}'.format(id=submission.id))
+            f'/submissions/{submission.id}')
         response2 = view2(request=request2, pk=submission.id)
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response2.data['detail']))
+            str(response2.data['detail']))
 
         # test that you need authentication for listing submissions
         view3 = SubmissionViewSet.as_view({'get': 'list'})
@@ -296,7 +298,7 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response3.data['detail']))
+            str(response3.data['detail']))
 
         # test that you need authentication for deleting a submission
         # pylint: disable=no-member
@@ -305,13 +307,13 @@ class TestSubmissionViewSet(TestBase):
 
         view4 = SubmissionViewSet.as_view({'delete': 'destroy'})
         request4 = self.factory.delete(
-            '/submissions/{id}'.format(id=submission.id))
+            f'/submissions/{submission.id}')
         response4 = view4(request=request4, pk=submission.id)
 
         self.assertEqual(response4.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response4.data['detail']))
+            str(response4.data['detail']))
 
         # test that you need authentication for updating a submission
         data = {
@@ -320,13 +322,13 @@ class TestSubmissionViewSet(TestBase):
 
         view5 = SubmissionViewSet.as_view({'patch': 'partial_update'})
         request5 = self.factory.patch(
-            '/submissions/{id}'.format(id=submission.id), data=data)
+            f'/submissions/{submission.id}', data=data)
         response5 = view5(request=request5, pk=submission.id)
 
         self.assertEqual(response5.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response5.data['detail']))
+            str(response5.data['detail']))
 
     def test_search(self):
         """
@@ -449,10 +451,12 @@ class TestSubmissionViewSet(TestBase):
         user = mommy.make('auth.User')
 
         # make a bunch of submissions
-        mommy.make('tasking.Submission', status=Submission.PENDING, _quantity=7)
+        mommy.make(
+            'tasking.Submission', status=Submission.PENDING, _quantity=7)
 
         # make one submission where status is APPROVED
-        submission = mommy.make('tasking.Submission', status=Submission.APPROVED)
+        submission = mommy.make(
+            'tasking.Submission', status=Submission.APPROVED)
 
         # check that we have 8 submissions
         # pylint: disable=no-member
@@ -461,7 +465,8 @@ class TestSubmissionViewSet(TestBase):
         view = SubmissionViewSet.as_view({'get': 'list'})
 
         # test that we get approved submissions
-        request = self.factory.get('/submissions', {'status': Submission.APPROVED})
+        request = self.factory.get(
+            '/submissions', {'status': Submission.APPROVED})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
@@ -469,7 +474,8 @@ class TestSubmissionViewSet(TestBase):
         self.assertEqual(response.data[0]['id'], submission.id)
 
         # test that we get pending submissions
-        request = self.factory.get('/submissions', {'status': Submission.PENDING})
+        request = self.factory.get(
+            '/submissions', {'status': Submission.PENDING})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
@@ -586,10 +592,12 @@ class TestSubmissionViewSet(TestBase):
         user = mommy.make('auth.User')
 
         # make a bunch of submissions
-        mommy.make('tasking.Submission', status=Submission.REJECTED, _quantity=7)
+        mommy.make(
+            'tasking.Submission', status=Submission.REJECTED, _quantity=7)
 
         # make one submission where status is REJECTED
-        submission = mommy.make('tasking.Submission', status=Submission.APPROVED)
+        submission = mommy.make(
+            'tasking.Submission', status=Submission.APPROVED)
 
         # check that we have 8 submissions
         # pylint: disable=no-member

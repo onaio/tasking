@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tests Project viewsets.
 """
-from __future__ import unicode_literals
-
-from django.utils import six
-
 import pytz
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -92,7 +87,7 @@ class TestProjectViewSet(TestBase):
 
         self.assertIn('target_id', response1.data.keys())
         self.assertEqual(TARGET_DOES_NOT_EXIST,
-                         six.text_type(response1.data['target_id'][0]))
+                         str(response1.data['target_id'][0]))
 
         # test bad content type validation
         bad_content_type = {
@@ -112,7 +107,7 @@ class TestProjectViewSet(TestBase):
         self.assertIn('target_content_type', response2.data.keys())
         self.assertEqual(
             'Invalid pk "999" - object does not exist.',
-            six.text_type(response2.data['target_content_type'][0]))
+            str(response2.data['target_content_type'][0]))
 
     def test_delete_project(self):
         """
@@ -126,7 +121,7 @@ class TestProjectViewSet(TestBase):
         self.assertTrue(Project.objects.filter(pk=project.id).exists())
         # delete project
         view = ProjectViewSet.as_view({'delete': 'destroy'})
-        request = self.factory.delete('/projects/{id}'.format(id=project.id))
+        request = self.factory.delete(f'/projects/{project.id}')
         force_authenticate(request, user=user)
         response = view(request=request, pk=project.id)
         # assert that task was deleted
@@ -139,11 +134,13 @@ class TestProjectViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         project_data = self._create_project()
+        project_id = project_data['id']
+
         view = ProjectViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get(
-            '/projects/{id}'.format(id=project_data['id']))
+            f'/projects/{project_id}')
         force_authenticate(request, user=user)
-        response = view(request=request, pk=project_data['id'])
+        response = view(request=request, pk=project_id)
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.data, project_data)
 
@@ -168,7 +165,9 @@ class TestProjectViewSet(TestBase):
         user = mommy.make('auth.User')
         user2 = mommy.make('auth.User')
         project_data = self._create_project()
+        project_id = project_data['id']
         project_data2 = self._create_project()
+        project2_id = project_data2['id']
 
         data = {
             'name': "project 36",
@@ -178,9 +177,9 @@ class TestProjectViewSet(TestBase):
 
         view = ProjectViewSet.as_view({'patch': 'partial_update'})
         request = self.factory.patch(
-            '/projects/{id}'.format(id=project_data['id']), data=data)
+            f'/projects/{project_id}', data=data)
         force_authenticate(request, user=user)
-        response = view(request=request, pk=project_data['id'])
+        response = view(request=request, pk=project_id)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual('project 36', response.data['name'])
@@ -198,9 +197,9 @@ class TestProjectViewSet(TestBase):
 
         view2 = ProjectViewSet.as_view({'patch': 'partial_update'})
         request2 = self.factory.patch(
-            '/projects/{id}'.format(id=project_data2['id']), data=data2)
+            f'/projects/{project2_id}', data=data2)
         force_authenticate(request2, user=user2)
-        response2 = view2(request=request2, pk=project_data2['id'])
+        response2 = view2(request=request2, pk=project2_id)
 
         self.assertEqual(response2.status_code, 200)
         self.assertEqual('Mission 99', response2.data['name'])
@@ -213,6 +212,7 @@ class TestProjectViewSet(TestBase):
         """
         mocked_target_object = mommy.make('tasking.Task')
         project_data = self._create_project()
+        project_id = project_data['id']
         project = mommy.make('tasking.Project')
         user = mommy.make('auth.User')
 
@@ -228,17 +228,17 @@ class TestProjectViewSet(TestBase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response.data['detail']))
+            str(response.data['detail']))
 
         # test that you need authentication for retrieving a project
         view2 = ProjectViewSet.as_view({'get': 'retrieve'})
         request2 = self.factory.get(
-            '/projects/{id}'.format(id=project_data['id']))
-        response2 = view2(request=request2, pk=project_data['id'])
+            f'/projects/{project_id}')
+        response2 = view2(request=request2, pk=project_id)
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response2.data['detail']))
+            str(response2.data['detail']))
 
         # test that you need authentication for listing projects
         view3 = ProjectViewSet.as_view({'get': 'list'})
@@ -247,20 +247,20 @@ class TestProjectViewSet(TestBase):
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response3.data['detail']))
+            str(response3.data['detail']))
 
         # test that you need authentication for deleting a project
         # pylint: disable=no-member
         self.assertTrue(Project.objects.filter(pk=project.id).exists())
 
         view4 = ProjectViewSet.as_view({'delete': 'destroy'})
-        request4 = self.factory.delete('/projects/{id}'.format(id=project.id))
+        request4 = self.factory.delete(f'/projects/{project.id}')
         response4 = view4(request=request4, pk=project.id)
 
         self.assertEqual(response4.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response4.data['detail']))
+            str(response4.data['detail']))
 
         # test that you need authentication for updating a project
         data = {
@@ -271,13 +271,13 @@ class TestProjectViewSet(TestBase):
 
         view5 = ProjectViewSet.as_view({'patch': 'partial_update'})
         request5 = self.factory.patch(
-            '/projects/{id}'.format(id=project_data['id']), data=data)
-        response5 = view5(request=request5, pk=project_data['id'])
+            f'/projects/{project_id}', data=data)
+        response5 = view5(request=request5, pk=project_id)
 
         self.assertEqual(response5.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response5.data['detail']))
+            str(response5.data['detail']))
 
     def test_name_search(self):
         """

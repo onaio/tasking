@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tests TaskOccurrence viewsets.
 """
-from __future__ import unicode_literals
-
-from django.utils import six
-
 from model_mommy import mommy
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tests.base import TestBase
@@ -49,11 +44,12 @@ class TestTaskOccurrenceViewSet(TestBase):
         """
         user = mommy.make('auth.User')
         occurrence_data = self._create_occurrence()
+        occurrence_id = occurrence_data['id']
         view = TaskOccurrenceViewSet.as_view({'get': 'retrieve'})
         request = self.factory.get(
-            '/occurrence/{id}'.format(id=occurrence_data['id']))
+            f'/occurrence/{occurrence_id}')
         force_authenticate(request, user=user)
-        response = view(request=request, pk=occurrence_data['id'])
+        response = view(request=request, pk=occurrence_id)
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(response.data, occurrence_data)
 
@@ -76,16 +72,17 @@ class TestTaskOccurrenceViewSet(TestBase):
         Test that authentication is required for all viewset actions
         """
         occurrence_data = self._create_occurrence()
+        occurrence_id = occurrence_data['id']
 
         # test that you need authentication for retrieving a occurrence
         view2 = TaskOccurrenceViewSet.as_view({'get': 'retrieve'})
         request2 = self.factory.get(
-            '/occurrence/{id}'.format(id=occurrence_data['id']))
-        response2 = view2(request=request2, pk=occurrence_data['id'])
+            f'/occurrence/{occurrence_id}')
+        response2 = view2(request=request2, pk=occurrence_id)
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response2.data['detail']))
+            str(response2.data['detail']))
 
         # test that you need authentication for listing a occurrence
         view3 = TaskOccurrenceViewSet.as_view({'get': 'list'})
@@ -94,7 +91,7 @@ class TestTaskOccurrenceViewSet(TestBase):
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
             'Authentication credentials were not provided.',
-            six.text_type(response3.data['detail']))
+            str(response3.data['detail']))
 
     def test_task_filter(self):
         """
@@ -264,9 +261,9 @@ class TestTaskOccurrenceViewSet(TestBase):
         for i in range(1, 7):
             mommy.make(
                 'tasking.TaskOccurrence',
-                date='2018-05-0{}'.format(i),
-                start_time='0{}:00'.format(i),
-                end_time='{}:00'.format(i + 10)
+                date=f'2018-05-0{i}',
+                start_time=f'0{i}:00',
+                end_time=f'{i + 10}:00'
             )
 
         # test sorting by date ascending

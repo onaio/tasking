@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Test for LocationType Serializers
 """
-from __future__ import unicode_literals
-
 from tests.base import TestBase
 
 from tasking.serializers import LocationTypeSerializer

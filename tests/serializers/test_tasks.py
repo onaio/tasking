@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Tests for task serializers
 """
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 from datetime import timedelta
 

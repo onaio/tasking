@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Project viewsets
 """
-from __future__ import unicode_literals
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -25,7 +22,7 @@ class ProjectViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         DjangoFilterBackend,
         filters.SearchFilter,
         filters.OrderingFilter]
-    filter_fields = ['tasks']
+    filterset_fields = ['tasks']
     search_fields = ['name', ]
     ordering_fields = ['name', 'created']
     queryset = Project.objects.all()  # pylint: disable=no-member

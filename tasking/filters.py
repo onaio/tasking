@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 """
-Main init file for tasking app
+Module containing the Filters for tasking app
 """
-from __future__ import unicode_literals
-
-from django_filters import rest_framework as filters
+from django_filters import rest_framework as rest_filters
+from rest_framework import filters
 
 from tasking.models import Task, TaskOccurrence
 
@@ -16,7 +14,7 @@ DATETIME_LOOKUPS = [
 TIME_LOOKUPS = ['exact', 'gt', 'lt', 'gte', 'lte']
 
 
-class TaskOccurrenceFilterSet(filters.FilterSet):
+class TaskOccurrenceFilterSet(rest_filters.FilterSet):
     """
     Filterset for TaskOccurrence
     """
@@ -36,25 +34,41 @@ class TaskOccurrenceFilterSet(filters.FilterSet):
         }
 
 
-class TaskFilterSet(filters.FilterSet):
+class TaskOccurenceFilter(filters.BaseFilterBackend):
+    """
+    Task filter backend that filters the TaskOccurences
+    """
+    def filter_queryset(self, request, queryset, view):
+        query_params = request.query_params
+        query_param_keys = query_params.keys()
+        filter_args = {}
+
+        for key in query_param_keys:
+            try:
+                name, lookup = key.split('__')
+            except ValueError:
+                pass
+            else:
+                if lookup in DATETIME_LOOKUPS and name == 'date':
+                    filter_args[key] = query_params.get(key)
+
+                if lookup in TIME_LOOKUPS and name in [
+                        'start_time', 'end_time']:
+                    filter_args[key] = query_params.get(key)
+
+        # pylint: disable=no-member
+        if filter_args:
+            task_ids = TaskOccurrence.objects.filter(
+                **filter_args).values_list('task_id', flat=True).distinct()
+            return queryset.filter(id__in=task_ids)
+
+        return queryset
+
+
+class TaskFilterSet(rest_filters.FilterSet):
     """
     Filterset for Task
     """
-    date = filters.DateFilter(
-        name='date',
-        lookup_expr=DATETIME_LOOKUPS,
-        method='filter_timing'
-    )
-    start_time = filters.TimeFilter(
-        name='start_time',
-        lookup_expr=TIME_LOOKUPS,
-        method='filter_timing'
-    )
-    end_time = filters.TimeFilter(
-        name='end_time',
-        lookup_expr=TIME_LOOKUPS,
-        method='filter_timing'
-    )
 
     # pylint: disable=too-few-public-methods
     class Meta:
@@ -63,50 +77,5 @@ class TaskFilterSet(filters.FilterSet):
         """
         model = Task
         fields = [
-            'locations',
-            'status',
-            'project',
-            'parent',
-            'date',
-            'start_time',
-            'end_time'
+            'locations', 'status', 'project', 'parent'
         ]
-
-    # pylint: disable=unused-argument
-    def filter_timing(self, queryset, name, value):
-        """
-        Method to filter against task timing using TaskOccurrences
-        """
-
-        # get the filter
-        try:
-            the_filter = self.get_filters()[name]
-        except KeyError:
-            # this name isn't a valid filter
-            return queryset
-
-        # first try the exact name
-        data = self.data.get(name)
-        if data is not None:
-            query_name = name
-        else:
-            # get the lookups
-            lookups = the_filter.lookup_expr
-            # loop through lookups to find which one is being used
-            if lookups:
-                for lookup in lookups:
-                    query_name = self.get_filter_name(name, lookup)
-                    data = self.data.get(query_name)
-                    if data is not None:
-                        break
-
-        if data is None:
-            # no data was found
-            return queryset
-
-        filter_args = {query_name: data}
-        # get task ids
-        # pylint: disable=no-member
-        task_ids = TaskOccurrence.objects.filter(
-            **filter_args).values_list('task_id', flat=True).distinct()
-        return queryset.filter(id__in=task_ids)

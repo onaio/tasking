@@ -1,8 +1,6 @@
 """
 Project viewsets
 """
-from __future__ import unicode_literals
-
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 

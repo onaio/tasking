@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
 """
 Module for the Task model(s)
 """
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
 from mptt.models import MPTTModel, TreeForeignKey
@@ -132,7 +128,6 @@ class BaseTaskLocation(TimeStampedModel, models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class TaskLocation(BaseTaskLocation):
     """
     Provides extra information on Task-Location relationship
@@ -154,11 +149,9 @@ class TaskLocation(BaseTaskLocation):
         """
         String representation of a TaskLocation object
         """
-        return "{task} at {location}".format(
-            task=self.task.name, location=self.location.name)
+        return f'{self.task.name} at {self.location.name}'
 
 
-@python_2_unicode_compatible
 class Task(BaseTask):
     """
     Task model class
@@ -196,7 +189,7 @@ class Task(BaseTask):
 
         e.g. Cow prices - 1
         """
-        return "{name} - {pk}".format(pk=self.pk, name=self.name)
+        return f'{self.name} - {self.pk}'
 
     # pylint: disable=no-member
     def get_submissions(self):

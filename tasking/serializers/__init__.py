@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Task Serializers init module
 """
-from __future__ import unicode_literals
-
 from tasking.serializers.contenttype import ContentTypeSerializer  # noqa
 from tasking.serializers.location import LocationSerializer  # noqa
 from tasking.serializers.locationtype import LocationTypeSerializer  # noqa

@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Location viewsets
 """
-from __future__ import unicode_literals
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -25,7 +22,7 @@ class LocationViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         filters.SearchFilter,
         DjangoFilterBackend,
         filters.OrderingFilter]
-    filter_fields = ['parent', 'country', 'location_type']
+    filterset_fields = ['parent', 'country', 'location_type']
     search_fields = ['name']
     ordering_fields = ['name', 'created']
     queryset = Location.objects.all()

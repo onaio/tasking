@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Test for Project Serializers
 """
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 
 from model_mommy import mommy

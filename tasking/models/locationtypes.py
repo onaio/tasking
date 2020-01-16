@@ -1,11 +1,7 @@
 """
 Module for the LocationType model
 """
-
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
 from tasking.models.base import TimeStampedModel
@@ -31,7 +27,6 @@ class BaseLocationType(TimeStampedModel, models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class LocationType(BaseLocationType):
     """
     LocationType model class

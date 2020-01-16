@@ -2,10 +2,7 @@
 """
 Module for the Task Submission model(s)
 """
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 from django.contrib.auth import get_user_model
 
@@ -70,7 +67,6 @@ class BaseSubmission(GenericFKModel, TimeStampedModel, models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class Submission(BaseSubmission):
     """
     Submission model class
@@ -107,8 +103,7 @@ class Submission(BaseSubmission):
 
         e.g. Cattle Price - 1 submission 1
         """
-        return "{task} submission {submission_id}".format(
-            submission_id=self.pk, task=self.task)
+        return f'{self.task} submission {self.pk}'
 
     def get_approved(self, status):
         """

@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Custom exceptions for tasking
 """
-from __future__ import unicode_literals
-
 from tasking.common_tags import (INVALID_SHAPEFILE, MISSING_FILE, NO_SHAPEFILE,
                                  TARGET_DOES_NOT_EXIST, UNNECESSARY_FILE)
 

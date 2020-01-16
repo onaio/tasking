@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Submission viewsets
 """
-from __future__ import unicode_literals
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets, filters
 from rest_framework.permissions import IsAuthenticated
@@ -23,7 +20,7 @@ class SubmissionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter, filters.SearchFilter,
                        DjangoFilterBackend]
-    filter_fields = [
+    filterset_fields = [
         'location',
         'task',
         'valid',
