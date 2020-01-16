@@ -3,7 +3,7 @@
 Abstract classes needed by other models in Kaznet.
 
 ## GeoTimeStampedModel
-Re-export timestamp model from django model as well as other geo django apis and fields.  
+Re-export timestamp model from django model as well as other geo django apis and fields.
 Inherits:
 ```
 django.contrib.gis.db.Models
@@ -15,7 +15,7 @@ django.contrib.gis.db.Models
 
 
 ## TimeStampedModel
-Abstract class to provide creation and modification datetimes for records in subclasses.  
+Abstract class to provide creation and modification datetimes for records in subclasses.
 Inherits:
 ```
 django.db.models
@@ -27,7 +27,7 @@ django.db.models
 
 
 ## GenericFKModel
-Generic class to DRY out references to other models.  
+Generic class to DRY out references to other models.
 We use [django's contenttypes framework](https://docs.djangoproject.com/en/2.0/ref/contrib/contenttypes)
 to create [generic relations](https://docs.djangoproject.com/en/2.0/ref/contrib/contenttypes/#generic-relations)
 with models which don't exist yet.

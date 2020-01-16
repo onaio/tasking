@@ -21,4 +21,3 @@ Computed from an [rrule](https://www.ietf.org/rfc/rfc2445.txt).
 
 #### methods
 `get_timestring`:  Returns a nice human-readable string that represents that date, start and end time.
-

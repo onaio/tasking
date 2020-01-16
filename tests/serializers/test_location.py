@@ -947,7 +947,7 @@ class TestLocationSerializer(TestCase):
         """
         Test invalid shapefile
         The appropriate exception is raised when we encounter an invalid
-        shapefile    
+        shapefile
         """
         mock.side_effect = TypeError
 

@@ -14,11 +14,11 @@ Inherits:
 
 
 ## Project
-Concrete class implementing projects.  
+Concrete class implementing projects.
 Inherits:
 ```
 BaseProject
 ```
 
---- 
+---
   * tasks `ManyToManyField` - ids of the tasks contained within the project.
