@@ -1,6 +1,6 @@
 # Locations
 
-Model to save real wold places. 
+Model to save real wold places.
 
 ## BaseLocation
 
@@ -28,7 +28,7 @@ django.contrib.gis.db.Model
 
 
 ## Location
-Concrete model for location. Implements BaseLocation as is.  
+Concrete model for location. Implements BaseLocation as is.
 Inherits:
 ```
 BaseLocation

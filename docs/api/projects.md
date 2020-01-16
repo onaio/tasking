@@ -8,7 +8,7 @@ Once a Project is created it's stored in the database and can be retrieved via t
 
 ### POST /api/v1/projects
 
-Creates a new project, requires a `name` , `target_content_type` and `target_id`. 
+Creates a new project, requires a `name` , `target_content_type` and `target_id`.
 
 ```console
 curl -X POST -H "Content-Type:application/json" -d '{"name": "Example Project", "target_content_type": 9, "target_id": "3"}' https://example.com/api/v1/projects

@@ -20,8 +20,8 @@ models.Model
   * timing_rule `TextField` - [recurrence rule](https://tools.ietf.org/html/rfc2445) for the task
   * estimated_time `DurationField` - estimated time for completion
   * total_submission_target `IntegerField` - maximum number of submissions wanted for the entire task
-  * user_submission_target `IntegerField` - maximum number of submissions wanted from each enumerator 
-  * status `CharField` - the status of the task. Has to be one of:  
+  * user_submission_target `IntegerField` - maximum number of submissions wanted from each enumerator
+  * status `CharField` - the status of the task. Has to be one of:
     - active
     - deactivated
     - expired
