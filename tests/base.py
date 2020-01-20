@@ -17,8 +17,6 @@ class TestBase(TestCase):
         Setup tests
         """
         # get the content type for Task model
-        self.task_type = get_allowed_contenttypes().filter(
-            model='task').first()
+        self.task_type = get_allowed_contenttypes().filter(model="task").first()
         # get the content type for User model
-        self.user_type = get_allowed_contenttypes().filter(
-            model='user').first()
+        self.user_type = get_allowed_contenttypes().filter(model="user").first()

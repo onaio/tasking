@@ -17,7 +17,7 @@ class TestLocationTypeSerializer(TestBase):
         """
 
         data = {
-            'name': "Household",
+            "name": "Household",
         }
 
         serializer_instance = LocationTypeSerializer(data=data)
@@ -25,12 +25,13 @@ class TestLocationTypeSerializer(TestBase):
         locationtype = serializer_instance.save()
 
         self.assertDictContainsSubset(data, serializer_instance.data)
-        self.assertEqual('Household', locationtype.name)
+        self.assertEqual("Household", locationtype.name)
 
         expected_fields = [
-            'id',
-            'name',
+            "id",
+            "name",
         ]
 
-        self.assertEqual(set(expected_fields),
-                         set(list(serializer_instance.data.keys())))
+        self.assertEqual(
+            set(expected_fields), set(list(serializer_instance.data.keys()))
+        )

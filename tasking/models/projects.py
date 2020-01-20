@@ -14,16 +14,17 @@ class BaseProject(GenericFKModel, TimeStampedModel, models.Model):
     This class is meant to be extended to add Projects to your own project.
     It only implements the bare minimum of what a Project could be.
     """
+
     name = models.CharField(
-        _('Name'),
-        max_length=255,
-        help_text=_('This is the name of the Project'))
+        _("Name"), max_length=255, help_text=_("This is the name of the Project")
+    )
 
     # pylint: disable=too-few-public-methods
     class Meta:
         """
         The meta option class for BaseProject
         """
+
         abstract = True
 
 
@@ -31,21 +32,24 @@ class Project(BaseProject):
     """
     Project model class
     """
+
     tasks = models.ManyToManyField(
-        'tasking.Task',
-        verbose_name=_('Tasks'),
+        "tasking.Task",
+        verbose_name=_("Tasks"),
         blank=True,
         default=None,
-        help_text=_('This represents the Task.'))
+        help_text=_("This represents the Task."),
+    )
 
     # pylint: disable=too-few-public-methods
     class Meta:
         """
         This is the meta options class for the Project model
         """
+
         abstract = False
-        ordering = ['name']
-        app_label = 'tasking'
+        ordering = ["name"]
+        app_label = "tasking"
 
     def __str__(self):
         """

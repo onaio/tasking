@@ -16,8 +16,6 @@ class TestProject(TestCase):
         Test __str__ method of Project model
         """
 
-        livestock_task_list = mommy.make(
-            'tasking.Project',
-            name="Livestock tasks")
+        livestock_task_list = mommy.make("tasking.Project", name="Livestock tasks")
         expected = "Livestock tasks"
         self.assertEqual(expected, livestock_task_list.__str__())

@@ -16,8 +16,9 @@ class LocationTypeSerializer(serializers.ModelSerializer):
         """
         Meta Options for LocationTypeSerializer
         """
+
         model = LocationType
         fields = [
-            'id',
-            'name',
+            "id",
+            "name",
         ]

@@ -15,13 +15,10 @@ class TaskOccurrenceViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Viewset for occurrence
     """
+
     serializer_class = TaskOccurrenceSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     filterset_class = TaskOccurrenceFilterSet
-    ordering_fields = [
-        'created',
-        'date',
-        'start_time',
-        'end_time']
+    ordering_fields = ["created", "date", "start_time", "end_time"]
     queryset = TaskOccurrence.objects.all()  # pylint: disable=no-member

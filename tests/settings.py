@@ -4,44 +4,43 @@ Settings for tests
 
 INSTALLED_APPS = (
     # core django apps
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.gis',
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.gis",
     # third party
-    'rest_framework',
-    'django_filters',
-    'rest_framework_gis',  # Required for CountryField in Location Model
-    'django_countries',  # Required for CountryField in Location Model
-    'mptt',
+    "rest_framework",
+    "django_filters",
+    "rest_framework_gis",  # Required for CountryField in Location Model
+    "django_countries",  # Required for CountryField in Location Model
+    "mptt",
     # custom
-    'tasking.apps.TaskingConfig',
+    "tasking.apps.TaskingConfig",
 )
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'ona_tasking',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1'
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": "ona_tasking",
+        "USER": "postgres",
+        "PASSWORD": "",
+        "HOST": "127.0.0.1",
     }
 }
 
-TIME_ZONE = 'Africa/Nairobi'
+TIME_ZONE = "Africa/Nairobi"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS':
-        ('django_filters.rest_framework.DjangoFilterBackend',)
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",)
 }
 
 SECRET_KEY = "secret_key_for_testing"
 
 FILE_UPLOAD_HANDLERS = [
-    'django.core.files.uploadhandler.MemoryFileUploadHandler',
-    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
 
 

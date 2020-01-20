@@ -22,34 +22,35 @@ class BaseSegmentRule(TimeStampedModel, models.Model):
     Then you would be able to use this SegmentRule to filter:
         SELECT * FROM task WHERE task_id=6;
     """
+
     name = models.CharField(
-        _('Name'),
-        max_length=255,
-        help_text=_('The name of this rule.'))
+        _("Name"), max_length=255, help_text=_("The name of this rule.")
+    )
     description = models.TextField(
-        _('Description'),
+        _("Description"),
+        default="",
         blank=True,
-        default='',
-        help_text=_('The description of this rule.')
+        help_text=_("The description of this rule."),
     )
     target_content_type = models.ForeignKey(
         ContentType,
         blank=True,
         null=True,
-        related_name='segment_rule',
+        related_name="segment_rule",
         default=None,
         db_index=True,
-        on_delete=models.SET_NULL)
+        on_delete=models.SET_NULL,
+    )
     target_field = models.CharField(
-        _('Target Field'),
+        _("Target Field"),
         max_length=255,
-        help_text=_('The field on the target model.'),
-        db_index=True
+        help_text=_("The field on the target model."),
+        db_index=True,
     )
     target_field_value = models.CharField(
-        _('Target Field Value'),
+        _("Target Field Value"),
         max_length=255,
-        help_text=_('The value of the target field')
+        help_text=_("The value of the target field"),
     )
     active = models.BooleanField()
 
@@ -58,6 +59,7 @@ class BaseSegmentRule(TimeStampedModel, models.Model):
         """
         Meta options for BaseSegmentRule
         """
+
         abstract = True
 
 
@@ -71,9 +73,10 @@ class SegmentRule(BaseSegmentRule):
         """
         Meta options for SegmentRule
         """
+
         abstract = False
-        app_label = 'tasking'
-        ordering = ['name']
+        app_label = "tasking"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name

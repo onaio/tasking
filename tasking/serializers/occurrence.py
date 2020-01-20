@@ -10,6 +10,7 @@ class TaskOccurrenceSerializer(serializers.ModelSerializer):
     """
     TaskOccurrence serializer class
     """
+
     time_string = serializers.SerializerMethodField()
 
     # pylint: disable=too-few-public-methods
@@ -17,17 +18,18 @@ class TaskOccurrenceSerializer(serializers.ModelSerializer):
         """
         Meta options for TaskOccurrenceSerializer
         """
+
         model = TaskOccurrence
         fields = [
-            'id',
-            'task',
-            'location',
-            'created',
-            'modified',
-            'date',
-            'start_time',
-            'end_time',
-            'time_string'
+            "id",
+            "task",
+            "location",
+            "created",
+            "modified",
+            "date",
+            "start_time",
+            "end_time",
+            "time_string",
         ]
 
     # pylint: disable=no-self-use

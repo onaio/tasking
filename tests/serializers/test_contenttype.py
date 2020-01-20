@@ -17,19 +17,14 @@ class TestContentTypeSerializer(TestCase):
         Test that the serializer returns the expected fields
         """
         mocked_contenttype = ContentType.objects.filter(
-            app_label='tasking', model='task').first()
+            app_label="tasking", model="task"
+        ).first()
 
         serializer_data = ContentTypeSerializer(mocked_contenttype).data
 
-        expected_fields = {
-            'app_label',
-            'model',
-            'id'
-        }
+        expected_fields = {"app_label", "model", "id"}
 
-        self.assertEqual(set(expected_fields),
-                         set(list(serializer_data.keys())))
-        self.assertEqual(
-            mocked_contenttype.app_label, serializer_data['app_label'])
-        self.assertEqual(mocked_contenttype.model, serializer_data['model'])
-        self.assertEqual(mocked_contenttype.id, serializer_data['id'])
+        self.assertEqual(set(expected_fields), set(list(serializer_data.keys())))
+        self.assertEqual(mocked_contenttype.app_label, serializer_data["app_label"])
+        self.assertEqual(mocked_contenttype.model, serializer_data["model"])
+        self.assertEqual(mocked_contenttype.id, serializer_data["id"])

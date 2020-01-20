@@ -12,8 +12,12 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework_gis.fields import GeoJsonDict
 from tests.base import TestBase
 
-from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
-                                 INVALID_SHAPEFILE, RADIUS_MISSING)
+from tasking.common_tags import (
+    GEODETAILS_ONLY,
+    GEOPOINT_MISSING,
+    INVALID_SHAPEFILE,
+    RADIUS_MISSING,
+)
 from tasking.models import Location
 from tasking.viewsets import LocationViewSet
 
@@ -33,20 +37,20 @@ class TestLocationViewSet(TestBase):
         """
         Helper to create a single location
         """
-        user = mommy.make('auth.User')
+        user = mommy.make("auth.User")
 
         data = {
-            'name': 'Nairobi',
-            'country': 'KE',
+            "name": "Nairobi",
+            "country": "KE",
         }
-        view = LocationViewSet.as_view({'post': 'create'})
-        request = self.factory.post('/locations', data)
+        view = LocationViewSet.as_view({"post": "create"})
+        request = self.factory.post("/locations", data)
         # Need authenticated user
         force_authenticate(request, user=user)
         response = view(request=request)
 
         self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual('Nairobi', response.data['name'])
+        self.assertEqual("Nairobi", response.data["name"])
         self.assertDictContainsSubset(data, response.data)
         return response.data
 
@@ -60,44 +64,36 @@ class TestLocationViewSet(TestBase):
         """
         Test that we can create a Location Object with a shapefile
         """
-        user = mommy.make('auth.User')
-        path = os.path.join(BASE_DIR, 'fixtures', 'test_shapefile.zip')
-        path2 = os.path.join(BASE_DIR, 'fixtures', 'SamburuCentralPolygon.zip')
+        user = mommy.make("auth.User")
+        path = os.path.join(BASE_DIR, "fixtures", "test_shapefile.zip")
+        path2 = os.path.join(BASE_DIR, "fixtures", "SamburuCentralPolygon.zip")
 
-        with open(path, 'r+b') as shapefile:
-            data = {
-                'name': 'Nairobi',
-                'country': 'KE',
-                'shapefile': shapefile
-            }
-            view = LocationViewSet.as_view({'post': 'create'})
-            request = self.factory.post('/locations', data)
+        with open(path, "r+b") as shapefile:
+            data = {"name": "Nairobi", "country": "KE", "shapefile": shapefile}
+            view = LocationViewSet.as_view({"post": "create"})
+            request = self.factory.post("/locations", data)
             # Need authenticated user
             force_authenticate(request, user=user)
             response = view(request=request)
 
             self.assertEqual(response.status_code, 201, response.data)
-            self.assertEqual('Nairobi', response.data['name'])
-            self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
-            location = Location.objects.get(pk=response.data['id'])
+            self.assertEqual("Nairobi", response.data["name"])
+            self.assertEqual(type(response.data["shapefile"]), GeoJsonDict)
+            location = Location.objects.get(pk=response.data["id"])
             self.assertEqual(1, len([_ for _ in location.shapefile]))
 
-        with open(path2, 'r+b') as shapefile2:
-            data = {
-                'name': 'Samburu',
-                'country': 'KE',
-                'shapefile': shapefile2
-            }
-            view = LocationViewSet.as_view({'post': 'create'})
-            request = self.factory.post('/locations', data)
+        with open(path2, "r+b") as shapefile2:
+            data = {"name": "Samburu", "country": "KE", "shapefile": shapefile2}
+            view = LocationViewSet.as_view({"post": "create"})
+            request = self.factory.post("/locations", data)
             # Need authenticated user
             force_authenticate(request, user=user)
             response = view(request=request)
 
             self.assertEqual(response.status_code, 201, response.data)
-            self.assertEqual('Samburu', response.data['name'])
-            self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
-            location = Location.objects.get(pk=response.data['id'])
+            self.assertEqual("Samburu", response.data["name"])
+            self.assertEqual(type(response.data["shapefile"]), GeoJsonDict)
+            location = Location.objects.get(pk=response.data["id"])
             self.assertEqual(1, len([_ for _ in location.shapefile]))
 
     @override_settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=False)
@@ -106,38 +102,32 @@ class TestLocationViewSet(TestBase):
         Test that we can create a Location Object with a shapefile that has
         nested multipolygons
         """
-        user = mommy.make('auth.User')
-        path = os.path.join(BASE_DIR, 'fixtures', 'kenya.zip')
+        user = mommy.make("auth.User")
+        path = os.path.join(BASE_DIR, "fixtures", "kenya.zip")
 
-        with open(path, 'r+b') as shapefile:
-            data = {
-                'name': 'Kenya',
-                'country': 'KE',
-                'shapefile': shapefile
-            }
-            view = LocationViewSet.as_view({'post': 'create'})
-            request = self.factory.post('/locations', data)
+        with open(path, "r+b") as shapefile:
+            data = {"name": "Kenya", "country": "KE", "shapefile": shapefile}
+            view = LocationViewSet.as_view({"post": "create"})
+            request = self.factory.post("/locations", data)
             # Need authenticated user
             force_authenticate(request, user=user)
 
             # should not work
-            with self.settings(
-                    TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=False):
+            with self.settings(TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=False):
                 response = view(request=request)
                 self.assertEqual(response.status_code, 400)
-                self.assertIn('shapefile', response.data.keys())
+                self.assertIn("shapefile", response.data.keys())
                 self.assertEqual(
-                    INVALID_SHAPEFILE,
-                    six.text_type(response.data['shapefile'][0]))
+                    INVALID_SHAPEFILE, six.text_type(response.data["shapefile"][0])
+                )
 
             # should work
-            with self.settings(
-                    TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=True):
+            with self.settings(TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=True):
                 response = view(request=request)
                 self.assertEqual(response.status_code, 201, response.data)
-                self.assertEqual('Kenya', response.data['name'])
-                self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
-                location = Location.objects.get(pk=response.data['id'])
+                self.assertEqual("Kenya", response.data["name"])
+                self.assertEqual(type(response.data["shapefile"]), GeoJsonDict)
+                location = Location.objects.get(pk=response.data["id"])
                 self.assertEqual(431, len([_ for _ in location.shapefile]))
 
     def test_create_location_with_shapefile_ignore_invalid(self):
@@ -146,17 +136,13 @@ class TestLocationViewSet(TestBase):
         that includes invalid types when
         TASKING_SHAPEFILE_IGNORE_INVALID_TYPES = True
         """
-        user = mommy.make('auth.User')
-        path = os.path.join(BASE_DIR, 'fixtures', 'kenya.zip')
+        user = mommy.make("auth.User")
+        path = os.path.join(BASE_DIR, "fixtures", "kenya.zip")
 
-        with open(path, 'r+b') as shapefile:
-            data = {
-                'name': 'Kenya',
-                'country': 'KE',
-                'shapefile': shapefile
-            }
-            view = LocationViewSet.as_view({'post': 'create'})
-            request = self.factory.post('/locations', data)
+        with open(path, "r+b") as shapefile:
+            data = {"name": "Kenya", "country": "KE", "shapefile": shapefile}
+            view = LocationViewSet.as_view({"post": "create"})
+            request = self.factory.post("/locations", data)
             # Need authenticated user
             force_authenticate(request, user=user)
 
@@ -164,18 +150,18 @@ class TestLocationViewSet(TestBase):
             with self.settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=False):
                 response = view(request=request)
                 self.assertEqual(response.status_code, 400)
-                self.assertIn('shapefile', response.data.keys())
+                self.assertIn("shapefile", response.data.keys())
                 self.assertEqual(
-                    INVALID_SHAPEFILE,
-                    six.text_type(response.data['shapefile'][0]))
+                    INVALID_SHAPEFILE, six.text_type(response.data["shapefile"][0])
+                )
 
             # should work
             with self.settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=True):
                 response = view(request=request)
                 self.assertEqual(response.status_code, 201, response.data)
-                self.assertEqual('Kenya', response.data['name'])
-                self.assertEqual(type(response.data['shapefile']), GeoJsonDict)
-                location = Location.objects.get(pk=response.data['id'])
+                self.assertEqual("Kenya", response.data["name"])
+                self.assertEqual(type(response.data["shapefile"]), GeoJsonDict)
+                location = Location.objects.get(pk=response.data["id"])
                 self.assertEqual(379, len([_ for _ in location.shapefile]))
 
     def test_create_with_bad_data(self):
@@ -183,75 +169,65 @@ class TestLocationViewSet(TestBase):
         Test that we get appropriate errors when trying to create an object
         with bad data
         """
-        bob_user = mommy.make('auth.User')
-        alice_user = mommy.make('auth.User')
-        liz_user = mommy.make('auth.User')
+        bob_user = mommy.make("auth.User")
+        alice_user = mommy.make("auth.User")
+        liz_user = mommy.make("auth.User")
 
         data_missing_radius = {
-            'name': 'Nairobi',
-            'geopoint': '30,10',
-            }
-        view = LocationViewSet.as_view({'post': 'create'})
-        request = self.factory.post('/locations', data_missing_radius)
+            "name": "Nairobi",
+            "geopoint": "30,10",
+        }
+        view = LocationViewSet.as_view({"post": "create"})
+        request = self.factory.post("/locations", data_missing_radius)
         # Need authenticated user
         force_authenticate(request, user=bob_user)
         response = view(request=request)
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn('radius', response.data.keys())
-        self.assertEqual(RADIUS_MISSING,
-                         str(response.data['radius'][0]))
+        self.assertIn("radius", response.data.keys())
+        self.assertEqual(RADIUS_MISSING, str(response.data["radius"][0]))
 
-        data_missing_geopoint = {
-            'name': 'Montreal',
-            'radius': 45.678
-            }
+        data_missing_geopoint = {"name": "Montreal", "radius": 45.678}
 
-        view1 = LocationViewSet.as_view({'post': 'create'})
-        request1 = self.factory.post('/locations', data_missing_geopoint)
+        view1 = LocationViewSet.as_view({"post": "create"})
+        request1 = self.factory.post("/locations", data_missing_geopoint)
         # Need authenticated user
         force_authenticate(request1, user=liz_user)
         response1 = view1(request=request1)
 
         self.assertEqual(response1.status_code, 400)
-        self.assertIn('geopoint', response1.data.keys())
-        self.assertEqual(GEOPOINT_MISSING,
-                         str(response1.data['geopoint'][0]))
+        self.assertIn("geopoint", response1.data.keys())
+        self.assertEqual(GEOPOINT_MISSING, str(response1.data["geopoint"][0]))
 
-        path = os.path.join(
-            BASE_DIR, 'fixtures', 'test_shapefile.zip')
+        path = os.path.join(BASE_DIR, "fixtures", "test_shapefile.zip")
 
-        with open(path, 'r+b') as shapefile:
+        with open(path, "r+b") as shapefile:
             data_shapefile = dict(
-                name='Arusha',
-                radius=56.6789,
-                geopoint='30,10',
-                shapefile=shapefile
-                )
+                name="Arusha", radius=56.6789, geopoint="30,10", shapefile=shapefile
+            )
 
-            view2 = LocationViewSet.as_view({'post': 'create'})
-            request2 = self.factory.post('/locations', data_shapefile)
+            view2 = LocationViewSet.as_view({"post": "create"})
+            request2 = self.factory.post("/locations", data_shapefile)
             # Need authenticated user
             force_authenticate(request2, user=alice_user)
             response2 = view2(request=request2)
 
             self.assertEqual(response2.status_code, 400)
-            self.assertIn('shapefile', response2.data.keys())
-            self.assertEqual(GEODETAILS_ONLY,
-                             str(response2.data['shapefile'][0]))
+            self.assertIn("shapefile", response2.data.keys())
+            self.assertEqual(GEODETAILS_ONLY, str(response2.data["shapefile"][0]))
 
     def test_delete_location(self):
         """
         Test DELETE location.
         """
-        user = mommy.make('auth.User')
-        location = mommy.make('tasking.Location')
+        user = mommy.make("auth.User")
+        location = mommy.make("tasking.Location")
 
         # assert that location exists
         self.assertTrue(Location.objects.filter(pk=location.id).exists())
         # delete location
-        view = LocationViewSet.as_view({'delete': 'destroy'})
-        request = self.factory.delete(f'/locations/{location.id}')
+        view = LocationViewSet.as_view({"delete": "destroy"})
+        request = self.factory.delete(f"/locations/{location.id}")
         force_authenticate(request, user=user)
         response = view(request=request, pk=location.id)
         # assert that location was deleted
@@ -262,12 +238,12 @@ class TestLocationViewSet(TestBase):
         """
         Test GET /locations/[pk] return a location matching pk.
         """
-        user = mommy.make('auth.User')
+        user = mommy.make("auth.User")
         location_data = self._create_location()
-        location_id = location_data['id']
+        location_id = location_data["id"]
 
-        view = LocationViewSet.as_view({'get': 'retrieve'})
-        request = self.factory.get(f'/locations/{location_id}')
+        view = LocationViewSet.as_view({"get": "retrieve"})
+        request = self.factory.get(f"/locations/{location_id}")
         force_authenticate(request, user=user)
         response = view(request=request, pk=location_id)
 
@@ -278,12 +254,12 @@ class TestLocationViewSet(TestBase):
         """
         Test GET /locations listing of locations for specific forms.
         """
-        user = mommy.make('auth.User')
+        user = mommy.make("auth.User")
         location_data = self._create_location()
 
-        view = LocationViewSet.as_view({'get': 'list'})
+        view = LocationViewSet.as_view({"get": "list"})
 
-        request = self.factory.get('/locations')
+        request = self.factory.get("/locations")
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
@@ -294,210 +270,200 @@ class TestLocationViewSet(TestBase):
         """
         Test UPDATE location
         """
-        user = mommy.make('auth.User')
+        user = mommy.make("auth.User")
         location_data = self._create_location()
-        location_id = location_data['id']
+        location_id = location_data["id"]
 
         data = {
-            'name': 'Arusha',
-            'country': 'TZ',
+            "name": "Arusha",
+            "country": "TZ",
         }
 
-        view = LocationViewSet.as_view({'patch': 'partial_update'})
-        request = self.factory.patch(
-            f'/locations/{location_id}', data=data)
+        view = LocationViewSet.as_view({"patch": "partial_update"})
+        request = self.factory.patch(f"/locations/{location_id}", data=data)
         force_authenticate(request, user=user)
         response = view(request=request, pk=location_id)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual('Arusha', response.data['name'])
-        self.assertEqual('TZ', response.data['country'])
+        self.assertEqual("Arusha", response.data["name"])
+        self.assertEqual("TZ", response.data["country"])
 
     def test_parent_filter(self):
         """
         Test that you can filter by parent
         """
-        user = mommy.make('auth.User')
-        location1 = mommy.make('tasking.Location', name='Eldorado')
-        location2 = mommy.make('tasking.Location', name='Africa')
+        user = mommy.make("auth.User")
+        location1 = mommy.make("tasking.Location", name="Eldorado")
+        location2 = mommy.make("tasking.Location", name="Africa")
 
         mommy.make(
-            'tasking.Location',
-            name='Market Town', parent=location2, _quantity=7)
+            "tasking.Location", name="Market Town", parent=location2, _quantity=7
+        )
 
-        view = LocationViewSet.as_view({'get': 'list'})
+        view = LocationViewSet.as_view({"get": "list"})
 
         # assert that there are no locations with location1 as a parent
-        request = self.factory.get('/locations?', {'parent': location1.id})
+        request = self.factory.get("/locations?", {"parent": location1.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
-        self.assertEqual(
-            Location.objects.filter(parent=location1).count(), 0)
+        self.assertEqual(Location.objects.filter(parent=location1).count(), 0)
 
         # assert that there are 7 locations with location2 as parent
-        request = self.factory.get('/locations?', {'parent': location2.id})
+        request = self.factory.get("/locations?", {"parent": location2.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 7)
-        self.assertEqual(
-            Location.objects.filter(parent=location2).count(), 7)
+        self.assertEqual(Location.objects.filter(parent=location2).count(), 7)
 
         # create a new location and make its parent location1 and assert that
         # it's there
-        mommy.make('tasking.Location', name='Africa', parent=location1)
+        mommy.make("tasking.Location", name="Africa", parent=location1)
 
-        request = self.factory.get('/locations?', {'parent': location1.id})
+        request = self.factory.get("/locations?", {"parent": location1.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(
-            Location.objects.filter(parent=location1).count(), 1)
+        self.assertEqual(Location.objects.filter(parent=location1).count(), 1)
 
     def test_location_type_filter(self):
         """
         Test that you can filter by location_type
         """
-        user = mommy.make('auth.User')
-        locationtype1 = mommy.make('tasking.LocationType', name='Household')
-        locationtype2 = mommy.make('tasking.LocationType', name='Hospital')
+        user = mommy.make("auth.User")
+        locationtype1 = mommy.make("tasking.LocationType", name="Household")
+        locationtype2 = mommy.make("tasking.LocationType", name="Hospital")
 
         mommy.make(
-            'tasking.Location',
-            name='Market Town', location_type=locationtype1, _quantity=7)
+            "tasking.Location",
+            name="Market Town",
+            location_type=locationtype1,
+            _quantity=7,
+        )
 
-        view = LocationViewSet.as_view({'get': 'list'})
+        view = LocationViewSet.as_view({"get": "list"})
 
         # assert that there are no locations with locationtype2
-        request = self.factory.get(
-            '/locations?', {'location_type': locationtype2.id})
+        request = self.factory.get("/locations?", {"location_type": locationtype2.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
         self.assertEqual(
-            Location.objects.filter(location_type=locationtype2).count(), 0)
+            Location.objects.filter(location_type=locationtype2).count(), 0
+        )
 
         # assert that there are 7 locations with locationtype1
-        request = self.factory.get(
-            '/locations?', {'location_type': locationtype1.id})
+        request = self.factory.get("/locations?", {"location_type": locationtype1.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 7)
         self.assertEqual(
-            Location.objects.filter(location_type=locationtype1).count(), 7)
+            Location.objects.filter(location_type=locationtype1).count(), 7
+        )
 
         # create a new location and make its location_type locationtype2
         # and assert that it's there
-        mommy.make(
-            'tasking.Location', name='Africa', location_type=locationtype2)
+        mommy.make("tasking.Location", name="Africa", location_type=locationtype2)
 
-        request = self.factory.get(
-            '/locations?', {'location_type': locationtype2.id})
+        request = self.factory.get("/locations?", {"location_type": locationtype2.id})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(
-            Location.objects.filter(location_type=locationtype2).count(), 1)
+            Location.objects.filter(location_type=locationtype2).count(), 1
+        )
 
     def test_country_filter(self):
         """
         Test that you can filter by country
         """
-        user = mommy.make('auth.User')
+        user = mommy.make("auth.User")
 
-        mommy.make(
-            'tasking.Location',
-            name='Market Town', country='US', _quantity=7)
+        mommy.make("tasking.Location", name="Market Town", country="US", _quantity=7)
 
-        view = LocationViewSet.as_view({'get': 'list'})
+        view = LocationViewSet.as_view({"get": "list"})
 
         # assert that there are no locations in Kenya(KE)
-        request = self.factory.get('/locations?', {'country': 'KE'})
+        request = self.factory.get("/locations?", {"country": "KE"})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
-        self.assertEqual(
-            Location.objects.filter(country='KE').count(), 0)
+        self.assertEqual(Location.objects.filter(country="KE").count(), 0)
 
         # assert that there are 7 locations in the United States(US)
-        request = self.factory.get('/locations?', {'country': 'US'})
+        request = self.factory.get("/locations?", {"country": "US"})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 7)
-        self.assertEqual(
-            Location.objects.filter(country='US').count(), 7)
+        self.assertEqual(Location.objects.filter(country="US").count(), 7)
 
         # create a new location with country Kenya(KE) and assert its there
-        mommy.make('tasking.Location', name='Nairobi', country='KE')
+        mommy.make("tasking.Location", name="Nairobi", country="KE")
 
-        request = self.factory.get('/locations?', {'country': 'KE'})
+        request = self.factory.get("/locations?", {"country": "KE"})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(
-            Location.objects.filter(country='KE').count(), 1)
+        self.assertEqual(Location.objects.filter(country="KE").count(), 1)
 
     def test_name_search(self):
         """
         Test that you can search by Name
         """
-        user = mommy.make('auth.User')
-        mommy.make('tasking.Location', name='Eldorado')
-        mommy.make('tasking.Location', name='Market', _quantity=7)
+        user = mommy.make("auth.User")
+        mommy.make("tasking.Location", name="Eldorado")
+        mommy.make("tasking.Location", name="Market", _quantity=7)
 
-        view = LocationViewSet.as_view({'get': 'list'})
-        request = self.factory.get('/locations', {'search': 'Eldorado'})
+        view = LocationViewSet.as_view({"get": "list"})
+        request = self.factory.get("/locations", {"search": "Eldorado"})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(
-            Location.objects.filter(name='Eldorado').count(), 1)
+        self.assertEqual(Location.objects.filter(name="Eldorado").count(), 1)
 
     def test_location_sorting(self):
         """
         Test that sorting works
         """
-        user = mommy.make('auth.User')
-        project1 = mommy.make('tasking.Location', name='Nairobi')
-        project2 = mommy.make('tasking.Location', name='Arusha')
+        user = mommy.make("auth.User")
+        project1 = mommy.make("tasking.Location", name="Nairobi")
+        project2 = mommy.make("tasking.Location", name="Arusha")
 
-        view = LocationViewSet.as_view({'get': 'list'})
+        view = LocationViewSet.as_view({"get": "list"})
 
         # order by name descending
-        request = self.factory.get('/locations', {'ordering': '-name'})
+        request = self.factory.get("/locations", {"ordering": "-name"})
         force_authenticate(request, user=user)
         response = view(request=request)
-        self.assertEqual(
-            response.data[0]['name'], project1.name)
-        self.assertEqual(response.data[0]['id'], project1.id)
-        self.assertEqual(
-            response.data[-1]['name'], project2.name)
-        self.assertEqual(response.data[-1]['id'], project2.id)
+        self.assertEqual(response.data[0]["name"], project1.name)
+        self.assertEqual(response.data[0]["id"], project1.id)
+        self.assertEqual(response.data[-1]["name"], project2.name)
+        self.assertEqual(response.data[-1]["id"], project2.id)
 
         # order by created ascending
-        request = self.factory.get('/locations', {'ordering': 'created'})
+        request = self.factory.get("/locations", {"ordering": "created"})
         force_authenticate(request, user=user)
         response = view(request=request)
         self.assertEqual(
-            response.data[0]['created'],
-            project1.created.astimezone(
-                pytz.timezone('Africa/Nairobi')).isoformat())
-        self.assertEqual(response.data[0]['id'], project1.id)
+            response.data[0]["created"],
+            project1.created.astimezone(pytz.timezone("Africa/Nairobi")).isoformat(),
+        )
+        self.assertEqual(response.data[0]["id"], project1.id)
         self.assertEqual(
-            response.data[-1]['created'],
-            project2.created.astimezone(
-                pytz.timezone('Africa/Nairobi')).isoformat())
-        self.assertEqual(response.data[-1]['id'], project2.id)
+            response.data[-1]["created"],
+            project2.created.astimezone(pytz.timezone("Africa/Nairobi")).isoformat(),
+        )
+        self.assertEqual(response.data[-1]["id"], project2.id)
 
     # pylint: disable=too-many-locals
     def test_authentication_required(self):
@@ -505,71 +471,75 @@ class TestLocationViewSet(TestBase):
         Test that authentication is required for all viewset actions
         """
         location_data = self._create_location()
-        location_id = location_data['id']
+        location_id = location_data["id"]
         location1_data = self._create_location()
-        location1_id = location1_data['id']
-        location = mommy.make('tasking.Location')
+        location1_id = location1_data["id"]
+        location = mommy.make("tasking.Location")
 
         # test that you need authentication for creating a location
         data = {
-            'name': 'Nairobi',
-            'country': 'KE',
-            }
+            "name": "Nairobi",
+            "country": "KE",
+        }
 
-        view = LocationViewSet.as_view({'post': 'create'})
-        request = self.factory.post('/locations', data)
+        view = LocationViewSet.as_view({"post": "create"})
+        request = self.factory.post("/locations", data)
 
         response = view(request=request)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
-            'Authentication credentials were not provided.',
-            str(response.data['detail']))
+            "Authentication credentials were not provided.",
+            str(response.data["detail"]),
+        )
 
         # test that you need authentication for retrieving a location
-        view1 = LocationViewSet.as_view({'get': 'retrieve'})
-        request1 = self.factory.get(f'/locations/{location_id}')
+        view1 = LocationViewSet.as_view({"get": "retrieve"})
+        request1 = self.factory.get(f"/locations/{location_id}")
         response1 = view1(request=request1, pk=location_id)
 
         self.assertEqual(response1.status_code, 403)
         self.assertEqual(
-            'Authentication credentials were not provided.',
-            str(response1.data['detail']))
+            "Authentication credentials were not provided.",
+            str(response1.data["detail"]),
+        )
 
         # test that you need authentication for listing a task
-        view2 = LocationViewSet.as_view({'get': 'list'})
-        request2 = self.factory.get('/locations')
+        view2 = LocationViewSet.as_view({"get": "list"})
+        request2 = self.factory.get("/locations")
         response2 = view2(request=request2)
 
         self.assertEqual(response2.status_code, 403)
         self.assertEqual(
-            'Authentication credentials were not provided.',
-            str(response2.data['detail']))
+            "Authentication credentials were not provided.",
+            str(response2.data["detail"]),
+        )
 
         # test that you need authentication for deleting a task
         # assert that location exists
         self.assertTrue(Location.objects.filter(pk=location.id).exists())
 
-        view3 = LocationViewSet.as_view({'delete': 'destroy'})
-        request3 = self.factory.delete(f'/locations/{location.id}')
+        view3 = LocationViewSet.as_view({"delete": "destroy"})
+        request3 = self.factory.delete(f"/locations/{location.id}")
         response3 = view3(request=request3, pk=location.id)
 
         self.assertEqual(response3.status_code, 403)
         self.assertEqual(
-            'Authentication credentials were not provided.',
-            str(response3.data['detail']))
+            "Authentication credentials were not provided.",
+            str(response3.data["detail"]),
+        )
 
         # test that you need authentication for updating a task
         data2 = {
-            'name': 'Arusha',
-            'country': 'TZ',
+            "name": "Arusha",
+            "country": "TZ",
         }
 
-        view4 = LocationViewSet.as_view({'patch': 'partial_update'})
-        request4 = self.factory.patch(
-            f'/locations/{location1_id}', data=data2)
+        view4 = LocationViewSet.as_view({"patch": "partial_update"})
+        request4 = self.factory.patch(f"/locations/{location1_id}", data=data2)
         response4 = view4(request=request4, pk=location1_id)
 
         self.assertEqual(response4.status_code, 403)
         self.assertEqual(
-            'Authentication credentials were not provided.',
-            str(response4.data['detail']))
+            "Authentication credentials were not provided.",
+            str(response4.data["detail"]),
+        )

@@ -26,21 +26,21 @@ class TestSubmissionSerializer(TestBase):
         Test that the serializer creates a submission
         """
         now = timezone.now()
-        mocked_target_object = mommy.make('auth.User')
-        mocked_task = mommy.make('tasking.Task', name='Cow Prices')
-        mocked_location = mommy.make('tasking.Location', name='Nairobi')
-        mocked_user = mommy.make('auth.User', username='Bob')
+        mocked_target_object = mommy.make("auth.User")
+        mocked_task = mommy.make("tasking.Task", name="Cow Prices")
+        mocked_location = mommy.make("tasking.Location", name="Nairobi")
+        mocked_user = mommy.make("auth.User", username="Bob")
 
         data = {
-            'task': mocked_task.id,
-            'location': mocked_location.id,
-            'submission_time': now,
-            'user': mocked_user.id,
-            'comments': 'Approved',
-            'status': Submission.REJECTED,
-            'valid': True,
-            'target_content_type': self.user_type.id,
-            'target_id': mocked_target_object.id,
+            "task": mocked_task.id,
+            "location": mocked_location.id,
+            "submission_time": now,
+            "user": mocked_user.id,
+            "comments": "Approved",
+            "status": Submission.REJECTED,
+            "valid": True,
+            "target_content_type": self.user_type.id,
+            "target_id": mocked_target_object.id,
         }
 
         serializer_instance = SubmissionSerializer(data=data)
@@ -49,15 +49,16 @@ class TestSubmissionSerializer(TestBase):
         submission = serializer_instance.save()
 
         # the subsmission_time field is going to be converted to isformat
-        data['submission_time'] = now.astimezone(
-            pytz.timezone('Africa/Nairobi')).isoformat()
+        data["submission_time"] = now.astimezone(
+            pytz.timezone("Africa/Nairobi")
+        ).isoformat()
         self.assertDictContainsSubset(data, serializer_instance.data)
 
         self.assertEqual(mocked_task, submission.task)
         self.assertEqual(mocked_location, submission.location)
         self.assertEqual(mocked_user, submission.user)
         self.assertEqual(now, submission.submission_time)
-        self.assertEqual('Approved', submission.comments)
+        self.assertEqual("Approved", submission.comments)
         self.assertEqual(Submission.REJECTED, submission.status)
         self.assertTrue(submission.valid)
 
@@ -69,22 +70,23 @@ class TestSubmissionSerializer(TestBase):
         self.assertTrue(submission.approved)
 
         expected_fields = {
-            'task',
-            'location',
-            'submission_time',
-            'user',
-            'comments',
-            'status',
-            'valid',
-            'target_content_type',
-            'target_id',
-            'id',
-            'created',
-            'modified'
+            "task",
+            "location",
+            "submission_time",
+            "user",
+            "comments",
+            "status",
+            "valid",
+            "target_content_type",
+            "target_id",
+            "id",
+            "created",
+            "modified",
         }
 
-        self.assertEqual(set(expected_fields),
-                         set(list(serializer_instance.data.keys())))
+        self.assertEqual(
+            set(expected_fields), set(list(serializer_instance.data.keys()))
+        )
 
     def test_validate_bad_data(self):
         """
@@ -92,17 +94,17 @@ class TestSubmissionSerializer(TestBase):
         for bad data
         """
         now = timezone.now()
-        mocked_target_object = mommy.make('auth.User')
-        mocked_task = mommy.make('tasking.Task', name='Cow Prices')
-        mocked_location = mommy.make('tasking.Location', name='Nairobi')
-        mocked_user = mommy.make('auth.User', username='Bob')
+        mocked_target_object = mommy.make("auth.User")
+        mocked_task = mommy.make("tasking.Task", name="Cow Prices")
+        mocked_location = mommy.make("tasking.Location", name="Nairobi")
+        mocked_user = mommy.make("auth.User", username="Bob")
 
         bad_target_id = OrderedDict(
             task=mocked_task.id,
             location=mocked_location.id,
             submission_time=now,
             user=mocked_user.id,
-            comments='Approved',
+            comments="Approved",
             status=Submission.APPROVED,
             valid=True,
             target_content_type=self.user_type.id,
@@ -116,12 +118,11 @@ class TestSubmissionSerializer(TestBase):
             location=mocked_location.id,
             submission_time=now,
             user=mocked_user.id,
-            comments='Approved',
+            comments="Approved",
             status=Submission.APPROVED,
             valid=True,
-            target_content_type='foobar',
+            target_content_type="foobar",
             target_id=mocked_target_object.id,
         )
 
-        self.assertFalse(
-            SubmissionSerializer(data=bad_content_type).is_valid())
+        self.assertFalse(SubmissionSerializer(data=bad_content_type).is_valid())

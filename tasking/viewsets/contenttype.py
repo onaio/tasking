@@ -13,10 +13,11 @@ class ContentTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Read Only Viewset for ContentType
     """
+
     serializer_class = ContentTypeSerializer
     permission_classes = [IsAuthenticated]
     queryset = get_allowed_contenttypes()
 
     def get_queryset(self):
         queryset = super(ContentTypeViewSet, self).get_queryset()
-        return queryset.order_by('app_label', 'model')
+        return queryset.order_by("app_label", "model")

@@ -14,11 +14,14 @@ from django_countries import Countries
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometryField
 
-from tasking.common_tags import (GEODETAILS_ONLY, GEOPOINT_MISSING,
-                                 INVALID_SHAPEFILE, NO_VALID_POLYGONS,
-                                 RADIUS_MISSING)
-from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
-                                UnnecessaryFiles)
+from tasking.common_tags import (
+    GEODETAILS_ONLY,
+    GEOPOINT_MISSING,
+    INVALID_SHAPEFILE,
+    NO_VALID_POLYGONS,
+    RADIUS_MISSING,
+)
+from tasking.exceptions import MissingFiles, ShapeFileNotFound, UnnecessaryFiles
 from tasking.models import Location
 from tasking.utils import get_polygons, get_shapefile
 
@@ -92,8 +95,8 @@ class ShapeFileField(GeometryField):
         """
         Custom conversion to representation for ShapeFileField
         """
-        if value in ('', None):
-            return ''
+        if value in ("", None):
+            return ""
         return super(ShapeFileField, self).to_representation(value)
 
 
@@ -109,7 +112,7 @@ class GeopointField(GeometryField):
         geopoint = value
         if geopoint is not None:
             if isinstance(geopoint, str):
-                geopoint_split = geopoint.split(',')
+                geopoint_split = geopoint.split(",")
                 lon = float(geopoint_split[0])
                 lat = float(geopoint_split[1])
 
@@ -127,8 +130,8 @@ class GeopointField(GeometryField):
         """
         Custom conversion to representation for GeopointField
         """
-        if value in ('', None):
-            return ''
+        if value in ("", None):
+            return ""
         return super(GeopointField, self).to_representation(value)
 
 
@@ -141,8 +144,8 @@ class SerializableCountryField(serializers.ChoiceField):
         """
         Custom conversion to representation for Country Field
         """
-        if value in ('', None):
-            return ''  # instead of `value` as Country(u'') is not serializable
+        if value in ("", None):
+            return ""  # instead of `value` as Country(u'') is not serializable
         return super(SerializableCountryField, self).to_representation(value)
 
 
@@ -150,8 +153,10 @@ class LocationSerializer(serializers.ModelSerializer):
     """
     Location serializer class
     """
+
     country = SerializableCountryField(
-        allow_blank=True, required=False, choices=Countries())
+        allow_blank=True, required=False, choices=Countries()
+    )
 
     shapefile = ShapeFileField(required=False)
     geopoint = GeopointField(required=False)
@@ -161,32 +166,24 @@ class LocationSerializer(serializers.ModelSerializer):
         Custom Validation for Location Serializer
         """
         if self.instance:
-            geopoint = attrs.get('geopoint', self.instance.geopoint)
-            radius = attrs.get('radius', self.instance.radius)
-            shapefile = attrs.get('shapefile', self.instance.shapefile)
+            geopoint = attrs.get("geopoint", self.instance.geopoint)
+            radius = attrs.get("radius", self.instance.radius)
+            shapefile = attrs.get("shapefile", self.instance.shapefile)
         else:
-            geopoint = attrs.get('geopoint')
-            radius = attrs.get('radius')
-            shapefile = attrs.get('shapefile')
+            geopoint = attrs.get("geopoint")
+            radius = attrs.get("radius")
+            shapefile = attrs.get("shapefile")
 
         if geopoint is not None:
             if shapefile is not None:
-                raise serializers.ValidationError(
-                    {'shapefile': GEODETAILS_ONLY}
-                )
+                raise serializers.ValidationError({"shapefile": GEODETAILS_ONLY})
             if radius is None:
-                raise serializers.ValidationError(
-                    {'radius': RADIUS_MISSING}
-                )
+                raise serializers.ValidationError({"radius": RADIUS_MISSING})
         if radius is not None:
             if shapefile is not None:
-                raise serializers.ValidationError(
-                    {'shapefile': GEODETAILS_ONLY}
-                )
+                raise serializers.ValidationError({"shapefile": GEODETAILS_ONLY})
             if geopoint is None:
-                raise serializers.ValidationError(
-                    {'geopoint': GEOPOINT_MISSING}
-                )
+                raise serializers.ValidationError({"geopoint": GEOPOINT_MISSING})
 
         return super(LocationSerializer, self).validate(attrs)
 
@@ -195,17 +192,18 @@ class LocationSerializer(serializers.ModelSerializer):
         """
         Meta options for LocationSerializer
         """
+
         model = Location
         fields = [
-            'id',
-            'name',
-            'country',
-            'description',
-            'geopoint',
-            'radius',
-            'location_type',
-            'shapefile',
-            'parent',
-            'created',
-            'modified'
+            "id",
+            "name",
+            "country",
+            "description",
+            "geopoint",
+            "radius",
+            "location_type",
+            "shapefile",
+            "parent",
+            "created",
+            "modified",
         ]

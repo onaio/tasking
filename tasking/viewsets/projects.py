@@ -10,19 +10,28 @@ from tasking.serializers import ProjectSerializer
 
 
 # pylint: disable=too-many-ancestors
-class ProjectViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                     mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
-                     mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class ProjectViewSet(  # pylint: disable=bad-continuation
+    viewsets.GenericViewSet,
+    mixins.UpdateModelMixin,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
+):
     """
     Viewset for projects
     """
+
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [
         DjangoFilterBackend,
         filters.SearchFilter,
-        filters.OrderingFilter]
-    filterset_fields = ['tasks']
-    search_fields = ['name', ]
-    ordering_fields = ['name', 'created']
+        filters.OrderingFilter,
+    ]
+    filterset_fields = ["tasks"]
+    search_fields = [
+        "name",
+    ]
+    ordering_fields = ["name", "created"]
     queryset = Project.objects.all()  # pylint: disable=no-member
