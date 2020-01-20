@@ -15,13 +15,11 @@ class TestSubmission(TestCase):
         """
         Test the string representation of Submission Model
         """
-        cattle = mommy.make(
-            'tasking.Task',
-            name='Cattle Price')
+        cattle = mommy.make("tasking.Task", name="Cattle Price")
         submission = mommy.make(
-            'tasking.Submission',
+            "tasking.Submission",
             task=cattle,
-            _fill_optional=['user', 'comments', 'submission_time'])
-        expected = f'Cattle Price - {submission.task.id}'\
-                   f' submission {submission.id}'
+            _fill_optional=["user", "comments", "submission_time"],
+        )
+        expected = f"Cattle Price - {submission.task.id}" f" submission {submission.id}"
         self.assertEqual(expected, str(submission))

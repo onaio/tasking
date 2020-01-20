@@ -1,8 +1,13 @@
 """
 Custom exceptions for tasking
 """
-from tasking.common_tags import (INVALID_SHAPEFILE, MISSING_FILE, NO_SHAPEFILE,
-                                 TARGET_DOES_NOT_EXIST, UNNECESSARY_FILE)
+from tasking.common_tags import (
+    INVALID_SHAPEFILE,
+    MISSING_FILE,
+    NO_SHAPEFILE,
+    TARGET_DOES_NOT_EXIST,
+    UNNECESSARY_FILE,
+)
 
 
 class TargetDoesNotExist(Exception):

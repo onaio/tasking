@@ -16,9 +16,10 @@ class ContentTypeSerializer(serializers.ModelSerializer):
         """
         Meta Options for ContentTypeSerializer
         """
+
         model = ContentType
         fields = [
-            'id',
-            'app_label',
-            'model',
+            "id",
+            "app_label",
+            "model",
         ]

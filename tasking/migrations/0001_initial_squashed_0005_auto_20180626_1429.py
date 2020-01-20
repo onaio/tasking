@@ -11,547 +11,700 @@ import tasking.validators
 
 class Migration(migrations.Migration):
 
-    replaces = [('tasking', '0001_initial'), ('tasking',
-                                              '0003_auto_20180618_1702'),
-                ('tasking', '0004_auto_20180620_1512'),
-                ('tasking', '0005_auto_20180626_1429')]
+    replaces = [
+        ("tasking", "0001_initial"),
+        ("tasking", "0003_auto_20180618_1702"),
+        ("tasking", "0004_auto_20180620_1512"),
+        ("tasking", "0005_auto_20180626_1429"),
+    ]
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('contenttypes', '0002_remove_content_type_name'),
+        ("contenttypes", "0002_remove_content_type_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Location',
+            name="Location",
             fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')),
-                ('created',
-                 models.DateTimeField(
-                     auto_now_add=True, verbose_name='Created')),
-                ('modified',
-                 models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('name',
-                 models.CharField(
-                     help_text='This represents the name of Location.',
-                     max_length=255,
-                     verbose_name='Name')),
-                ('country',
-                 django_countries.fields.CountryField(
-                     blank=True,
-                     default='',
-                     help_text='This represents the Country.',
-                     max_length=2,
-                     verbose_name='Country')),
-                ('geopoint',
-                 django.contrib.gis.db.models.fields.PointField(
-                     blank=True,
-                     default=None,
-                     help_text=
-                     'This represents the Geographical Point of the Location.',
-                     null=True,
-                     srid=4326,
-                     verbose_name='GeoPoint')),
-                ('radius',
-                 models.DecimalField(
-                     blank=True,
-                     decimal_places=4,
-                     default=None,
-                     help_text='This represents the radius from the geopoint.',
-                     max_digits=64,
-                     null=True,
-                     verbose_name='Radius')),
-                ('shapefile',
-                 django.contrib.gis.db.models.fields.PolygonField(
-                     blank=True,
-                     default=None,
-                     help_text='This represents the Shapefile of the Location',
-                     null=True,
-                     srid=4326,
-                     verbose_name='Shapefile')),
-                ('description',
-                 models.TextField(
-                     blank=True,
-                     default='',
-                     help_text=
-                     'This represents the description of the Location.',
-                     verbose_name='Description')),
-                ('lft',
-                 models.PositiveIntegerField(db_index=True, editable=False)),
-                ('rght',
-                 models.PositiveIntegerField(db_index=True, editable=False)),
-                ('tree_id',
-                 models.PositiveIntegerField(db_index=True, editable=False)),
-                ('level',
-                 models.PositiveIntegerField(db_index=True, editable=False)),
-                ('parent',
-                 mptt.fields.TreeForeignKey(
-                     blank=True,
-                     default=None,
-                     null=True,
-                     on_delete=django.db.models.deletion.PROTECT,
-                     related_name='children',
-                     to='tasking.Location')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created"),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified"),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="This represents the name of Location.",
+                        max_length=255,
+                        verbose_name="Name",
+                    ),
+                ),
+                (
+                    "country",
+                    django_countries.fields.CountryField(
+                        blank=True,
+                        default="",
+                        help_text="This represents the Country.",
+                        max_length=2,
+                        verbose_name="Country",
+                    ),
+                ),
+                (
+                    "geopoint",
+                    django.contrib.gis.db.models.fields.PointField(
+                        blank=True,
+                        default=None,
+                        help_text="This represents the Geographical Point of the Location.",
+                        null=True,
+                        srid=4326,
+                        verbose_name="GeoPoint",
+                    ),
+                ),
+                (
+                    "radius",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=4,
+                        default=None,
+                        help_text="This represents the radius from the geopoint.",
+                        max_digits=64,
+                        null=True,
+                        verbose_name="Radius",
+                    ),
+                ),
+                (
+                    "shapefile",
+                    django.contrib.gis.db.models.fields.PolygonField(
+                        blank=True,
+                        default=None,
+                        help_text="This represents the Shapefile of the Location",
+                        null=True,
+                        srid=4326,
+                        verbose_name="Shapefile",
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        default="",
+                        help_text="This represents the description of the Location.",
+                        verbose_name="Description",
+                    ),
+                ),
+                ("lft", models.PositiveIntegerField(db_index=True, editable=False)),
+                ("rght", models.PositiveIntegerField(db_index=True, editable=False)),
+                ("tree_id", models.PositiveIntegerField(db_index=True, editable=False)),
+                ("level", models.PositiveIntegerField(db_index=True, editable=False)),
+                (
+                    "parent",
+                    mptt.fields.TreeForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="children",
+                        to="tasking.Location",
+                    ),
+                ),
+            ],
+            options={"ordering": ["country", "name", "id"], "abstract": False,},
+        ),
+        migrations.CreateModel(
+            name="Project",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created"),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified"),
+                ),
+                (
+                    "target_object_id",
+                    models.PositiveIntegerField(
+                        blank=True, db_index=True, default=None, null=True
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="This is the name of the Project",
+                        max_length=255,
+                        verbose_name="Name",
+                    ),
+                ),
+                (
+                    "target_content_type",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="contenttypes.ContentType",
+                    ),
+                ),
+            ],
+            options={"ordering": ["name"], "abstract": False,},
+        ),
+        migrations.CreateModel(
+            name="SegmentRule",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created"),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified"),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="The name of this rule.",
+                        max_length=255,
+                        verbose_name="Name",
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        default="",
+                        help_text="The description of this rule.",
+                        verbose_name="Description",
+                    ),
+                ),
+                (
+                    "target_field",
+                    models.CharField(
+                        db_index=True,
+                        help_text="The field on the target model.",
+                        max_length=255,
+                        verbose_name="Target Field",
+                    ),
+                ),
+                (
+                    "target_field_value",
+                    models.CharField(
+                        help_text="The value of the target field",
+                        max_length=255,
+                        verbose_name="Target Field Value",
+                    ),
+                ),
+                ("active", models.BooleanField()),
+                (
+                    "target_content_type",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="segment_rule",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
+            ],
+            options={"ordering": ["name"], "abstract": False,},
+        ),
+        migrations.CreateModel(
+            name="Submission",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created"),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified"),
+                ),
+                (
+                    "target_object_id",
+                    models.PositiveIntegerField(
+                        blank=True, db_index=True, default=None, null=True
+                    ),
+                ),
+                (
+                    "submission_time",
+                    models.DateTimeField(
+                        help_text="This is the date and time the task was submitted.",
+                        verbose_name="Submission Time",
+                    ),
+                ),
+                (
+                    "valid",
+                    models.BooleanField(
+                        default=False,
+                        help_text="This represents whether submission is valid or not.",
+                        verbose_name="Valid",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("a", "Approved"),
+                            ("b", "Rejected"),
+                            ("c", "Under Review"),
+                            ("d", "Pending Review"),
+                        ],
+                        default="d",
+                        help_text="The status of the Submission",
+                        max_length=1,
+                        verbose_name="Status",
+                    ),
+                ),
+                (
+                    "comments",
+                    models.TextField(
+                        blank=True,
+                        default="",
+                        help_text="This represents the comments.",
+                        verbose_name="Comments",
+                    ),
+                ),
+                (
+                    "location",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        help_text="This represents the Location.",
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="tasking.Location",
+                        verbose_name="Location",
+                    ),
+                ),
+                (
+                    "target_content_type",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="contenttypes.ContentType",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['country', 'name', 'id'],
-                'abstract': False,
+                "ordering": ["submission_time", "task__name", "id"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Project',
+            name="Task",
             fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')),
-                ('created',
-                 models.DateTimeField(
-                     auto_now_add=True, verbose_name='Created')),
-                ('modified',
-                 models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('target_object_id',
-                 models.PositiveIntegerField(
-                     blank=True, db_index=True, default=None, null=True)),
-                ('name',
-                 models.CharField(
-                     help_text='This is the name of the Project',
-                     max_length=255,
-                     verbose_name='Name')),
-                ('target_content_type',
-                 models.ForeignKey(
-                     blank=True,
-                     default=None,
-                     null=True,
-                     on_delete=django.db.models.deletion.SET_NULL,
-                     to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created"),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified"),
+                ),
+                (
+                    "target_object_id",
+                    models.PositiveIntegerField(
+                        blank=True, db_index=True, default=None, null=True
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="This represents the name.",
+                        max_length=255,
+                        verbose_name="Name",
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        default="",
+                        help_text="This represents the description.",
+                        verbose_name="Description",
+                    ),
+                ),
+                (
+                    "start",
+                    models.DateTimeField(
+                        help_text="This is the date and time the task starts.",
+                        verbose_name="Start",
+                    ),
+                ),
+                (
+                    "end",
+                    models.DateTimeField(
+                        blank=True,
+                        default=None,
+                        help_text="This is the date and time the task starts.",
+                        null=True,
+                        verbose_name="Start",
+                    ),
+                ),
+                (
+                    "timing_rule",
+                    models.TextField(
+                        help_text="This stores the rrule for recurrence.",
+                        validators=[tasking.validators.validate_rrule],
+                        verbose_name="Timing Rule",
+                    ),
+                ),
+                (
+                    "total_submission_target",
+                    models.IntegerField(
+                        blank=True,
+                        default=None,
+                        help_text="This is the total number of submissions required for this task. Set to None if there is no Max.",
+                        null=True,
+                        verbose_name="Total Submissions Target",
+                    ),
+                ),
+                (
+                    "user_submission_target",
+                    models.IntegerField(
+                        blank=True,
+                        default=None,
+                        help_text="This is the total number of submissions per user required for this task. Set to None if there is no Max.",
+                        null=True,
+                        verbose_name="User Submissions Target",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("a", "Active"),
+                            ("b", "Deactivated"),
+                            ("c", "Expired"),
+                            ("d", "Draft"),
+                            ("s", "Scheduled"),
+                            ("e", "Archived"),
+                        ],
+                        default="d",
+                        help_text="The status of the Task",
+                        max_length=1,
+                        verbose_name="Status",
+                    ),
+                ),
+                (
+                    "estimated_time",
+                    models.DurationField(
+                        blank=True,
+                        default=None,
+                        help_text="This represents the estimated time it takes to complete a task",
+                        null=True,
+                        verbose_name="Estimated Time",
+                    ),
+                ),
+                ("lft", models.PositiveIntegerField(db_index=True, editable=False)),
+                ("rght", models.PositiveIntegerField(db_index=True, editable=False)),
+                ("tree_id", models.PositiveIntegerField(db_index=True, editable=False)),
+                ("level", models.PositiveIntegerField(db_index=True, editable=False)),
             ],
-            options={
-                'ordering': ['name'],
-                'abstract': False,
-            },
+            options={"ordering": ["start", "name", "id"], "abstract": False,},
         ),
         migrations.CreateModel(
-            name='SegmentRule',
+            name="TaskLocation",
             fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')),
-                ('created',
-                 models.DateTimeField(
-                     auto_now_add=True, verbose_name='Created')),
-                ('modified',
-                 models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('name',
-                 models.CharField(
-                     help_text='The name of this rule.',
-                     max_length=255,
-                     verbose_name='Name')),
-                ('description',
-                 models.TextField(
-                     blank=True,
-                     default='',
-                     help_text='The description of this rule.',
-                     verbose_name='Description')),
-                ('target_field',
-                 models.CharField(
-                     db_index=True,
-                     help_text='The field on the target model.',
-                     max_length=255,
-                     verbose_name='Target Field')),
-                ('target_field_value',
-                 models.CharField(
-                     help_text='The value of the target field',
-                     max_length=255,
-                     verbose_name='Target Field Value')),
-                ('active', models.BooleanField()),
-                ('target_content_type',
-                 models.ForeignKey(
-                     blank=True,
-                     default=None,
-                     null=True,
-                     on_delete=django.db.models.deletion.SET_NULL,
-                     related_name='segment_rule',
-                     to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created"),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified"),
+                ),
+                (
+                    "timing_rule",
+                    models.TextField(
+                        help_text="This stores the rrule for recurrence.",
+                        validators=[tasking.validators.validate_rrule],
+                        verbose_name="Timing Rule",
+                    ),
+                ),
+                ("start", models.TimeField(verbose_name="Start Time")),
+                ("end", models.TimeField(verbose_name="End Time")),
+                (
+                    "location",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="tasking.Location",
+                    ),
+                ),
+                (
+                    "task",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="tasking.Task"
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['name'],
-                'abstract': False,
-            },
+            options={"ordering": ["task", "location", "start"],},
         ),
         migrations.CreateModel(
-            name='Submission',
+            name="TaskOccurrence",
             fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')),
-                ('created',
-                 models.DateTimeField(
-                     auto_now_add=True, verbose_name='Created')),
-                ('modified',
-                 models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('target_object_id',
-                 models.PositiveIntegerField(
-                     blank=True, db_index=True, default=None, null=True)),
-                ('submission_time',
-                 models.DateTimeField(
-                     help_text=
-                     'This is the date and time the task was submitted.',
-                     verbose_name='Submission Time')),
-                ('valid',
-                 models.BooleanField(
-                     default=False,
-                     help_text=
-                     'This represents whether submission is valid or not.',
-                     verbose_name='Valid')),
-                ('status',
-                 models.CharField(
-                     choices=[('a', 'Approved'), ('b', 'Rejected'),
-                              ('c', 'Under Review'), ('d', 'Pending Review')],
-                     default='d',
-                     help_text='The status of the Submission',
-                     max_length=1,
-                     verbose_name='Status')),
-                ('comments',
-                 models.TextField(
-                     blank=True,
-                     default='',
-                     help_text='This represents the comments.',
-                     verbose_name='Comments')),
-                ('location',
-                 models.ForeignKey(
-                     blank=True,
-                     default=None,
-                     help_text='This represents the Location.',
-                     null=True,
-                     on_delete=django.db.models.deletion.PROTECT,
-                     to='tasking.Location',
-                     verbose_name='Location')),
-                ('target_content_type',
-                 models.ForeignKey(
-                     blank=True,
-                     default=None,
-                     null=True,
-                     on_delete=django.db.models.deletion.SET_NULL,
-                     to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created"),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified"),
+                ),
+                (
+                    "date",
+                    models.DateField(
+                        help_text="The date of the occurrence", verbose_name="Date"
+                    ),
+                ),
+                (
+                    "start_time",
+                    models.TimeField(
+                        help_text="The start time of the occurrence",
+                        verbose_name="Start Time",
+                    ),
+                ),
+                (
+                    "end_time",
+                    models.TimeField(
+                        help_text="The end time of the occurrence",
+                        verbose_name="End Time",
+                    ),
+                ),
+                (
+                    "task",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="tasking.Task",
+                        verbose_name="Task Occurrence",
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['submission_time', 'task__name', 'id'],
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='Task',
-            fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')),
-                ('created',
-                 models.DateTimeField(
-                     auto_now_add=True, verbose_name='Created')),
-                ('modified',
-                 models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('target_object_id',
-                 models.PositiveIntegerField(
-                     blank=True, db_index=True, default=None, null=True)),
-                ('name',
-                 models.CharField(
-                     help_text='This represents the name.',
-                     max_length=255,
-                     verbose_name='Name')),
-                ('description',
-                 models.TextField(
-                     blank=True,
-                     default='',
-                     help_text='This represents the description.',
-                     verbose_name='Description')),
-                ('start',
-                 models.DateTimeField(
-                     help_text='This is the date and time the task starts.',
-                     verbose_name='Start')),
-                ('end',
-                 models.DateTimeField(
-                     blank=True,
-                     default=None,
-                     help_text='This is the date and time the task starts.',
-                     null=True,
-                     verbose_name='Start')),
-                ('timing_rule',
-                 models.TextField(
-                     help_text='This stores the rrule for recurrence.',
-                     validators=[tasking.validators.validate_rrule],
-                     verbose_name='Timing Rule')),
-                ('total_submission_target',
-                 models.IntegerField(
-                     blank=True,
-                     default=None,
-                     help_text=
-                     'This is the total number of submissions required for this task. Set to None if there is no Max.',
-                     null=True,
-                     verbose_name='Total Submissions Target')),
-                ('user_submission_target',
-                 models.IntegerField(
-                     blank=True,
-                     default=None,
-                     help_text=
-                     'This is the total number of submissions per user required for this task. Set to None if there is no Max.',
-                     null=True,
-                     verbose_name='User Submissions Target')),
-                ('status',
-                 models.CharField(
-                     choices=[('a', 'Active'), ('b', 'Deactivated'),
-                              ('c', 'Expired'), ('d', 'Draft'),
-                              ('s', 'Scheduled'), ('e', 'Archived')],
-                     default='d',
-                     help_text='The status of the Task',
-                     max_length=1,
-                     verbose_name='Status')),
-                ('estimated_time',
-                 models.DurationField(
-                     blank=True,
-                     default=None,
-                     help_text=
-                     'This represents the estimated time it takes to complete a task',
-                     null=True,
-                     verbose_name='Estimated Time')),
-                ('lft',
-                 models.PositiveIntegerField(db_index=True, editable=False)),
-                ('rght',
-                 models.PositiveIntegerField(db_index=True, editable=False)),
-                ('tree_id',
-                 models.PositiveIntegerField(db_index=True, editable=False)),
-                ('level',
-                 models.PositiveIntegerField(db_index=True, editable=False)),
-            ],
-            options={
-                'ordering': ['start', 'name', 'id'],
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='TaskLocation',
-            fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')),
-                ('created',
-                 models.DateTimeField(
-                     auto_now_add=True, verbose_name='Created')),
-                ('modified',
-                 models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('timing_rule',
-                 models.TextField(
-                     help_text='This stores the rrule for recurrence.',
-                     validators=[tasking.validators.validate_rrule],
-                     verbose_name='Timing Rule')),
-                ('start', models.TimeField(verbose_name='Start Time')),
-                ('end', models.TimeField(verbose_name='End Time')),
-                ('location',
-                 models.ForeignKey(
-                     on_delete=django.db.models.deletion.CASCADE,
-                     to='tasking.Location')),
-                ('task',
-                 models.ForeignKey(
-                     on_delete=django.db.models.deletion.CASCADE,
-                     to='tasking.Task')),
-            ],
-            options={
-                'ordering': ['task', 'location', 'start'],
-            },
-        ),
-        migrations.CreateModel(
-            name='TaskOccurrence',
-            fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')),
-                ('created',
-                 models.DateTimeField(
-                     auto_now_add=True, verbose_name='Created')),
-                ('modified',
-                 models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('date',
-                 models.DateField(
-                     help_text='The date of the occurrence',
-                     verbose_name='Date')),
-                ('start_time',
-                 models.TimeField(
-                     help_text='The start time of the occurrence',
-                     verbose_name='Start Time')),
-                ('end_time',
-                 models.TimeField(
-                     help_text='The end time of the occurrence',
-                     verbose_name='End Time')),
-                ('task',
-                 models.ForeignKey(
-                     on_delete=django.db.models.deletion.CASCADE,
-                     to='tasking.Task',
-                     verbose_name='Task Occurrence')),
-            ],
-            options={
-                'ordering': ['task', 'date', 'start_time'],
-                'abstract': False,
-            },
+            options={"ordering": ["task", "date", "start_time"], "abstract": False,},
         ),
         migrations.AddField(
-            model_name='task',
-            name='locations',
+            model_name="task",
+            name="locations",
             field=models.ManyToManyField(
                 blank=True,
                 default=None,
-                help_text='This represents the location.',
-                through='tasking.TaskLocation',
-                to='tasking.Location',
-                verbose_name='Location'),
+                help_text="This represents the location.",
+                through="tasking.TaskLocation",
+                to="tasking.Location",
+                verbose_name="Location",
+            ),
         ),
         migrations.AddField(
-            model_name='task',
-            name='parent',
+            model_name="task",
+            name="parent",
             field=mptt.fields.TreeForeignKey(
                 blank=True,
                 default=None,
-                help_text='This represents the parent task.',
+                help_text="This represents the parent task.",
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
-                to='tasking.Task',
-                verbose_name='Parent task'),
+                to="tasking.Task",
+                verbose_name="Parent task",
+            ),
         ),
         migrations.AddField(
-            model_name='task',
-            name='segment_rules',
+            model_name="task",
+            name="segment_rules",
             field=models.ManyToManyField(
                 blank=True,
                 default=None,
-                to='tasking.SegmentRule',
-                verbose_name='Segment Rules'),
+                to="tasking.SegmentRule",
+                verbose_name="Segment Rules",
+            ),
         ),
         migrations.AddField(
-            model_name='task',
-            name='target_content_type',
+            model_name="task",
+            name="target_content_type",
             field=models.ForeignKey(
                 blank=True,
                 default=None,
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
-                to='contenttypes.ContentType'),
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.AddField(
-            model_name='submission',
-            name='task',
+            model_name="submission",
+            name="task",
             field=models.ForeignKey(
-                help_text='This represents the Task.',
+                help_text="This represents the Task.",
                 on_delete=django.db.models.deletion.PROTECT,
-                to='tasking.Task',
-                verbose_name='Task'),
+                to="tasking.Task",
+                verbose_name="Task",
+            ),
         ),
         migrations.AddField(
-            model_name='submission',
-            name='user',
+            model_name="submission",
+            name="user",
             field=models.ForeignKey(
-                help_text='This represents the User.',
+                help_text="This represents the User.",
                 on_delete=django.db.models.deletion.PROTECT,
                 to=settings.AUTH_USER_MODEL,
-                verbose_name='User'),
+                verbose_name="User",
+            ),
         ),
         migrations.AddField(
-            model_name='project',
-            name='tasks',
+            model_name="project",
+            name="tasks",
             field=models.ManyToManyField(
                 blank=True,
                 default=None,
-                help_text='This represents the Task.',
-                to='tasking.Task',
-                verbose_name='Tasks'),
+                help_text="This represents the Task.",
+                to="tasking.Task",
+                verbose_name="Tasks",
+            ),
         ),
         migrations.AlterField(
-            model_name='location',
-            name='shapefile',
+            model_name="location",
+            name="shapefile",
             field=django.contrib.gis.db.models.fields.MultiPolygonField(
                 blank=True,
                 default=None,
-                help_text='This represents the Shapefile of the Location',
+                help_text="This represents the Shapefile of the Location",
                 null=True,
                 srid=4326,
-                verbose_name='Shapefile'),
+                verbose_name="Shapefile",
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='end',
+            model_name="task",
+            name="end",
             field=models.DateTimeField(
                 blank=True,
                 default=None,
-                help_text='This is the date and time the task ends.',
+                help_text="This is the date and time the task ends.",
                 null=True,
-                verbose_name='End'),
+                verbose_name="End",
+            ),
         ),
         migrations.CreateModel(
-            name='LocationType',
+            name="LocationType",
             fields=[
-                ('id',
-                 models.AutoField(
-                     auto_created=True,
-                     primary_key=True,
-                     serialize=False,
-                     verbose_name='ID')),
-                ('created',
-                 models.DateTimeField(
-                     auto_now_add=True, verbose_name='Created')),
-                ('modified',
-                 models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('name',
-                 models.CharField(
-                     help_text='This is the name of the Location Type',
-                     max_length=255,
-                     verbose_name='Name')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created"),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Modified"),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="This is the name of the Location Type",
+                        max_length=255,
+                        verbose_name="Name",
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['name', 'id'],
-                'abstract': False,
-            },
+            options={"ordering": ["name", "id"], "abstract": False,},
         ),
         migrations.AddField(
-            model_name='location',
-            name='location_type',
+            model_name="location",
+            name="location_type",
             field=models.ForeignKey(
                 blank=True,
                 default=None,
-                help_text='This represents the Location Type.',
+                help_text="This represents the Location Type.",
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
-                to='tasking.LocationType',
-                verbose_name='Location Type'),
+                to="tasking.LocationType",
+                verbose_name="Location Type",
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='timing_rule',
+            model_name="task",
+            name="timing_rule",
             field=models.TextField(
                 blank=True,
                 default=None,
-                help_text='This stores the rrule for recurrence.',
+                help_text="This stores the rrule for recurrence.",
                 null=True,
                 validators=[tasking.validators.validate_rrule],
-                verbose_name='Timing Rule'),
+                verbose_name="Timing Rule",
+            ),
         ),
     ]

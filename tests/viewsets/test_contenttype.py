@@ -24,15 +24,13 @@ class TestContentTypeViewSet(TestBase):
         """
         Test that we can get the list of allowed content types
         """
-        user = mommy.make('auth.User')
-        view = ContentTypeViewSet.as_view({'get': 'list'})
+        user = mommy.make("auth.User")
+        view = ContentTypeViewSet.as_view({"get": "list"})
 
-        request = self.factory.get('/contenttypes')
+        request = self.factory.get("/contenttypes")
         force_authenticate(request, user=user)
         response = view(request=request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            len(response.data), get_allowed_contenttypes().count())
-        self.assertTrue(
-            ContentType.objects.filter(pk=response.data[1]['id']).exists())
+        self.assertEqual(len(response.data), get_allowed_contenttypes().count())
+        self.assertTrue(ContentType.objects.filter(pk=response.data[1]["id"]).exists())

@@ -19,8 +19,11 @@ class TestSignals(TestCase):
         """
         Setup the Signal tests
         """
-        post_save.connect(create_occurrences, sender='tasking.Task',
-                          dispatch_uid='create_task_occurrences')
+        post_save.connect(
+            create_occurrences,
+            sender="tasking.Task",
+            dispatch_uid="create_task_occurrences",
+        )
 
     def test_task_occurrences(self):
         """
@@ -30,8 +33,7 @@ class TestSignals(TestCase):
 
         # create a Task object
         task = mommy.make(
-            'tasking.Task',
-            timing_rule='RRULE:FREQ=DAILY;INTERVAL=10;COUNT=57'
+            "tasking.Task", timing_rule="RRULE:FREQ=DAILY;INTERVAL=10;COUNT=57"
         )
         # pylint: disable=no-member
         self.assertEqual(57, TaskOccurrence.objects.filter(task=task).count())

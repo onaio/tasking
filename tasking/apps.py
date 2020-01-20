@@ -9,7 +9,8 @@ class TaskingConfig(AppConfig):
     """
     Tasking App Config Class
     """
-    name = 'tasking'
+
+    name = "tasking"
     app_label = "tasking"
     verbose_name = _("Tasking")
 
@@ -21,6 +22,7 @@ class TaskingConfig(AppConfig):
         # pylint: disable=import-outside-toplevel
         from django.conf import settings
         import tasking.settings as defaults
+
         for name in dir(defaults):
             if name.isupper() and not hasattr(settings, name):
                 setattr(settings, name, getattr(defaults, name))

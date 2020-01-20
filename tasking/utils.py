@@ -14,56 +14,31 @@ from django.utils import timezone
 
 from dateutil.rrule import rrulestr
 
-from tasking.exceptions import (MissingFiles, ShapeFileNotFound,
-                                TargetDoesNotExist, UnnecessaryFiles)
+from tasking.exceptions import (
+    MissingFiles,
+    ShapeFileNotFound,
+    TargetDoesNotExist,
+    UnnecessaryFiles,
+)
 from tasking.models import TaskOccurrence
 
 DEFAULT_ALLOWED_CONTENTTYPES = [
-    {
-        'app_label': 'tasking',
-        'model': 'task'
-    },
-    {
-        'app_label': 'tasking',
-        'model': 'location'
-    },
-    {
-        'app_label': 'tasking',
-        'model': 'project'
-    },
-    {
-        'app_label': 'tasking',
-        'model': 'segmentrule'
-    },
-    {
-        'app_label': 'tasking',
-        'model': 'submission'
-    },
-    {
-        'app_label': 'auth',
-        'model': 'user'
-    },
-    {
-        'app_label': 'auth',
-        'model': 'group'
-    },
-    {
-        'app_label': 'logger',
-        'model': 'xform'
-    },
-    {
-        'app_label': 'logger',
-        'model': 'instance'
-    },
-    {
-        'app_label': 'logger',
-        'model': 'project'
-    }
+    {"app_label": "tasking", "model": "task"},
+    {"app_label": "tasking", "model": "location"},
+    {"app_label": "tasking", "model": "project"},
+    {"app_label": "tasking", "model": "segmentrule"},
+    {"app_label": "tasking", "model": "submission"},
+    {"app_label": "auth", "model": "user"},
+    {"app_label": "auth", "model": "group"},
+    {"app_label": "logger", "model": "xform"},
+    {"app_label": "logger", "model": "instance"},
+    {"app_label": "logger", "model": "project"},
 ]
 
-ALLOWED_CONTENTTYPES = getattr(settings, 'TASKING_ALLOWED_CONTENTTYPES',
-                               DEFAULT_ALLOWED_CONTENTTYPES)
-MAX_OCCURRENCES = getattr(settings, 'TASKING_MAX_OCCURRENCES', 500)
+ALLOWED_CONTENTTYPES = getattr(
+    settings, "TASKING_ALLOWED_CONTENTTYPES", DEFAULT_ALLOWED_CONTENTTYPES
+)
+MAX_OCCURRENCES = getattr(settings, "TASKING_MAX_OCCURRENCES", 500)
 
 
 def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
@@ -71,7 +46,7 @@ def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
     Returns a queryset of allowed content_types
     """
     filters = [
-        Q(app_label=item['app_label'], model=item['model'])
+        Q(app_label=item["app_label"], model=item["model"])
         for item in allowed_content_types
     ]
     if filters:
@@ -114,11 +89,13 @@ def get_occurrence_end_time(task, the_rrule, end_time_input=None):
 
 
 # pylint: disable=invalid-name
-def generate_task_occurrences(task,
-                              timing_rule,
-                              start_time_input=None,
-                              end_time_input=None,
-                              OccurrenceModelClass=TaskOccurrence):
+def generate_task_occurrences(  # pylint: disable=bad-continuation
+    task,
+    timing_rule,
+    start_time_input=None,
+    end_time_input=None,
+    OccurrenceModelClass=TaskOccurrence,
+):
     """
     Generates TaskOccurrence objects using the Task timing_rule field
 
@@ -156,11 +133,9 @@ def generate_task_occurrences(task,
     # the end datetime for the task
     task_end = task.end
 
-    start_time = get_occurrence_start_time(
-        the_rrule, start_time_input=start_time_input)
+    start_time = get_occurrence_start_time(the_rrule, start_time_input=start_time_input)
 
-    end_time = get_occurrence_end_time(
-        task, the_rrule, end_time_input=end_time_input)
+    end_time = get_occurrence_end_time(task, the_rrule, end_time_input=end_time_input)
 
     occurrence_list = []
 
@@ -169,8 +144,9 @@ def generate_task_occurrences(task,
 
         # if we've reached our max count or if rrule_instance is
         # greater than the task_end we then break the loop
-        if len(occurrence_list) == occurrence_count or\
-         (task_end is not None and rrule_instance.date() > task_end.date()):
+        if len(occurrence_list) == occurrence_count or (
+            task_end is not None and rrule_instance.date() > task_end.date()
+        ):
             break
 
         # if end time is provided as in input use it as the_end_time
@@ -181,8 +157,7 @@ def generate_task_occurrences(task,
             # day this is because we have no information about what time the
             # task should run to on a particular day, we therefore set it to
             # the end of the day
-            this_end_time = time(
-                hour=23, minute=59, second=59, microsecond=999999)
+            this_end_time = time(hour=23, minute=59, second=59, microsecond=999999)
 
             # for the last occurrence if the end time is not none we set the
             # end date for the timing_rule this is because we believe that
@@ -199,7 +174,8 @@ def generate_task_occurrences(task,
                 task=task,
                 date=rrule_instance.date(),
                 start_time=start_time,
-                end_time=this_end_time)
+                end_time=this_end_time,
+            )
 
             occurrence_list.append(occurrence_obj)
 
@@ -211,8 +187,9 @@ def generate_task_occurrences(task,
     return OccurrenceModelClass.objects.filter(task=task)
 
 
-def generate_tasklocation_occurrences(task_location,
-                                      OccurrenceModelClass=TaskOccurrence):
+def generate_tasklocation_occurrences(  # pylint: disable=bad-continuation
+    task_location, OccurrenceModelClass=TaskOccurrence
+):
     """
     Generates TaskOccurrence objects using the TaskLocation timing_rule field
 
@@ -230,7 +207,8 @@ def generate_tasklocation_occurrences(task_location,
         timing_rule=task_location.timing_rule,
         start_time_input=task_location.start,
         end_time_input=task_location.end,
-        OccurrenceModelClass=OccurrenceModelClass)
+        OccurrenceModelClass=OccurrenceModelClass,
+    )
 
 
 def get_rrule_start(rrule_obj):
@@ -301,20 +279,20 @@ def get_shapefile(geofile):
     needed_files = {}
 
     for item in name_list:
-        if item.endswith('shp'):
-            needed_files['shp'] = item
-        elif item.endswith('dbf'):
-            needed_files['dbf'] = item
-        elif item.endswith('shx'):
-            needed_files['shx'] = item
+        if item.endswith("shp"):
+            needed_files["shp"] = item
+        elif item.endswith("dbf"):
+            needed_files["dbf"] = item
+        elif item.endswith("shx"):
+            needed_files["shx"] = item
 
-    if not needed_files.get('dbf') or not needed_files.get('shx'):
+    if not needed_files.get("dbf") or not needed_files.get("shx"):
         raise MissingFiles()
 
-    if not needed_files.get('shp'):
+    if not needed_files.get("shp"):
         raise ShapeFileNotFound()
 
-    return needed_files['shp']
+    return needed_files["shp"]
 
 
 def get_polygons(geom_object_list):
@@ -348,8 +326,8 @@ def get_polygons(geom_object_list):
                 result = _process_multipolygon(
                     multipolygon_obj=item,
                     results=result,
-                    ignore_invalid=settings.
-                    TASKING_SHAPEFILE_IGNORE_INVALID_TYPES)
+                    ignore_invalid=settings.TASKING_SHAPEFILE_IGNORE_INVALID_TYPES,
+                )
             else:
                 continue
         else:
@@ -357,8 +335,8 @@ def get_polygons(geom_object_list):
                 result = _process_multipolygon(
                     multipolygon_obj=item,
                     results=result,
-                    ignore_invalid=settings.
-                    TASKING_SHAPEFILE_IGNORE_INVALID_TYPES)
+                    ignore_invalid=settings.TASKING_SHAPEFILE_IGNORE_INVALID_TYPES,
+                )
             else:
                 result.append(item.geos)
 

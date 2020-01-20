@@ -25,7 +25,7 @@ class TestExceptions(TestCase):
         Test TargetDoesNotExist error message is what we expect
         """
         with self.assertRaises(TargetDoesNotExist) as context:
-            get_target(app_label='foo', target_type='bar')
+            get_target(app_label="foo", target_type="bar")
         the_exception = context.exception
         self.assertEqual(TARGET_DOES_NOT_EXIST, the_exception.message)
 
@@ -33,8 +33,7 @@ class TestExceptions(TestCase):
         """
         Test ShapeFileNotFound error message is what we expect
         """
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'missing_shp.zip')
+        path = os.path.join(BASE_DIR, "tests", "fixtures", "missing_shp.zip")
         zip_file = zipfile.ZipFile(path)
 
         with self.assertRaises(ShapeFileNotFound) as context:
@@ -46,8 +45,7 @@ class TestExceptions(TestCase):
         """
         Test missing .dbf file
         """
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'missing_dbf.zip')
+        path = os.path.join(BASE_DIR, "tests", "fixtures", "missing_dbf.zip")
         zip_file = zipfile.ZipFile(path)
 
         with self.assertRaises(MissingFiles) as context:
@@ -59,8 +57,7 @@ class TestExceptions(TestCase):
         """
         Test missing .shx file
         """
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'missing_shx.zip')
+        path = os.path.join(BASE_DIR, "tests", "fixtures", "missing_shx.zip")
         zip_file = zipfile.ZipFile(path)
 
         with self.assertRaises(MissingFiles) as context:
@@ -73,8 +70,7 @@ class TestExceptions(TestCase):
         """
         Test MissingFiles error message is what we expect
         """
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_missing_files.zip')
+        path = os.path.join(BASE_DIR, "tests", "fixtures", "test_missing_files.zip")
         zip_file = zipfile.ZipFile(path)
 
         with self.assertRaises(MissingFiles) as context:
@@ -87,8 +83,7 @@ class TestExceptions(TestCase):
         """
         Test UnnecessaryFiles error message is what we expect
         """
-        path = os.path.join(
-            BASE_DIR, 'tests', 'fixtures', 'test_unnecessary_files.zip')
+        path = os.path.join(BASE_DIR, "tests", "fixtures", "test_unnecessary_files.zip")
         zip_file = zipfile.ZipFile(path)
 
         with self.assertRaises(UnnecessaryFiles) as context:

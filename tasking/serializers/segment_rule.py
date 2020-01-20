@@ -21,16 +21,17 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
         """
         Meta options for SegmentRuleSerializer
         """
+
         fields = [
-            'description',
-            'active',
-            'target_content_type',
-            'target_field',
-            'target_field_value',
-            'id',
-            'created',
-            'modified',
-            'name',
+            "description",
+            "active",
+            "target_content_type",
+            "target_field",
+            "target_field_value",
+            "id",
+            "created",
+            "modified",
+            "name",
         ]
         model = SegmentRule
 
@@ -42,27 +43,23 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
         # validate that target_field is actually an existing field
         # on the target model
         if self.instance is None:
-            target_field = attrs.get('target_field')
-            target_type = attrs.get('target_content_type')
+            target_field = attrs.get("target_field")
+            target_type = attrs.get("target_content_type")
         else:
             # in this case we are editting an existing record
-            target_field = attrs.get(
-                'target_field', self.instance.target_field)
+            target_field = attrs.get("target_field", self.instance.target_field)
             target_type = attrs.get(
-                'target_content_type', self.instance.target_content_type)
+                "target_content_type", self.instance.target_content_type
+            )
 
         if not target_type or not isinstance(target_type, ContentType):
-            raise ValidationError({
-                'target_content_type': TARGET_DOES_NOT_EXIST
-            })
+            raise ValidationError({"target_content_type": TARGET_DOES_NOT_EXIST})
         target_model = target_type.model_class()
 
         try:
             # pylint: disable=protected-access
             target_model._meta.get_field(target_field)
         except FieldDoesNotExist as exception:
-            raise ValidationError({
-                'target_field': str(exception)
-            })
+            raise ValidationError({"target_field": str(exception)})
 
         return super(SegmentRuleSerializer, self).validate(attrs)

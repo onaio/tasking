@@ -15,5 +15,5 @@ class TestSegmentRule(TestCase):
         """
         Test the str method on SegmentRule model
         """
-        rule0 = mommy.make('tasking.SegmentRule', name='Rule Zero')
-        self.assertEqual('Rule Zero', rule0.__str__())
+        rule0 = mommy.make("tasking.SegmentRule", name="Rule Zero")
+        self.assertEqual("Rule Zero", rule0.__str__())

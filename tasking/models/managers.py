@@ -15,6 +15,5 @@ class TaskManager(models.Manager):
         Custom get_queryset for Task Model
         """
         queryset = super(TaskManager, self).get_queryset()
-        queryset = queryset.annotate(
-            submission_count=models.Count('submission__id'))
+        queryset = queryset.annotate(submission_count=models.Count("submission__id"))
         return queryset

@@ -8,5 +8,4 @@ from tasking.serializers.occurrence import TaskOccurrenceSerializer  # noqa
 from tasking.serializers.project import ProjectSerializer  # noqa
 from tasking.serializers.segment_rule import SegmentRuleSerializer  # noqa
 from tasking.serializers.submissions import SubmissionSerializer  # noqa
-from tasking.serializers.task import (TaskLocationSerializer,  # noqa
-                                      TaskSerializer)
+from tasking.serializers.task import TaskLocationSerializer, TaskSerializer  # noqa

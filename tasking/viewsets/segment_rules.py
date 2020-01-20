@@ -9,12 +9,18 @@ from tasking.serializers import SegmentRuleSerializer
 
 
 # pylint: disable=too-many-ancestors
-class SegmentRuleViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                         mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
-                         mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class SegmentRuleViewSet(  # pylint: disable=bad-continuation
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     """
     Viewset for segment rules
     """
+
     serializer_class = SegmentRuleSerializer
     permission_classes = [IsAuthenticated]
     queryset = SegmentRule.objects.all()  # pylint: disable=no-member

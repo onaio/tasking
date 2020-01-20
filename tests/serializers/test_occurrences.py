@@ -17,13 +17,13 @@ class TestTaskOccurrenceSerializer(TestBase):
         Test that the serializer can create TaskOccurrence objects
         """
 
-        task = mommy.make('tasking.Task')
+        task = mommy.make("tasking.Task")
 
         data = {
-            'task': task.id,
-            'date': '2018-05-24',
-            'start_time': '07:00:00',
-            'end_time': '19:00:00'
+            "task": task.id,
+            "date": "2018-05-24",
+            "start_time": "07:00:00",
+            "end_time": "19:00:00",
         }
 
         serializer_instance = TaskOccurrenceSerializer(data=data)
@@ -31,38 +31,36 @@ class TestTaskOccurrenceSerializer(TestBase):
         occurrence = serializer_instance.save()
 
         self.assertDictContainsSubset(data, serializer_instance.data)
+        self.assertEqual(occurrence.task.id, serializer_instance.data["task"])
         self.assertEqual(
-            occurrence.task.id, serializer_instance.data['task'])
-        self.assertEqual(
-            '24th May 2018, 7 a.m. to 7 p.m.',
-            serializer_instance.data['time_string'])
+            "24th May 2018, 7 a.m. to 7 p.m.", serializer_instance.data["time_string"]
+        )
 
         expected_fields = [
-            'created',
-            'modified',
-            'task',
-            'location',
-            'start_time',
-            'date',
-            'end_time',
-            'time_string',
-            'id',
+            "created",
+            "modified",
+            "task",
+            "location",
+            "start_time",
+            "date",
+            "end_time",
+            "time_string",
+            "id",
         ]
-        self.assertEqual(set(expected_fields),
-                         set(list(serializer_instance.data)))
+        self.assertEqual(set(expected_fields), set(list(serializer_instance.data)))
 
     def test_occurrence_location(self):
         """
         Test occurrence creation with location
         """
-        task = mommy.make('tasking.Task')
-        location = mommy.make('tasking.Location')
+        task = mommy.make("tasking.Task")
+        location = mommy.make("tasking.Location")
         data = {
-            'task': task.id,
-            'location': location.id,
-            'date': '2018-05-24',
-            'start_time': '07:00:00',
-            'end_time': '19:00:00'
+            "task": task.id,
+            "location": location.id,
+            "date": "2018-05-24",
+            "start_time": "07:00:00",
+            "end_time": "19:00:00",
         }
 
         serializer_instance = TaskOccurrenceSerializer(data=data)
@@ -71,10 +69,8 @@ class TestTaskOccurrenceSerializer(TestBase):
 
         self.assertDictContainsSubset(data, serializer_instance.data)
 
+        self.assertEqual(occurrence.task.id, serializer_instance.data["task"])
+        self.assertEqual(occurrence.location.id, serializer_instance.data["location"])
         self.assertEqual(
-            occurrence.task.id, serializer_instance.data['task'])
-        self.assertEqual(
-            occurrence.location.id, serializer_instance.data['location'])
-        self.assertEqual(
-            '24th May 2018, 7 a.m. to 7 p.m.',
-            serializer_instance.data['time_string'])
+            "24th May 2018, 7 a.m. to 7 p.m.", serializer_instance.data["time_string"]
+        )
