@@ -76,6 +76,7 @@ class TestSegmentRuleSerializer(TestBase):
             name="Rule Zero",
             description="Some description",
             target_content_type=self.task_type.id,
+            active=False,
             target_field="invalid_field",
             target_field_value=6,
             target_app_label="tasking",
@@ -85,5 +86,5 @@ class TestSegmentRuleSerializer(TestBase):
         self.assertFalse(instance.is_valid())
         self.assertEqual(
             "Task has no field named 'invalid_field'",
-            str(instance.errors["target_field"][0]),
+            instance.errors["target_field"][0],
         )

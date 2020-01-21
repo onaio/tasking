@@ -4,7 +4,6 @@ Tests Location viewsets.
 import os
 
 from django.test import override_settings
-from django.utils import six
 
 import pytz
 from model_mommy import mommy
@@ -117,9 +116,7 @@ class TestLocationViewSet(TestBase):
                 response = view(request=request)
                 self.assertEqual(response.status_code, 400)
                 self.assertIn("shapefile", response.data.keys())
-                self.assertEqual(
-                    INVALID_SHAPEFILE, six.text_type(response.data["shapefile"][0])
-                )
+                self.assertEqual(INVALID_SHAPEFILE, response.data["shapefile"][0])
 
             # should work
             with self.settings(TASKING_SHAPEFILE_ALLOW_NESTED_MULTIPOLYGONS=True):
@@ -151,9 +148,7 @@ class TestLocationViewSet(TestBase):
                 response = view(request=request)
                 self.assertEqual(response.status_code, 400)
                 self.assertIn("shapefile", response.data.keys())
-                self.assertEqual(
-                    INVALID_SHAPEFILE, six.text_type(response.data["shapefile"][0])
-                )
+                self.assertEqual(INVALID_SHAPEFILE, response.data["shapefile"][0])
 
             # should work
             with self.settings(TASKING_SHAPEFILE_IGNORE_INVALID_TYPES=True):
