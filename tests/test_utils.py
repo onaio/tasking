@@ -4,6 +4,7 @@ Tests for tasking utils
 import os
 import zipfile
 from datetime import datetime, time, timedelta
+from tempfile import TemporaryDirectory
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.gdal import DataSource, geometries
@@ -12,7 +13,6 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 
 import pytz
-from tempfile import TemporaryDirectory
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 from model_mommy import mommy

@@ -1,4 +1,9 @@
 repos:
+-   repo: https://github.com/timothycrosley/isort
+    rev: 4.3.21-2
+    hooks:
+    -   id: isort
+        exclude: migrations
 -   repo: https://github.com/psf/black
     rev: 19.10b0
     hooks:

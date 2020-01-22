@@ -5,11 +5,11 @@ import logging
 import zipfile
 from io import BytesIO
 from os import path
+from tempfile import TemporaryDirectory
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
 
-from tempfile import TemporaryDirectory
 from django_countries import Countries
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometryField

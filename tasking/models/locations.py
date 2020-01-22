@@ -1,11 +1,12 @@
 """
 Module for the Location model(s)
 """
+from django.contrib.gis.db import models
+from django.utils.translation import ugettext as _
+
 from django_countries.fields import CountryField
 from mptt.models import MPTTModel, TreeForeignKey
 
-from django.contrib.gis.db import models
-from django.utils.translation import ugettext as _
 from tasking.models.base import GeoTimeStampedModel
 
 

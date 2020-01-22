@@ -1,11 +1,11 @@
 """
 Tests Task viewsets.
 """
+import json
 from datetime import timedelta
 
 from django.utils import timezone
 
-import json
 import pytz
 from dateutil.parser import parse
 from model_mommy import mommy

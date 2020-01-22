@@ -2,9 +2,9 @@
 """
 Module for the Task Submission model(s)
 """
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext as _
-from django.contrib.auth import get_user_model
 
 from tasking.models.base import GenericFKModel, TimeStampedModel
 

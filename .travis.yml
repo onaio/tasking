@@ -20,6 +20,8 @@ matrix:
         - python: 3.6
           env: TOXENV=pylint
         - python: 3.6
+          env: TOXENV=isort
+        - python: 3.6
           env: TOXENV=black
 services:
     - postgresql

@@ -2,12 +2,12 @@
 TaskOccurrence viewsets
 """
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters
+from rest_framework import filters, viewsets
 from rest_framework.permissions import IsAuthenticated
 
+from tasking.filters import TaskOccurrenceFilterSet
 from tasking.models import TaskOccurrence
 from tasking.serializers import TaskOccurrenceSerializer
-from tasking.filters import TaskOccurrenceFilterSet
 
 
 # pylint: disable=too-many-ancestors
