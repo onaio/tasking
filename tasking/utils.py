@@ -3,16 +3,21 @@
 Utility functions for tasking
 """
 import operator
-from datetime import time
+from datetime import datetime, time
 from functools import reduce
+from typing import Iterator, List, Optional, Union
+from zipfile import ZipFile
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.gdal import geometries
+from django.contrib.gis.gdal.geometries import MultiPolygon, Polygon
 from django.db.models import Q
+from django.db.models.base import ModelBase
+from django.db.models.query import QuerySet
 from django.utils import timezone
 
-from dateutil.rrule import rrulestr
+from dateutil.rrule import rrule, rrulestr
 
 from tasking.exceptions import (
     MissingFiles,
@@ -21,6 +26,7 @@ from tasking.exceptions import (
     UnnecessaryFiles,
 )
 from tasking.models import TaskOccurrence
+from tasking.models.tasks import Task
 
 DEFAULT_ALLOWED_CONTENTTYPES = [
     {"app_label": "tasking", "model": "task"},
@@ -41,7 +47,9 @@ ALLOWED_CONTENTTYPES = getattr(
 MAX_OCCURRENCES = getattr(settings, "TASKING_MAX_OCCURRENCES", 500)
 
 
-def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
+def get_allowed_contenttypes(  # pylint: disable=bad-continuation
+    allowed_content_types: List = ALLOWED_CONTENTTYPES,
+) -> QuerySet:
     """
     Returns a queryset of allowed content_types
     """
@@ -54,7 +62,7 @@ def get_allowed_contenttypes(allowed_content_types=ALLOWED_CONTENTTYPES):
     return ContentType.objects.none()
 
 
-def get_occurrence_start_time(the_rrule, start_time_input=None):
+def get_occurrence_start_time(the_rrule: rrule, start_time_input=None) -> time:
     """
     Get the start time used to create a task occurrence
     """
@@ -69,7 +77,9 @@ def get_occurrence_start_time(the_rrule, start_time_input=None):
     return start_time
 
 
-def get_occurrence_end_time(task, the_rrule, end_time_input=None):
+def get_occurrence_end_time(  # pylint: disable=bad-continuation
+    task: Task, the_rrule: rrule, end_time_input=None
+) -> Optional[time]:
     """
     Get the end time used to create a task occurrence
     """
@@ -90,12 +100,12 @@ def get_occurrence_end_time(task, the_rrule, end_time_input=None):
 
 # pylint: disable=invalid-name
 def generate_task_occurrences(  # pylint: disable=bad-continuation
-    task,
-    timing_rule,
-    start_time_input=None,
-    end_time_input=None,
-    OccurrenceModelClass=TaskOccurrence,
-):
+    task: Task,
+    timing_rule: str,
+    start_time_input: Optional[time] = None,
+    end_time_input: Optional[time] = None,
+    OccurrenceModelClass: ModelBase = TaskOccurrence,
+) -> QuerySet:
     """
     Generates TaskOccurrence objects using the Task timing_rule field
 
@@ -137,7 +147,7 @@ def generate_task_occurrences(  # pylint: disable=bad-continuation
 
     end_time = get_occurrence_end_time(task, the_rrule, end_time_input=end_time_input)
 
-    occurrence_list = []
+    occurrence_list: List[object] = []
 
     # lets loop through all datetimes in the rrule
     for rrule_instance in the_rrule:
@@ -211,25 +221,25 @@ def generate_tasklocation_occurrences(  # pylint: disable=bad-continuation
     )
 
 
-def get_rrule_start(rrule_obj):
+def get_rrule_start(rrule_obj: rrule) -> datetime:
     """
     Returns the timezone-aware start datetime from rrule
     """
     # pylint: disable=protected-access
-    start = rrule_obj._dtstart
+    start = rrule_obj._dtstart  # type: ignore
     if timezone.is_naive(start):
         return timezone.make_aware(start)
     return start
 
 
-def get_rrule_end(rrule_obj):
+def get_rrule_end(rrule_obj: rrule) -> Optional[datetime]:
     """
     Returns the timezone-aware end datetime from rrule
     """
     # pylint: disable=protected-access
-    until = rrule_obj._until
+    until = rrule_obj._until  # type: ignore
     # pylint: disable=protected-access
-    count = rrule_obj._count
+    count = rrule_obj._count  # type: ignore
 
     if until is not None:
         # if until is set let us use it
@@ -249,7 +259,7 @@ def get_rrule_end(rrule_obj):
     return end
 
 
-def get_target(app_label, target_type):
+def get_target(app_label: str, target_type: str) -> ContentType:
     """
     Returns the target_type
     """
@@ -259,7 +269,7 @@ def get_target(app_label, target_type):
         raise TargetDoesNotExist()
 
 
-def get_shapefile(geofile):
+def get_shapefile(geofile: ZipFile) -> str:
     """
     Returns the filename of ShapeFile
     """
@@ -295,7 +305,7 @@ def get_shapefile(geofile):
     return needed_files["shp"]
 
 
-def get_polygons(geom_object_list):
+def get_polygons(geom_object_list: Union[Iterator, List[Polygon]]) -> List[Polygon]:
     """
     Takes a geom object list and returns polygons, runs recursively
 
@@ -304,7 +314,9 @@ def get_polygons(geom_object_list):
     :return: list of Polygon objects
     """
 
-    def _process_multipolygon(multipolygon_obj, results, ignore_invalid):
+    def _process_multipolygon(  # pylint: disable=bad-continuation
+        multipolygon_obj: MultiPolygon, results: List[Polygon], ignore_invalid: bool
+    ) -> List[Polygon]:
         """
         Process multipolygon object
         """

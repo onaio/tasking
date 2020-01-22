@@ -20,6 +20,9 @@ tblib = "*"
 mock = "*"
 pre-commit = "*"
 black = "==19.10b0"
+mypy = "*"
+djangorestframework-stubs = "*"
+django-stubs = "*"
 
 [packages]
 e1839a8 = {editable = true,path = "."}

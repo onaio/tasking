@@ -1,8 +1,13 @@
 """
 Tasking Serializers
 """
+from collections import OrderedDict
+from datetime import datetime
+from typing import Any, Dict, Optional
+
 from dateutil.rrule import rrulestr
 from rest_framework import serializers
+from rest_framework.utils.serializer_helpers import ReturnList
 
 from tasking.common_tags import (
     INVALID_END_DATE,
@@ -16,7 +21,7 @@ from tasking.utils import get_rrule_end, get_rrule_start
 from tasking.validators import validate_rrule
 
 
-def check_timing_rule(value):
+def check_timing_rule(value: str) -> str:
     """
     Validate timing rule
     """
@@ -48,7 +53,7 @@ class TaskLocationSerializer(serializers.ModelSerializer):
         ]
 
     # pylint: disable=no-self-use
-    def validate_timing_rule(self, value):
+    def validate_timing_rule(self, value: str) -> str:
         """
         Validate timing rule
         """
@@ -122,13 +127,13 @@ class TaskSerializer(GenericForeignKeySerializer):
         model = Task
 
     # pylint: disable=no-self-use
-    def validate_timing_rule(self, value):
+    def validate_timing_rule(self, value: str) -> str:
         """
         Validate timing rule
         """
         return check_timing_rule(value)
 
-    def validate(self, attrs):
+    def validate(self, attrs: OrderedDict) -> OrderedDict:
         """
         Object level validation method for TaskSerializer
         """
@@ -143,14 +148,14 @@ class TaskSerializer(GenericForeignKeySerializer):
             for location_input in attrs.get("locations_input", []):
                 tasklocation_timing_rules.append(location_input["timing_rule"])
 
-            # get start and end from timing rules
+            timing_rule_start: Optional[datetime] = None
+            timing_rule_end: Optional[datetime] = None
+
+            # get start and end from timing rule if present
             timing_rule = attrs.get("timing_rule")
             if timing_rule is not None:
                 timing_rule_start = get_rrule_start(rrulestr(timing_rule))
                 timing_rule_end = get_rrule_end(rrulestr(timing_rule))
-            else:
-                timing_rule_start = None
-                timing_rule_end = None
 
             if not start_from_input:
                 # start was not input by user, we try and generate it from
@@ -191,7 +196,7 @@ class TaskSerializer(GenericForeignKeySerializer):
 
         return super(TaskSerializer, self).validate(attrs)
 
-    def get_submission_count(self, obj):
+    def get_submission_count(self, obj: Task) -> int:
         """
         Add a custom method to get submission count
         """
@@ -200,7 +205,7 @@ class TaskSerializer(GenericForeignKeySerializer):
         except AttributeError:
             return obj.submissions
 
-    def get_task_locations(self, obj):
+    def get_task_locations(self, obj: Task) -> ReturnList:
         """
         Get serialized TaskLocation objects
         """
@@ -208,7 +213,7 @@ class TaskSerializer(GenericForeignKeySerializer):
         queryset = TaskLocation.objects.filter(task=obj)
         return TaskLocationSerializer(queryset, many=True).data
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, Any]) -> Task:
         """
         Custom create method for Tasks
         """
@@ -224,7 +229,7 @@ class TaskSerializer(GenericForeignKeySerializer):
 
         return task
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Task, validated_data: Dict[str, Any]) -> Task:
         """
         Custom update method for Tasks
         """

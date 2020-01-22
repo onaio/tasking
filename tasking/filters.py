@@ -1,8 +1,11 @@
 """
 Module containing the Filters for tasking app
 """
+from django.db.models.query import QuerySet
+
 from django_filters import rest_framework as rest_filters
 from rest_framework import filters
+from rest_framework.request import Request
 
 from tasking.models import Task, TaskOccurrence
 
@@ -57,7 +60,9 @@ class TaskOccurenceFilter(filters.BaseFilterBackend):
     Task filter backend that filters the TaskOccurences
     """
 
-    def filter_queryset(self, request, queryset, view):
+    def filter_queryset(  # pylint: disable=bad-continuation
+        self, request: Request, queryset: QuerySet, view,
+    ) -> QuerySet:
         query_params = request.query_params
         query_param_keys = query_params.keys()
         filter_args = {}

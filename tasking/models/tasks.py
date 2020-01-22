@@ -208,14 +208,14 @@ class Task(BaseTask):
         return f"{self.name} - {self.pk}"
 
     # pylint: disable=no-member
-    def get_submissions(self):
+    def get_submissions(self) -> int:
         """
         Custom method to get number of submissions
         """
         return self.submission_set.count()
 
     @property
-    def submissions(self):
+    def submissions(self) -> int:
         """
         Number of Submissions made for this task
         """
