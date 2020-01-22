@@ -6,11 +6,19 @@ import zipfile
 
 from django.test import TestCase, override_settings
 
-from tasking.common_tags import TARGET_DOES_NOT_EXIST, NO_SHAPEFILE
-from tasking.common_tags import UNNECESSARY_FILE, MISSING_FILE
-from tasking.exceptions import TargetDoesNotExist, ShapeFileNotFound
-from tasking.exceptions import MissingFiles, UnnecessaryFiles
-from tasking.utils import get_target, get_shapefile
+from tasking.common_tags import (
+    MISSING_FILE,
+    NO_SHAPEFILE,
+    TARGET_DOES_NOT_EXIST,
+    UNNECESSARY_FILE,
+)
+from tasking.exceptions import (
+    MissingFiles,
+    ShapeFileNotFound,
+    TargetDoesNotExist,
+    UnnecessaryFiles,
+)
+from tasking.utils import get_shapefile, get_target
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 

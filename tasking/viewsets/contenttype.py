@@ -4,8 +4,8 @@ ContentType viewsets
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from tasking.utils import get_allowed_contenttypes
 from tasking.serializers import ContentTypeSerializer
+from tasking.utils import get_allowed_contenttypes
 
 
 # pylint: disable=too-many-ancestors

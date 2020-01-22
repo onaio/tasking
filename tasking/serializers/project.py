@@ -2,7 +2,6 @@
 Project Serializers
 """
 from tasking.models import Project
-
 from tasking.serializers.base import GenericForeignKeySerializer
 
 

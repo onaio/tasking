@@ -2,7 +2,7 @@
 Submission viewsets
 """
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, viewsets, filters
+from rest_framework import filters, mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from tasking.models import Submission

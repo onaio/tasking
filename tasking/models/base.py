@@ -3,8 +3,8 @@ Base Tasking Models
 """
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
 from django.contrib.gis.db import models as geomodels
+from django.db import models
 from django.utils.translation import ugettext as _
 
 

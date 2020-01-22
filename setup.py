@@ -1,7 +1,7 @@
 """
 Setup.py for ona tasking
 """
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="ona-tasking",

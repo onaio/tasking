@@ -3,9 +3,9 @@ Submission Serializers
 """
 from rest_framework import serializers
 
+from tasking.common_tags import CANT_EDIT_TASK
 from tasking.models import Submission
 from tasking.serializers.base import GenericForeignKeySerializer
-from tasking.common_tags import CANT_EDIT_TASK
 
 
 class SubmissionSerializer(GenericForeignKeySerializer):
