@@ -26,7 +26,7 @@ $ pipenv install -e git+https://github.com/onaio/tasking.git#egg=ona-tasking
 Optionally, you can install a specific tag or branch like this:
 
 ```sh
-pipenv install -e git+https://github.com/onaio/tasking.git@<tag_number OR branch_name>#egg=ona-tasking
+$ pipenv install -e git+https://github.com/onaio/tasking.git@<tag_number OR branch_name>#egg=ona-tasking
 ```
 
 Then add the following to your `INSTALLED_APPS`:
