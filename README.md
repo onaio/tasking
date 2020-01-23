@@ -1,64 +1,84 @@
-# ona-tasking
+# Ona Tasking
 
 [![Build Status](https://travis-ci.org/onaio/tasking.svg?branch=master)](https://travis-ci.org/onaio/tasking)
 
-A Django app that adds tasking to your Django project.
+Ona-tasking is a Django application that allows users to implement tasking.
 
-**Table of Contents**
+_We define tasking as an activity where you assign tasks to users, who then make submissions._
 
-* [Design guidelines](https://github.com/onaio/tasking/blob/master/docs/design.md)
-* [Contribution guidelines](http://github.com/onaio/tasking/blob/master/CONTRIBUTING.md)
-* [Installation](https://github.com/onaio/tasking/blob/master/docs/installation.md)
-* [Architecture](https://github.com/onaio/tasking/blob/master/docs/architecture.md)
-* [Usage](https://github.com/onaio/tasking/blob/master/docs/usage.md)
-* [What is tasking?](https://github.com/onaio/tasking#what-is-tasking)
-* [Testing](https://github.com/onaio/tasking#testing)
+Full documentation [here](https://github.com/onaio/tasking/tree/master/docs).
 
-## What is tasking?
+## Requirements
 
-We define tasking as an activity where you assign tasks to users, who then make task submissions.
+- Python: 3.6, 3.7, 3.8
+- Django: 2.2, 3.0
 
-Some definitions:
+*Optional:* Ona-tasking was tested with [PostGIS](https://docs.djangoproject.com/en/3.0/ref/contrib/gis/install/postgis/) as the database backend. We recommend that you utilize PostGIS.
 
-### Task
+## Installation
 
-A piece of work to be done or undertaken.
-
-Tasks are usually very specific to one's own needs.  For instance, one task might be to fill in a form for a survey, while another may be to fix a broken car.
-
-ona-tasking tries to implement tasks in an abstract and extensible way so that you can integrate them easily into your own project.
-
-This is done by implementing:
-
-* a concrete `Task` model class that has minimal tasking features that you can use right out of the box to represent a Task
-* an abstract `BaseTask` model class that you can inherit and do with as you please
-* utility functions to aid in tasking
-
-### User
-
-A person who does a task.
-
-ona-tasking assumes that a user is a Django user - either an instance of the `django.contrib.auth.models.User` class, or your own `User` class.
-
-### Task Submission
-
-Once a user does a task, this is what they submit.  It can then be validated and verified to ascertain that it meets the requirements of the task.
-
-Because tasks can be varied in how they actually work, task submissions can be very different depending on your particular use-case.  Similar to Tasks above, we have:
-
-* a `Submission` model that you can use straight out of the box.  It only includes minimal features, however.
-* an abstract `BaseSubmission` model class that you can inherit and extend
-
----
-
-Therefore, ona-tasking gives you the ability to create tasks.  Users can do these tasks and then make submissions to you.  You can then approve/reject these task submissions.
-
-## Testing
+Install using pipenv:
 
 ```sh
+$ pipenv install -e git+https://github.com/onaio/tasking.git#egg=ona-tasking
+```
 
-pip install -U tox
+Optionally, you can install a specific tag or branch like this:
 
-tox
+```sh
+pipenv install -e git+https://github.com/onaio/tasking.git@<tag_number OR branch_name>#egg=ona-tasking
+```
+
+Then add the following to your `INSTALLED_APPS`:
 
 ```
+[
+...
+# Third Party Packages required by ona-tasking
+'django_countries',
+'django_filters',
+'mptt',
+'rest_framework',
+'rest_framework_gis',
+# ona-tasking
+'tasking.apps.TaskingConfig',
+]
+```
+
+## Usage
+
+Ona-tasking provides a good base for implementing tasking into your project. Here is a small example on how this can be done.
+
+```python
+...
+from tasking.models import BaseTask
+
+
+# Custom Task Model for application
+class TodoTask(BaseTask):
+    creator = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    assignee = models.ForeignKey(
+        'auth.User', on_delete=models.SET_NULL, null=True, blank=True, default=None)
+
+    class Meta:
+        abstract = False
+
+...
+
+def create_task(request):
+    assignee = request.POST['assignee']
+    task = TodoTask.objects.create(
+        assignee=assignee,
+        creator=request.user,
+        name='Fetch milk',
+        description='Please buy 30 litres of milk and deliver them to my house',
+        start=datetime.now()
+    )
+    return redirect('task_detail', task_id=task)
+```
+
+The example above depicts a small part of the available models and API in the package. Read more about what's provided by the package in our [docs](https://github.com/onaio/tasking/tree/master/docs).
+
+## Contributing
+
+Contributions are wholeheartedly welcome. Please have a look at our [contribution guidelines](https://github.com/onaio/tasking/blob/master/CONTRIBUTING.md) before contributing.
