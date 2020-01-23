@@ -1,20 +1,46 @@
 # Submissions
 
-Model used to implement Submissions.
+Model representing a submission. A submission is a ...
 
 ## BaseSubmission
 
-Abstract class that contains the bare minimum for implementation of Submission. Inherits from GeneralFKModel and TimeStamped Model.
+Abstract class implementing submissions.
 
-  - `user`: *integer*, is the unique identifier for a User. **Required** on object initialization.
-  - `submission_time`: *Date and Time*, is the date and time a task was submitted. **Required** on object initialization.
-  - `valid`: *boolean*, represents whether a submission is valid or not. It Defaults to False on Initialization of an Object.
-  - `status`: *string*, is the status of a submission. It can be either APPROVED, REJECTED, UNDER REVIEW or PENDING REVIEW. It Defaults to PENDING REVIEW on Initialization of an Object.
-  - `comments`: *string*.
+_This class inherits from the `GenericFKModel` as such it is able to link to a specific `target` of which we assume is going to be the submission data._
+
+Inherits:
+```
+tasking.models.base.GenericFKModel
+tasking.models.base.TimeStampedModel
+django.db.models.Model
+```
+
+---
+
+  * user `ForeignKey` - _required_ The user who has submitted the submission.
+  * submission_time `DateTimeField` - _required_ The date and time the submission was made.
+  * valid `BooleanField`: _Defaults to False_. The validity of the submission.
+  * status `CharField`: The status of a submission. It can be either APPROVED, REJECTED, UNDER REVIEW or PENDING REVIEW. It Defaults to PENDING REVIEW on Initialization of an Object.
+  * comments `TextField`: The comments given by the reviewer or the requester to the user who created the submission.
 
 ## Submission
 
-Class that inherits from BaseSubmission and adds linking between a Task and Submission as well as Location and Submission.
+Concrete class implementing submissions. This implementation of submissions is more focused on recording and tracking location sensitive submissions for a task.
 
-  - `task`: *integer*, is a foreign key that links a Task object to a submission. **Required** on object initialization.
-  - `location`: *integer*, is a foreign key that links a Location object to a submission. **Required** on object initialization.
+Inherits:
+```
+BaseSubmission
+```
+
+---
+
+  * task `ForeignKey`: _required_ The task of which the submission is being submitted to.
+  * location `ForeignKey`: The location the submission was made in.
+
+### Methods
+
+- `get_approved(status)`: Determines whether the status falls under the approved statuses.
+
+### Properties
+
+- approved `Boolean`: Whether the submission has been approved or not.
