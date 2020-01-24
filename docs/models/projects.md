@@ -1,24 +1,32 @@
 # Projects
 
-Projects hold tasks within an organization. You can think of them as folders/directories.
+Model used to represent projects. Projects can be a collection of things i.e tasks, locations, submissions etc.
+
+Projects provide an easy way to categorize other objects within your application.
 
 ## BaseProject
-Abstract class for projects
+
+Abstract class implementing projects
 
 Inherits:
 ```
+mptt.models.MPTTModel
+tasking.models.base.GeoTimeStampedModel
+django.db.models.Model
 ```
 
 ---
-  * name `CharField` - name of the project
+  * name `CharField` - _required_ Name of the project.
 
 
 ## Project
-Concrete class implementing projects.
+
+Concrete class for projects. This implementation of projects is more focused towards a collection of tasks.
+
 Inherits:
 ```
 BaseProject
 ```
 
 ---
-  * tasks `ManyToManyField` - ids of the tasks contained within the project.
+  * tasks `ManyToManyField` - All tasks stored in the project.

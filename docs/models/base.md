@@ -1,32 +1,36 @@
 # Base
 
-Abstract classes needed by other models in Kaznet.
-
-## GeoTimeStampedModel
-Re-export timestamp model from django model as well as other geo django apis and fields.
-Inherits:
-```
-django.contrib.gis.db.Models
-```
-
----
-  * created `DateTimeField` - _auto added_ creation date and time for a record
-  * modified `DateTimeField` - _auto added_ modification  last modified date and time for a record
-
+Abstract classes needed by other models in Ona Tasking.
 
 ## TimeStampedModel
-Abstract class to provide creation and modification datetimes for records in subclasses.
+
+Abstract model class that provides the `created` and `modified` datetimes for records.
+
 Inherits:
 ```
 django.db.models
 ```
 
 ---
-  * created `DateTimeField` - _auto added_ creation date and time for a record
-  * modified `DateTimeField` - _auto added_ modification  last modified date and time for a record
+  * created `DateTimeField` - _auto added_ The date and time the record was created.
+  * modified `DateTimeField` - _auto added_ The date and time the record was last modified.
+
+## GeoTimeStampedModel
+
+Abstract model class that re-exports the TimeStampedmodel with GeoDjango APIs and fields.
+
+Inherits:
+```
+django.contrib.gis.db.Models
+```
+
+---
+  * created `DateTimeField` - _auto added_ The date and time the record was created.
+  * modified `DateTimeField` - _auto added_ The date and time the record was last modified.
 
 
 ## GenericFKModel
+
 Generic class to DRY out references to other models.
 We use [django's contenttypes framework](https://docs.djangoproject.com/en/2.0/ref/contrib/contenttypes)
 to create [generic relations](https://docs.djangoproject.com/en/2.0/ref/contrib/contenttypes/#generic-relations)
@@ -38,6 +42,6 @@ django.db.models
 ```
 
 ---
-  * target_content_type `ForeignKey` -
-  * target_object_id `PositiveIntegerField` -
-  * target_content_object `GenericForeignKey` - actual foreign key reference to another model
+  * target_content_type `ForeignKey` - The [content type](https://docs.djangoproject.com/en/3.0/ref/contrib/contenttypes/#the-contenttype-model) of the object being linked.
+  * target_object_id `PositiveIntegerField` - The unique identification of the object.
+  * target_content_object `GenericForeignKey` - The actual foreign key reference to another model.
