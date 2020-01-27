@@ -1,6 +1,8 @@
 """
 Base Serializers
 """
+from collections import OrderedDict
+
 from rest_framework import serializers
 
 from tasking.common_tags import TARGET_DOES_NOT_EXIST
@@ -25,7 +27,7 @@ class GenericForeignKeySerializer(ContentTypeFieldSerializer):
 
     target_id = serializers.IntegerField(source="target_object_id")
 
-    def validate(self, attrs):
+    def validate(self, attrs: OrderedDict) -> OrderedDict:
         """
         Validate target id
         """

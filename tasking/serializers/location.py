@@ -3,15 +3,19 @@ Location Serializers
 """
 import logging
 import zipfile
+from collections import OrderedDict
 from io import BytesIO
 from os import path
 from tempfile import TemporaryDirectory
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import MultiPolygon, Point
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from django_countries import Countries
+from django_countries.fields import Country
 from rest_framework import serializers
+from rest_framework_gis.fields import GeoJsonDict
 from rest_framework_gis.serializers import GeometryField
 
 from tasking.common_tags import (
@@ -33,7 +37,9 @@ class ShapeFileField(GeometryField):
     Custom Field for Shapefile
     """
 
-    def to_internal_value(self, value):  # pylint: disable=too-many-locals
+    def to_internal_value(
+        self, value: InMemoryUploadedFile  # pylint: disable=bad-continuation
+    ) -> MultiPolygon:  # pylint: disable=too-many-locals
         """
         Custom Conversion for shapefile field
         """
@@ -91,7 +97,7 @@ class ShapeFileField(GeometryField):
 
         return multipolygon
 
-    def to_representation(self, value):
+    def to_representation(self, value: MultiPolygon) -> GeoJsonDict:
         """
         Custom conversion to representation for ShapeFileField
         """
@@ -105,7 +111,7 @@ class GeopointField(GeometryField):
     Custom Field for Geopoint
     """
 
-    def to_internal_value(self, value):
+    def to_internal_value(self, value: str) -> Point:
         """
         Custom conversion for GeopointField
         """
@@ -140,7 +146,7 @@ class SerializableCountryField(serializers.ChoiceField):
     Custom Serialization for Country Field
     """
 
-    def to_representation(self, value):
+    def to_representation(self, value: Country) -> str:
         """
         Custom conversion to representation for Country Field
         """
@@ -161,7 +167,7 @@ class LocationSerializer(serializers.ModelSerializer):
     shapefile = ShapeFileField(required=False)
     geopoint = GeopointField(required=False)
 
-    def validate(self, attrs):
+    def validate(self, attrs: OrderedDict) -> OrderedDict:
         """
         Custom Validation for Location Serializer
         """

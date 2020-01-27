@@ -1,6 +1,8 @@
 """
 SegmentRule Serializers
 """
+from collections import OrderedDict
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
 
@@ -35,7 +37,7 @@ class SegmentRuleSerializer(ContentTypeFieldSerializer):
         ]
         model = SegmentRule
 
-    def validate(self, attrs):
+    def validate(self, attrs: OrderedDict) -> OrderedDict:
         """
         Custom validation for SegmentRuleSerializer
         """

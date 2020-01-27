@@ -4,11 +4,16 @@ Signals for tasking
 These signals are not connected by default, you will have to connect them
 'manually' in your own code
 """
+from mptt.models import MPTTModelBase
+
+from tasking.models.tasks import Task
 from tasking.utils import generate_task_occurrences
 
 
 # pylint: disable=unused-argument
-def create_occurrences(sender, instance, created, **kwargs):
+def create_occurrences(  # pylint: disable=bad-continuation
+    sender: MPTTModelBase, instance: Task, created: bool, **kwargs
+) -> None:
     """
     Create occurrences when a task timing_rule changes
     """

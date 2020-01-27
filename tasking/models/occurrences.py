@@ -68,7 +68,7 @@ class TaskOccurrence(BaseOccurrence):
             )
         return f"{self.task.name} - {self.get_timestring()}"
 
-    def get_timestring(self):
+    def get_timestring(self) -> str:
         """
         Returns a nice human-readable string that represents that date, start
         and end time

@@ -4,7 +4,7 @@ Tasking validators
 from dateutil.rrule import rrulestr
 
 
-def validate_rrule(rule_string):
+def validate_rrule(rule_string: str) -> bool:
     """
     Validates an rrule string; returns True or False
     """

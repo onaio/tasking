@@ -33,7 +33,7 @@ class TaskOccurrenceSerializer(serializers.ModelSerializer):
         ]
 
     # pylint: disable=no-self-use
-    def get_time_string(self, obj):
+    def get_time_string(self, obj: TaskOccurrence) -> str:
         """
         Returns a friendly human-readable description of the occurrence
         date and times

@@ -2,6 +2,8 @@
 """
 Module for the Task Submission model(s)
 """
+from typing import Optional
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext as _
@@ -110,19 +112,19 @@ class Submission(BaseSubmission):
         """
         return f"{self.task} submission {self.pk}"
 
-    def get_approved(self, status):
+    def get_approved(self, status: str) -> Optional[bool]:
         """
         Class method that gets the value of approved property
         """
-        if status == self.APPROVED:
+        if status == self.APPROVED:  # pylint: disable=no-else-return
             return True
-        if status == self.REJECTED:
+        elif status == self.REJECTED:
             return False
 
         return None
 
     @property
-    def approved(self):
+    def approved(self) -> Optional[bool]:
         """
         Approved class property for submission
         """

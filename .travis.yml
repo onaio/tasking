@@ -23,6 +23,8 @@ matrix:
           env: TOXENV=isort
         - python: 3.6
           env: TOXENV=black
+        - python: 3.6
+          env: TOXENV=mypy
 services:
     - postgresql
 addons:

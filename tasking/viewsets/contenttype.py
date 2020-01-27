@@ -1,6 +1,8 @@
 """
 ContentType viewsets
 """
+from django.db.models.query import QuerySet
+
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -18,6 +20,6 @@ class ContentTypeViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = get_allowed_contenttypes()
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = super(ContentTypeViewSet, self).get_queryset()
         return queryset.order_by("app_label", "model")

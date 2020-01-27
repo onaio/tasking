@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from tasking.common_tags import CANT_EDIT_TASK
 from tasking.models import Submission
+from tasking.models.tasks import Task
 from tasking.serializers.base import GenericForeignKeySerializer
 
 
@@ -13,7 +14,7 @@ class SubmissionSerializer(GenericForeignKeySerializer):
     Submission serializer class
     """
 
-    def validate_task(self, value):
+    def validate_task(self, value: Task) -> Task:
         """
         Validate Task
         """
